@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 let map = {};
+let turn = true;
 
 const SIZE = 8;
 const S_SIZE = 40;
@@ -122,11 +123,13 @@ class Square extends React.Component {
 				padding: 0
 			}} onClick={
 				() => {
-					if (document.getElementById(this.props.x + "_" + this.props.y).style.background != 'black') {
+					if (this.state.value == 0) {
 						this.setState({
-							value: setValue(this.props.x, this.props.y, (getValue(this.props.x, this.props.y) + 1) % 3)
+							value: setValue(this.props.x, this.props.y, turn ? 1 : 2)
 						});
 						checkWin(this.props.x, this.props.y);
+						turn = !turn;
+						board.forceUpdate();
 					}
 				}
 			}>{this.state.value == 1 ? "○" : this.state.value == 2 ? "❌" : ""}</button>
@@ -224,9 +227,10 @@ class Board extends React.Component {
 					top: 50,
 					left: 50,
 					overflow: 'auto',
-					width: 'calc(100% - 100px)',
-					height: 'calc(100% - 100px)',
-					background: '#ccc'
+					width: 'calc(100% - 104px)',
+					height: 'calc(100% - 104px)',
+					background: '#ccc',
+					border: (turn ? '2px solid blue' : '2px solid red')
 				}}>
 					{this.state.chunks}
 				</div>
