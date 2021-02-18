@@ -7,22 +7,41 @@
     scrollbar-width   : none !important;
 }
 
-button {
+.square {
     position        : absolute;
     background-color: #fff;
-    font-weight     : bolder;
     border          : 0.5px solid #000;
     border-radius   : 0;
     margin          : 0;
     padding         : 0;
-    font-family     : monospace;
-    text-align      : 'center';
 }
 
-button:hover {
+.square:hover {
     background-color: #ffa;
 }
 
 .win-square {
     background-color: #000;
+}
+
+.win-square:hover {
+    background-color: #000;
+}
+
+.icon {
+    margin     : auto;
+    display    : block;
+    height     : 100%;
+    width      : 100%;
+    text-align : center;
+    font-family: monospace;
+}
+
+*,
+*:before,
+*:after {
+    -webkit-user-select: none;
+    -moz-user-select   : none;
+    -ms-user-select    : none;
+    user-select        : none;
 }

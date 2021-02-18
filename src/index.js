@@ -171,12 +171,12 @@ class Square extends React.Component {
 	}
 	render() {
 		return (
-			<button id={this.props.x + "_" + this.props.y} style={{
+			<div className="square" id={this.props.x + "_" + this.props.y} style={{
 				top: flatten(this.props.y, SIZE) * S_SIZE,
 				left: flatten(this.props.x, SIZE) * S_SIZE,
 				width: S_SIZE,
 				height: S_SIZE,
-				fontSize: S_SIZE * 0.75,
+				fontSize: S_SIZE * 0.78,
 				color: (this.state.value == 1 ? "blue" : "red")
 			}} onClick={
 				() => {
@@ -195,7 +195,7 @@ class Square extends React.Component {
 						}
 					}
 				}
-			}>{this.state.value == 1 ? "○" : this.state.value == 2 ? "❌" : ""}</button>
+			}><div className="icon">{this.state.value == 1 ? "○" : this.state.value == 2 ? "✕" : ""}</div></div>
 		)
 	}
 }
@@ -340,7 +340,7 @@ const board = ReactDOM.render(
 
 const params = new URLSearchParams(window.location.search);
 
-if (params.get('win') !== null) {
+if (params.get('win') != null) {
 	winLength = parseInt(params.get('win'));
 }
 
