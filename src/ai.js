@@ -234,7 +234,7 @@ export class Fuzzy {
 		});
 
 		let select;
-		if (defenseHighest > Math.floor(this.winLength / 2) && attackHighest <= this.winLength - 2)
+		if (defenseHighest > this.winLength / 2 && attackHighest <= this.winLength - 2)
 			select = defenseHighs[Math.floor(Math.random() * defenseHighs.length)];
 		else
 			select = attackHighs[Math.floor(Math.random() * attackHighs.length)];
