@@ -54,10 +54,6 @@ export class Fuzzy {
 				curr++;
 				tx++;
 			}
-			if (curr > high)
-				high = curr;
-
-			curr = 0;
 			tx = e.x - 1;
 			ty = e.y;
 			while (this.getValue(tx, ty) === 1) {
@@ -74,10 +70,6 @@ export class Fuzzy {
 				curr++;
 				ty++;
 			}
-			if (curr > high)
-				high = curr;
-
-			curr = 0;
 			tx = e.x;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 1) {
@@ -95,10 +87,6 @@ export class Fuzzy {
 				tx++;
 				ty++;
 			}
-			if (curr > high)
-				high = curr;
-
-			curr = 0;
 			tx = e.x - 1;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 1) {
@@ -117,10 +105,6 @@ export class Fuzzy {
 				tx++;
 				ty--;
 			}
-			if (curr > high)
-				high = curr;
-
-			curr = 0;
 			tx = e.x - 1;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 1) {
