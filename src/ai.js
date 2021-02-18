@@ -36,14 +36,18 @@ export class Fuzzy {
 			for (let j = -1; j <= 1; j++) {
 				if (i == 0 && j == 0)
 					continue;
-				if (this.getValue(i + last.x, j + last.y) == 0 && this.heatMap[(i + last.x) + "_" + (j + last.y)] === undefined) {
-					this.heatMap[(i + last.x) + "_" + (j + last.y)] = {
-						x: i + last.x,
-						y: j + last.y
-					};
+				if (this.getValue(i + last.x, j + last.y) == 0) {
+					if (this.heatMap[(i + last.x) + "_" + (j + last.y)] === undefined) {
+						this.heatMap[(i + last.x) + "_" + (j + last.y)] = {
+							x: i + last.x,
+							y: j + last.y
+						};
+					}
 				}
 			}
 		}
+
+		//defense
 		Object.values(this.heatMap).forEach(e => {
 			let high = 0;
 
@@ -115,32 +119,126 @@ export class Fuzzy {
 			if (curr > high)
 				high = curr;
 
-			e.val = high;
+			e.def = high;
 		});
-		let highs = [];
-		let highest = 0;
+
+		//attack
 		Object.values(this.heatMap).forEach(e => {
-			if (e.val > highest) {
-				highs = [e];
-				highest = e.val;
-			} else if (e.val == highest) {
-				highs.push(e);
+			let high = 0;
+
+			let curr = 0;
+			let tx = e.x + 1;
+			let ty = e.y;
+			while (this.getValue(tx, ty) === 2) {
+				curr++;
+				tx++;
+			}
+			tx = e.x - 1;
+			ty = e.y;
+			while (this.getValue(tx, ty) === 2) {
+				curr++;
+				tx--;
+			}
+			if (curr > high)
+				high = curr;
+
+			curr = 0;
+			tx = e.x;
+			ty = e.y + 1;
+			while (this.getValue(tx, ty) === 2) {
+				curr++;
+				ty++;
+			}
+			tx = e.x;
+			ty = e.y - 1;
+			while (this.getValue(tx, ty) === 2) {
+				curr++;
+				ty--;
+			}
+			if (curr > high)
+				high = curr;
+
+			curr = 0;
+			tx = e.x + 1;
+			ty = e.y + 1;
+			while (this.getValue(tx, ty) === 2) {
+				curr++;
+				tx++;
+				ty++;
+			}
+			tx = e.x - 1;
+			ty = e.y - 1;
+			while (this.getValue(tx, ty) === 2) {
+				curr++;
+				tx--;
+				ty--;
+			}
+			if (curr > high)
+				high = curr;
+
+			curr = 0;
+			tx = e.x + 1;
+			ty = e.y - 1;
+			while (this.getValue(tx, ty) === 2) {
+				curr++;
+				tx++;
+				ty--;
+			}
+			tx = e.x - 1;
+			ty = e.y + 1;
+			while (this.getValue(tx, ty) === 2) {
+				curr++;
+				tx--;
+				ty++;
+			}
+			if (curr > high)
+				high = curr;
+
+			e.att = high;
+		});
+
+		let defenseHighs = [];
+		let defenseHighest = 0;
+		let attackHighs = [];
+		let attackHighest = 0;
+		Object.values(this.heatMap).forEach(e => {
+			if (e.def > defenseHighest) {
+				defenseHighs = [e];
+				defenseHighest = e.def;
+			} else if (e.def == defenseHighest) {
+				defenseHighs.push(e);
+			}
+			if (e.att > attackHighest) {
+				attackHighs = [e];
+				attackHighest = e.att;
+			} else if (e.att == attackHighest) {
+				attackHighs.push(e);
 			}
 		});
-		let select = highs[Math.floor(Math.random() * highs.length)];
+
+		let select;
+		if (defenseHighest >= 4)
+			select = defenseHighs[Math.floor(Math.random() * defenseHighs.length)];
+		else
+			select = attackHighs[Math.floor(Math.random() * attackHighs.length)];
+		console.log(select);
+
 		delete this.heatMap[select.x + "_" + select.y];
 		for (let i = -1; i <= 1; i++) {
 			for (let j = -1; j <= 1; j++) {
 				if (i == 0 && j == 0)
 					continue;
-				if (this.getValue(i + select.x, j + select.y) == 0 && this.heatMap[(i + select.x) + "_" + (j + select.y)] === undefined) {
-					this.heatMap[(i + select.x) + "_" + (j + select.y)] = {
-						x: i + select.x,
-						y: j + select.y
-					};
+				if (this.getValue(i + select.x, j + select.y) == 0) {
+					if (this.heatMap[(i + select.x) + "_" + (j + select.y)] === undefined) {
+						this.heatMap[(i + select.x) + "_" + (j + select.y)] = {
+							x: i + select.x,
+							y: j + select.y
+						};
+					}
 				}
 			}
 		}
+
 		this.selectSquare(select.x, select.y);
 	}
 }
