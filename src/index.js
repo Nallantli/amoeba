@@ -1,5 +1,4 @@
-import { faChevronLeft, faChevronRight, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { basic } from './ai';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles.css';
@@ -166,6 +165,12 @@ class Square extends React.Component {
 						checkWin(this.props.x, this.props.y);
 						turn = !turn;
 						board.forceUpdate();
+						if (AI !== undefined && !turn) {
+							AI.doTurn({
+								x: this.props.x,
+								y: this.props.y
+							});
+						}
 					}
 				}
 			}>{this.state.value == 1 ? "○" : this.state.value == 2 ? "❌" : ""}</button>
@@ -258,7 +263,7 @@ class Board extends React.Component {
 		};
 		this.renderChunks = this.renderChunks.bind(this);
 	}
-	renderChunks(x, y) {
+	renderChunks() {
 		let nc = [];
 		Object.values(map).map(c => {
 			if (low_x === undefined || c.x < low_x)
@@ -310,6 +315,13 @@ const board = ReactDOM.render(
 	<Board />,
 	document.getElementById('root')
 );
+
+let AI = undefined;
+switch (window.location.search) {
+	case '?basic':
+		AI = basic(getValue);
+		break;
+}
 
 for (let i = -2; i <= 2; i++) {
 	for (let j = -2; j <= 2; j++) {
