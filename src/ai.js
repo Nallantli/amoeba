@@ -221,7 +221,6 @@ export class Fuzzy {
 			select = defenseHighs[Math.floor(Math.random() * defenseHighs.length)];
 		else
 			select = attackHighs[Math.floor(Math.random() * attackHighs.length)];
-		console.log(select);
 
 		delete this.heatMap[select.x + "_" + select.y];
 		for (let i = -1; i <= 1; i++) {
