@@ -10,6 +10,8 @@ let high_x = undefined;
 let low_y = undefined;
 let high_y = undefined;
 
+let win = false;
+
 const SIZE = 10;
 const S_SIZE = 40;
 
@@ -52,6 +54,7 @@ function checkWin(x, y) {
 		}
 		if (squares.length == winLength) {
 			squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
+			win = true;
 			break;
 		}
 	}
@@ -67,6 +70,7 @@ function checkWin(x, y) {
 		}
 		if (squares.length == winLength) {
 			squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
+			win = true;
 			break;
 		}
 	}
@@ -82,6 +86,7 @@ function checkWin(x, y) {
 		}
 		if (squares.length == winLength) {
 			squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
+			win = true;
 			break;
 		}
 	}
@@ -97,6 +102,7 @@ function checkWin(x, y) {
 		}
 		if (squares.length == winLength) {
 			squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
+			win = true;
 			break;
 		}
 	}
@@ -180,18 +186,22 @@ class Square extends React.Component {
 				color: (this.state.value == 1 ? "blue" : "red")
 			}} onClick={
 				() => {
-					if (this.state.value == 0) {
+					if (this.state.value == 0 && !win) {
 						this.setState({
 							value: setValue(this.props.x, this.props.y, turn ? 1 : 2)
 						});
 						checkWin(this.props.x, this.props.y);
-						turn = !turn;
-						board.forceUpdate();
-						if (AI !== undefined && !turn) {
-							AI.doTurn({
-								x: this.props.x,
-								y: this.props.y
-							});
+						if (!win) {
+							turn = !turn;
+							board.forceUpdate();
+							if (AI !== undefined && !turn) {
+								AI.doTurn({
+									x: this.props.x,
+									y: this.props.y
+								});
+							}
+						} else {
+							board.forceUpdate();
 						}
 					}
 				}
