@@ -10,8 +10,10 @@ let high_x = undefined;
 let low_y = undefined;
 let high_y = undefined;
 
-const SIZE = 8;
+const SIZE = 10;
 const S_SIZE = 40;
+
+let winLength = 5;
 
 function flatten(x, d) {
 	while (x < 0)
@@ -38,9 +40,9 @@ function checkWin(x, y) {
 	let check = getValue(x, y);
 	if (check == 0)
 		return;
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < winLength; i++) {
 		let squares = [];
-		for (let j = 0; j < 5; j++) {
+		for (let j = 0; j < winLength; j++) {
 			let s = getValue(x - i + j, y);
 			if (s === undefined)
 				break;
@@ -48,14 +50,14 @@ function checkWin(x, y) {
 				break;
 			squares.push((x - i + j) + "_" + y);
 		}
-		if (squares.length == 5) {
+		if (squares.length == winLength) {
 			squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
 			break;
 		}
 	}
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < winLength; i++) {
 		let squares = [];
-		for (let j = 0; j < 5; j++) {
+		for (let j = 0; j < winLength; j++) {
 			let s = getValue(x, y - i + j);
 			if (s === undefined)
 				break;
@@ -63,14 +65,14 @@ function checkWin(x, y) {
 				break;
 			squares.push(x + "_" + (y - i + j));
 		}
-		if (squares.length == 5) {
+		if (squares.length == winLength) {
 			squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
 			break;
 		}
 	}
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < winLength; i++) {
 		let squares = [];
-		for (let j = 0; j < 5; j++) {
+		for (let j = 0; j < winLength; j++) {
 			let s = getValue(x - i + j, y - i + j);
 			if (s === undefined)
 				break;
@@ -78,14 +80,14 @@ function checkWin(x, y) {
 				break;
 			squares.push((x - i + j) + "_" + (y - i + j));
 		}
-		if (squares.length == 5) {
+		if (squares.length == winLength) {
 			squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
 			break;
 		}
 	}
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < winLength; i++) {
 		let squares = [];
-		for (let j = 0; j < 5; j++) {
+		for (let j = 0; j < winLength; j++) {
 			let s = getValue(x - i + j, y + i - j);
 			if (s === undefined)
 				break;
@@ -93,7 +95,7 @@ function checkWin(x, y) {
 				break;
 			squares.push((x - i + j) + "_" + (y + i - j));
 		}
-		if (squares.length == 5) {
+		if (squares.length == winLength) {
 			squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
 			break;
 		}
@@ -321,13 +323,19 @@ const board = ReactDOM.render(
 	document.getElementById('root')
 );
 
+const params = new URLSearchParams(window.location.search);
+
+if (params.get('win') !== null) {
+	winLength = parseInt(params.get('win'));
+}
+
 let AI = undefined;
-switch (window.location.search) {
-	case '?basic':
-		AI = new Basic(getValue, selectSquare);
+switch (params.get('ai')) {
+	case 'basic':
+		AI = new Basic(getValue, selectSquare, winLength);
 		break;
-	case '?fuzzy':
-		AI = new Fuzzy(getValue, selectSquare);
+	case 'fuzzy':
+		AI = new Fuzzy(getValue, selectSquare, winLength);
 		break;
 }
 

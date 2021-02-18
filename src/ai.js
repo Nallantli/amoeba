@@ -1,5 +1,5 @@
 export class Basic {
-	constructor(getValue, selectSquare) {
+	constructor(getValue, selectSquare, winLength) {
 		this.getValue = getValue;
 		this.selectSquare = selectSquare;
 	}
@@ -24,9 +24,10 @@ export class Basic {
 }
 
 export class Fuzzy {
-	constructor(getValue, selectSquare) {
+	constructor(getValue, selectSquare, winLength) {
 		this.getValue = getValue;
 		this.selectSquare = selectSquare;
+		this.winLength = winLength;
 		this.heatMap = {};
 	}
 	doTurn(last) {
@@ -58,12 +59,14 @@ export class Fuzzy {
 				curr++;
 				tx++;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y;
 			while (this.getValue(tx, ty) === 1) {
 				curr++;
 				tx--;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			if (curr > high)
 				high = curr;
 
@@ -74,12 +77,14 @@ export class Fuzzy {
 				curr++;
 				ty++;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			tx = e.x;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 1) {
 				curr++;
 				ty--;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			if (curr > high)
 				high = curr;
 
@@ -91,6 +96,7 @@ export class Fuzzy {
 				tx++;
 				ty++;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 1) {
@@ -98,6 +104,7 @@ export class Fuzzy {
 				tx--;
 				ty--;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			if (curr > high)
 				high = curr;
 
@@ -109,6 +116,7 @@ export class Fuzzy {
 				tx++;
 				ty--;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 1) {
@@ -116,6 +124,7 @@ export class Fuzzy {
 				tx--;
 				ty++;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			if (curr > high)
 				high = curr;
 
@@ -133,12 +142,14 @@ export class Fuzzy {
 				curr++;
 				tx++;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y;
 			while (this.getValue(tx, ty) === 2) {
 				curr++;
 				tx--;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			if (curr > high)
 				high = curr;
 
@@ -149,12 +160,14 @@ export class Fuzzy {
 				curr++;
 				ty++;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			tx = e.x;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 2) {
 				curr++;
 				ty--;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			if (curr > high)
 				high = curr;
 
@@ -166,6 +179,7 @@ export class Fuzzy {
 				tx++;
 				ty++;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 2) {
@@ -173,6 +187,7 @@ export class Fuzzy {
 				tx--;
 				ty--;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			if (curr > high)
 				high = curr;
 
@@ -184,6 +199,7 @@ export class Fuzzy {
 				tx++;
 				ty--;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 2) {
@@ -191,6 +207,7 @@ export class Fuzzy {
 				tx--;
 				ty++;
 			}
+			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
 			if (curr > high)
 				high = curr;
 
@@ -217,7 +234,7 @@ export class Fuzzy {
 		});
 
 		let select;
-		if (defenseHighest >= 3 && attackHighest < 4)
+		if (defenseHighest > Math.floor(this.winLength / 2) && attackHighest <= this.winLength - 2)
 			select = defenseHighs[Math.floor(Math.random() * defenseHighs.length)];
 		else
 			select = attackHighs[Math.floor(Math.random() * attackHighs.length)];
