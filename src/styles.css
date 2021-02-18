@@ -1,0 +1,28 @@
+*::-webkit-scrollbar {
+    display: none !important;
+}
+
+* {
+    -ms-overflow-style: none !important;
+    scrollbar-width   : none !important;
+}
+
+button {
+    position        : absolute;
+    background-color: #fff;
+    font-weight     : bolder;
+    border          : 0.5px solid #000;
+    border-radius   : 0;
+    margin          : 0;
+    padding         : 0;
+    font-family     : monospace;
+    text-align      : 'center';
+}
+
+button:hover {
+    background-color: #ffa;
+}
+
+.win-square {
+    background-color: #000;
+}
