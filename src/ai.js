@@ -133,7 +133,6 @@ export class Fuzzy {
 
 			e.val = high;
 		});
-		console.log(this.heatMap);
 		let highs = [];
 		let highest = 0;
 		Object.values(this.heatMap).forEach(e => {
@@ -158,7 +157,6 @@ export class Fuzzy {
 				}
 			}
 		}
-		console.log(select);
 		this.selectSquare(select.x, select.y);
 	}
 }
