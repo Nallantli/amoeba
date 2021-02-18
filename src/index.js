@@ -1,4 +1,4 @@
-import { basic } from './ai';
+import { Basic, Fuzzy } from './ai';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles.css';
@@ -138,6 +138,11 @@ function addRight() {
 	for (let y = low_y; y <= high_y; y++)
 		addChunk(high_x + 1, y);
 	board.renderChunks();
+}
+
+function selectSquare(x, y) {
+	const element = document.getElementById(x + "_" + y);
+	element.click();
 }
 
 class Square extends React.Component {
@@ -319,7 +324,10 @@ const board = ReactDOM.render(
 let AI = undefined;
 switch (window.location.search) {
 	case '?basic':
-		AI = basic(getValue);
+		AI = new Basic(getValue, selectSquare);
+		break;
+	case '?fuzzy':
+		AI = new Fuzzy(getValue, selectSquare);
 		break;
 }
 
