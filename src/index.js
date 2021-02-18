@@ -143,7 +143,22 @@ function addRight() {
 }
 
 function selectSquare(x, y) {
-	const element = document.getElementById(x + "_" + y);
+	let element = document.getElementById(x + "_" + y);
+	if (element == null) {
+		console.log(x, y, low_x * SIZE, low_y * SIZE, high_x * SIZE, high_y * SIZE);
+		while (x < low_x * SIZE)
+			addLeft();
+		while (y < low_y * SIZE)
+			addTop();
+		while (x >= high_x * SIZE)
+			addRight();
+		while (y >= high_y * SIZE)
+			addBottom();
+		setValue(x, y, 2);
+		turn = !turn;
+		board.forceUpdate();
+		return;
+	}
 	element.click();
 }
 
