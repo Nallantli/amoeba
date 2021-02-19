@@ -238,7 +238,7 @@ export class Fuzzy {
 		attackHighs.sort((a, b) => b.def - a.def).filter(e => e.def == attackHighs[0].def);
 
 		let select;
-		if (defenseHighest > this.winLength - 1.5 && attackHighest < this.winLength - 1.5 || defenseHighest > this.winLength - 1)
+		if ((defenseHighest > this.winLength - 1.5 && attackHighest < this.winLength - 1.5) || (defenseHighest > this.winLength - 1 && attackHighest <= this.winLength - 0.5))
 			select = defenseHighs[Math.floor(Math.random() * defenseHighs.length)];
 		else if (attackHighest > this.winLength / 2)
 			select = attackHighs[Math.floor(Math.random() * attackHighs.length)];
