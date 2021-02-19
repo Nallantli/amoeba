@@ -107,7 +107,7 @@ function checkWin(x, y) {
 		}
 	}
 
-	if (win && AI.debugHistory !== undefined)
+	if (win && AI !== undefined && AI.debugHistory !== undefined)
 		console.log(AI.debugHistory);
 }
 
