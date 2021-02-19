@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/amoeba/static/css/main.dd75be03.chunk.css",
+    "main.css": "/amoeba/static/css/main.faa66bb1.chunk.css",
     "main.js": "/amoeba/static/js/main.d4901d77.chunk.js",
     "main.js.map": "/amoeba/static/js/main.d4901d77.chunk.js.map",
     "runtime-main.js": "/amoeba/static/js/runtime-main.cc264413.js",
@@ -8,14 +8,14 @@
     "static/js/2.6e92170e.chunk.js": "/amoeba/static/js/2.6e92170e.chunk.js",
     "static/js/2.6e92170e.chunk.js.map": "/amoeba/static/js/2.6e92170e.chunk.js.map",
     "index.html": "/amoeba/index.html",
-    "static/css/main.dd75be03.chunk.css.map": "/amoeba/static/css/main.dd75be03.chunk.css.map",
+    "static/css/main.faa66bb1.chunk.css.map": "/amoeba/static/css/main.faa66bb1.chunk.css.map",
     "static/js/2.6e92170e.chunk.js.LICENSE.txt": "/amoeba/static/js/2.6e92170e.chunk.js.LICENSE.txt",
     "static/media/styles.css": "/amoeba/static/media/iosevka-bold.1eb9c984.ttf"
   },
   "entrypoints": [
     "static/js/runtime-main.cc264413.js",
     "static/js/2.6e92170e.chunk.js",
-    "static/css/main.dd75be03.chunk.css",
+    "static/css/main.faa66bb1.chunk.css",
     "static/js/main.d4901d77.chunk.js"
   ]
 }
