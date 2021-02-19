@@ -255,7 +255,7 @@ export class Fuzzy {
 				x: select.x,
 				y: select.y
 			},
-			data: this.heatMap
+			data: JSON.parse(JSON.stringify(this.heatMap))
 		});
 
 		delete this.heatMap[select.x + "_" + select.y];
