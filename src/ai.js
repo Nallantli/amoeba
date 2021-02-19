@@ -233,6 +233,10 @@ export class Fuzzy {
 			}
 		});
 
+		defenseHighs.sort((a, b) =>  b.att - a.att).filter(e => e.att == defenseHighs[0].att);
+
+		attackHighs.sort((a, b) =>  b.def - a.def).filter(e => e.def == attackHighs[0].def);;
+
 		let select;
 		if (defenseHighest > this.winLength / 2 && attackHighest <= this.winLength - 2)
 			select = defenseHighs[Math.floor(Math.random() * defenseHighs.length)];
