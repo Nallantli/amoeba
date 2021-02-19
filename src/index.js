@@ -186,7 +186,7 @@ class Square extends React.Component {
 				width: S_SIZE,
 				height: S_SIZE,
 				fontSize: S_SIZE * 0.78,
-				color: (this.state.value == 1 ? "blue" : "red")
+				color: (this.state.value == 1 ? "blue" : (this.state.value == 2 ? "red" : "white"))
 			}} onClick={
 				() => {
 					if (this.state.value == 0 && !win) {
@@ -290,6 +290,22 @@ class Grid extends React.Component {
 	}
 }
 
+class Refresh extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		return (
+			<button
+				id="refresh-button"
+				onClick={() => {
+					window.location.reload();
+				}}
+			>Reset Game</button>
+		);
+	}
+}
+
 class Board extends React.Component {
 	constructor(props) {
 		super(props);
@@ -341,6 +357,7 @@ class Board extends React.Component {
 				>
 					{this.state.grid}
 				</div>
+				<Refresh />
 			</div>
 		);
 	}
