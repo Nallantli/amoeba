@@ -1,4 +1,4 @@
-import { Easy, Basic, Fuzzy } from './ai';
+import { Basic, Fuzzy } from './ai';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles.css';
@@ -163,7 +163,7 @@ function selectSquare(x, y) {
 			addRight();
 		while (y >= high_y * SIZE)
 			addBottom();
-		setValue(x, y, 2);
+		setValue(x, y, turn ? 1 : 2);
 		turn = !turn;
 		board.forceUpdate();
 		return;
@@ -197,7 +197,7 @@ class Square extends React.Component {
 						if (!win) {
 							turn = !turn;
 							board.forceUpdate();
-							if (AI !== undefined && !turn) {
+							if (AI !== undefined && turn != isCross) {
 								AI.doTurn({
 									x: this.props.x,
 									y: this.props.y
@@ -357,16 +357,27 @@ if (params.get('win') != null) {
 	winLength = parseInt(params.get('win'));
 }
 
+let isCross;
+
+switch (params.get('mode')) {
+	case '1':
+		isCross = true;
+		break;
+	case '2':
+		isCross = false;
+		break;
+	default:
+		isCross = true;
+		break;
+}
+
 let AI = undefined;
 switch (params.get('ai')) {
 	case 'basic':
-		AI = new Basic(getValue, selectSquare, winLength);
+		AI = new Basic(getValue, selectSquare, winLength, isCross);
 		break;
 	case 'fuzzy':
-		AI = new Fuzzy(getValue, selectSquare, winLength);
-		break;
-	case 'easy':
-		AI = new Easy(getValue, selectSquare, winLength);
+		AI = new Fuzzy(getValue, selectSquare, winLength, isCross);
 		break;
 }
 
@@ -378,3 +389,11 @@ for (let i = -2; i <= 2; i++) {
 
 board.renderChunks();
 document.getElementById("grid").scrollBy(S_SIZE * SIZE, S_SIZE * SIZE);
+
+if (!isCross) {
+	if (AI != undefined) {
+		AI.doTurn();
+	} else {
+		turn = !turn;
+	}
+}
