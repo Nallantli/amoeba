@@ -1,4 +1,4 @@
-import { Basic, Fuzzy } from './ai';
+import { Easy, Basic, Fuzzy } from './ai';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles.css';
@@ -361,6 +361,9 @@ switch (params.get('ai')) {
 		break;
 	case 'fuzzy':
 		AI = new Fuzzy(getValue, selectSquare, winLength);
+		break;
+	case 'easy':
+		AI = new Easy(getValue, selectSquare, winLength);
 		break;
 }
 
