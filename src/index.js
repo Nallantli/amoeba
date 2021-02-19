@@ -106,6 +106,9 @@ function checkWin(x, y) {
 			break;
 		}
 	}
+
+	if (win && AI.debugHistory !== undefined)
+		console.log(AI.debugHistory);
 }
 
 function addChunk(x, y) {

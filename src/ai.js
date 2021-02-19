@@ -29,6 +29,7 @@ export class Fuzzy {
 		this.selectSquare = selectSquare;
 		this.winLength = winLength;
 		this.heatMap = {};
+		this.debugHistory = [];
 	}
 	doTurn(last) {
 		if (this.heatMap[last.x + "_" + last.y] !== undefined)
@@ -244,6 +245,18 @@ export class Fuzzy {
 			select = attackHighs[Math.floor(Math.random() * attackHighs.length)];
 		else
 			select = defenseHighs[Math.floor(Math.random() * defenseHighs.length)];
+
+		this.debugHistory.push({
+			player: {
+				x: last.x,
+				y: last.y
+			},
+			enemy: {
+				x: select.x,
+				y: select.y
+			},
+			data: this.heatMap
+		});
 
 		delete this.heatMap[select.x + "_" + select.y];
 		for (let i = -1; i <= 1; i++) {
