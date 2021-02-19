@@ -53,81 +53,85 @@ export class Fuzzy {
 		Object.values(this.heatMap).forEach(e => {
 			let high = 0;
 
-			let curr = 0;
+			let a = 0;
+			let b = 0;
 			let tx = e.x + 1;
 			let ty = e.y;
 			while (this.getValue(tx, ty) === 1) {
-				curr++;
+				a++;
 				tx++;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
+			a += (a != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y;
 			while (this.getValue(tx, ty) === 1) {
-				curr++;
+				b++;
 				tx--;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
-			if (curr > high)
-				high = curr;
+			b += (b != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
+			if (a + b > high)
+				high = a + b;
 
-			curr = 0;
+			a = 0;
+			b = 0;
 			tx = e.x;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 1) {
-				curr++;
+				a++;
 				ty++;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
+			a += (a != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
 			tx = e.x;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 1) {
-				curr++;
+				b++;
 				ty--;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
-			if (curr > high)
-				high = curr;
+			b += (b != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
+			if (a + b > high)
+				high = a + b;
 
-			curr = 0;
+			a = 0;
+			b = 0;
 			tx = e.x + 1;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 1) {
-				curr++;
+				a++;
 				tx++;
 				ty++;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
+			a += (a != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 1) {
-				curr++;
+				b++;
 				tx--;
 				ty--;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
-			if (curr > high)
-				high = curr;
+			b += (b != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
+			if (a + b > high)
+				high = a + b;
 
-			curr = 0;
+			a = 0;
+			b = 0;
 			tx = e.x + 1;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 1) {
-				curr++;
+				a++;
 				tx++;
 				ty--;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
+			a += (a != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 1) {
-				curr++;
+				b++;
 				tx--;
 				ty++;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
-			if (curr > high)
-				high = curr;
+			b += (b != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
+			if (a + b > high)
+				high = a + b;
 
 			e.def = high;
 		});
@@ -136,81 +140,85 @@ export class Fuzzy {
 		Object.values(this.heatMap).forEach(e => {
 			let high = 0;
 
-			let curr = 0;
+			let a = 0;
+			let b = 0;
 			let tx = e.x + 1;
 			let ty = e.y;
 			while (this.getValue(tx, ty) === 2) {
-				curr++;
+				a++;
 				tx++;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
+			a += (a != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y;
 			while (this.getValue(tx, ty) === 2) {
-				curr++;
+				b++;
 				tx--;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
-			if (curr > high)
-				high = curr;
+			b += (b != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
+			if (a + b > high)
+				high = a + b;
 
-			curr = 0;
+			a = 0;
+			b = 0;
 			tx = e.x;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 2) {
-				curr++;
+				a++;
 				ty++;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
+			a += (a != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
 			tx = e.x;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 2) {
-				curr++;
+				b++;
 				ty--;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
-			if (curr > high)
-				high = curr;
+			b += (b != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
+			if (a + b > high)
+				high = a + b;
 
-			curr = 0;
+			a = 0;
+			b = 0;
 			tx = e.x + 1;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 2) {
-				curr++;
+				a++;
 				tx++;
 				ty++;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
+			a += (a != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 2) {
-				curr++;
+				b++;
 				tx--;
 				ty--;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
-			if (curr > high)
-				high = curr;
+			b += (b != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
+			if (a + b > high)
+				high = a + b;
 
-			curr = 0;
+			a = 0;
+			b = 0;
 			tx = e.x + 1;
 			ty = e.y - 1;
 			while (this.getValue(tx, ty) === 2) {
-				curr++;
+				a++;
 				tx++;
 				ty--;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
+			a += (a != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
 			tx = e.x - 1;
 			ty = e.y + 1;
 			while (this.getValue(tx, ty) === 2) {
-				curr++;
+				b++;
 				tx--;
 				ty++;
 			}
-			curr += this.getValue(tx, ty) === 0 ? 0.5 : 0;
-			if (curr > high)
-				high = curr;
+			b += (b != 0 && this.getValue(tx, ty) === 0) ? 0.5 : 0;
+			if (a + b > high)
+				high = a + b;
 
 			e.att = high;
 		});
@@ -239,7 +247,7 @@ export class Fuzzy {
 		attackHighs.sort((a, b) => b.def - a.def).filter(e => e.def == attackHighs[0].def);
 
 		let select;
-		if ((defenseHighest > this.winLength - 1.5 && attackHighest < this.winLength - 1.5) || (defenseHighest > this.winLength - 1 && attackHighest <= this.winLength - 0.5))
+		if ((defenseHighest > this.winLength - 2 && attackHighest < this.winLength - 1.5) || (defenseHighest > this.winLength - 1 && attackHighest <= this.winLength - 1))
 			select = defenseHighs[Math.floor(Math.random() * defenseHighs.length)];
 		else if (attackHighest > this.winLength / 2)
 			select = attackHighs[Math.floor(Math.random() * attackHighs.length)];
