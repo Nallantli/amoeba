@@ -21,3 +21,11 @@ https://nallantli.github.io/amoeba/?ai=fuzzy
 ## No AI:
 
 https://nallantli.github.io/amoeba/
+
+---
+
+_Up and down I go,_
+
+_trying hard to make a row;_
+
+_dang - A.I just won._
