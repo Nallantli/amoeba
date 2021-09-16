@@ -10,13 +10,7 @@ Scroll for more space!
 
 ## AI:
 
-Bad AI with no strategy:
-
-https://nallantli.github.io/amoeba/?ai=basic
-
-Good AI:
-
-https://nallantli.github.io/amoeba/?ai=fuzzy
+https://nallantli.github.io/amoeba/?p2=fuzzy
 
 ## No AI:
 
