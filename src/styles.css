@@ -12,11 +12,14 @@
     scrollbar-width   : none !important;
 }
 
+.svg {
+    margin: 7px;
+}
+
 .square {
     position        : absolute;
-    background-color: #fff;
-    border          : 0.5px solid #000;
-    border-radius   : 0;
+    background-color: #111;
+    outline         : 1px solid #333;
     margin          : 0;
     padding         : 0;
     transition      : all 0.2s;
@@ -27,11 +30,11 @@
 }
 
 .win-square {
-    background-color: #000;
+    background-color: #fff;
 }
 
 .win-square:hover {
-    background-color: #000;
+    background-color: #fff;
 }
 
 .icon {
@@ -57,6 +60,34 @@
     background-color: white;
     color           : black;
     transition      : all 0.2s;
+}
+
+#limit-dialog {
+    position        : absolute;
+    display         : block;
+    top             : 10px;
+    left            : 10px;
+    font-size       : 1rem;
+    font-family     : 'Iosevka', monospace;
+    padding         : 10px;
+    border          : 1px solid black;
+    border-radius   : 0;
+    background-color: white;
+    color           : black;
+}
+
+#score-dialog {
+    position        : absolute;
+    display         : block;
+    bottom          : 10px;
+    left            : 10px;
+    font-size       : 1rem;
+    font-family     : 'Iosevka', monospace;
+    border          : 1px solid black;
+    padding         : 10px;
+    border-radius   : 0;
+    background-color: white;
+    color           : black;
 }
 
 #refresh-button:hover {
