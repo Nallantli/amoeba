@@ -1,6 +1,7 @@
 import SVGCross from './img/cross.svg';
 import SVGCircle from './img/circle.svg';
 import SVGDiamond from './img/diamond.svg';
+import SVGSquare from './img/square.svg';
 
 export function flatten(x, d) {
 	while (x < 0)
@@ -14,11 +15,13 @@ export const CONFIG = {
 	player_colors: [
 		'#5588ff',
 		'#ff3344',
-		'#33ff44'
+		'#ffcc33',
+		"#33ff44"
 	],
 	player_icons: [
 		SVGCircle,
 		SVGCross,
-		SVGDiamond
+		SVGDiamond,
+		SVGSquare
 	]
 };

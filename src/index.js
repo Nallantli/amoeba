@@ -1,11 +1,38 @@
-import { Fuzzy } from './ai';
+import { Fuzzy, ElkAtt, ElkDef, Elk } from './ai';
 import { Chunk } from './Chunk';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles.css';
 import { flatten, CONFIG } from './Utils';
 
-let player_count = 2;
+
+const params = new URLSearchParams(window.location.search);
+const winLength = params.get('win') ? parseInt(params.get('win')) : 5;
+const player_count = params.get('count') ? parseInt(params.get('count')) : 2;
+
+let AIs = [];
+for (let i = 0; i < player_count; i++) {
+	switch (params.get(`p${i + 1}`)) {
+		case "fuzzy":
+			AIs.push(new Fuzzy(getValue, winLength, i + 1, player_count));
+			break;
+		case "elk":
+			AIs.push(new Elk(getValue, winLength, i + 1, player_count));
+			break;
+		case "elkatt":
+			AIs.push(new ElkAtt(getValue, winLength, i + 1, player_count));
+			break;
+		case "elkdef":
+			AIs.push(new ElkDef(getValue, winLength, i + 1, player_count));
+			break;
+		default:
+			AIs.push(undefined);
+			break;
+	}
+}
+
+const LIMITED = params.get('limit') ? true : false;
+let move_limit = params.get('limit') ? parseInt(params.get('limit')) : 0;
 
 let GLOBAL_MAP = {};
 let low_x = undefined;
@@ -257,7 +284,6 @@ function addRight(map) {
 function selectSquare(x, y, map, turn) {
 	let element = document.getElementById(x + "_" + y);
 	if (element === null) {
-		console.log(x, y, low_x * CONFIG.SIZE, low_y * CONFIG.SIZE, high_x * CONFIG.SIZE, high_y * CONFIG.SIZE);
 		while (x < low_x * CONFIG.SIZE)
 			addLeft(map);
 		while (y < low_y * CONFIG.SIZE)
@@ -458,24 +484,6 @@ class Board extends React.Component {
 		);
 	}
 }
-
-const params = new URLSearchParams(window.location.search);
-const winLength = params.get('winLength') ? parseInt(params.get('winLength')) : 5;
-
-let AIs = [];
-for (let i = 0; i < player_count; i++) {
-	switch (params.get(`p${i + 1}`)) {
-		case "fuzzy":
-			AIs.push(new Fuzzy(getValue, winLength, i + 1, player_count));
-			break;
-		default:
-			AIs.push(undefined);
-			break;
-	}
-}
-
-const LIMITED = params.get('limit') ? true : false;
-let move_limit = params.get('limit') ? parseInt(params.get('limit')) : 0;
 
 const board = ReactDOM.render(
 	<Board map={GLOBAL_MAP} />,
