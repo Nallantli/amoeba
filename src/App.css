@@ -7,6 +7,11 @@ body {
   height          : 100vh;
 }
 
+* {
+  touch-action: none;
+  -ms-touch-action: none;
+}
+
 .board {
   position: absolute;
   top     : 50%;

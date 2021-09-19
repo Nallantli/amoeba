@@ -53,6 +53,9 @@ export class Board extends React.Component {
 		this.selectSquare = this.selectSquare.bind(this);
 		this.postMove = this.postMove.bind(this);
 		this.handleScroll = this.handleScroll.bind(this);
+		this.handleTouchStart = this.handleTouchStart.bind(this);
+		this.handleTouchMove = this.handleTouchMove.bind(this);
+		this.handleTouchEnd = this.handleTouchEnd.bind(this);
 		this.sharePoint = this.sharePoint.bind(this);
 		this.horizontalCount = this.horizontalCount.bind(this);
 		this.verticalCount = this.verticalCount.bind(this);
@@ -96,7 +99,10 @@ export class Board extends React.Component {
 			yLow: 0,
 			yHigh: 0,
 			playerScores: Array(props.playerCount).fill(0),
-			moveLimit: props.limit
+			moveLimit: props.limit,
+			isTouching: false,
+			touchStart: { x: 0, y: 0 },
+			touchOffset: { x: 0, y: 0 }
 		}
 	}
 	sharePoint(a, b) {
@@ -189,14 +195,52 @@ export class Board extends React.Component {
 		return playerScores;
 	}
 	handleScroll(e) {
+		e.preventDefault();
 		const { offsetX, offsetY } = this.state;
 		this.setState({
 			offsetX: offsetX - e.deltaX / 2,
 			offsetY: offsetY - e.deltaY / 2
 		})
 	}
+	handleTouchMove(e) {
+		e.preventDefault();
+		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		var touch = evt.touches[0] || evt.changedTouches[0];
+		this.setState({
+			touchOffset: { x: touch.pageX, y: touch.pageY }
+		});
+	}
+	handleTouchStart(e) {
+		e.preventDefault();
+		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		var touch = evt.touches[0] || evt.changedTouches[0];
+		this.setState({
+			isTouching: true,
+			touchStart: { x: touch.pageX, y: touch.pageY },
+			touchOffset: { x: touch.pageX, y: touch.pageY }
+		});
+	}
+	handleTouchEnd(e) {
+		e.preventDefault();
+		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		var touch = evt.touches[0] || evt.changedTouches[0];
+		const { offsetX, offsetY, touchStart, touchOffset } = this.state;
+		this.setState({
+			isTouching: false,
+			offsetX: offsetX + (touchOffset.x - touchStart.x),
+			offsetY: offsetY + (touchOffset.y - touchStart.y)
+		}, () => {
+			if (Math.pow(touchStart.x - touch.pageX, 2) + Math.pow(touchStart.y - touch.pageY, 2) < 10) {
+				touch.target.click();
+			}
+		});
+	}
 	componentDidMount() {
-		window.addEventListener('wheel', this.handleScroll);
+		window.addEventListener('wheel', this.handleScroll, { passive: false });
+		window.addEventListener('touchstart', this.handleTouchStart, { passive: false });
+		window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+		window.addEventListener('touchend', this.handleTouchEnd, { passive: false });
+		window.addEventListener('touchcancel', this.handleTouchEnd, { passive: false });
 		this.boardRef.current.addEventListener('selectSquare', this.selectSquare);
 		let newState = { ...this.state };
 		for (let i = -1; i <= 1; i++) {
@@ -383,7 +427,11 @@ export class Board extends React.Component {
 		};
 	}
 	render() {
-		let { xLow, yLow, xHigh, yHigh } = this.state;
+		let { offsetX, offsetY, isTouching, touchOffset, touchStart, xLow, yLow, xHigh, yHigh } = this.state;
+		if (isTouching) {
+			offsetX = offsetX + (touchOffset.x - touchStart.x);
+			offsetY = offsetY + (touchOffset.y - touchStart.y);
+		}
 		const width = spaceSize * chunkSize * (xHigh - xLow + 1);
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
 		return (
@@ -407,9 +455,9 @@ export class Board extends React.Component {
 							width: `${width}px`,
 							height: `${height}px`,
 							top: `50%`,
-							marginTop: `${-height / 2 + this.state.offsetY}px`,
+							marginTop: `${-height / 2 + offsetY}px`,
 							left: `50%`,
-							marginLeft: `${-width / 2 + this.state.offsetX}px`
+							marginLeft: `${-width / 2 + offsetX}px`
 						}}
 					>
 						{Object.values(this.state.map).map(value =>
