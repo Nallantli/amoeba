@@ -1,11 +1,11 @@
-function countLine(x, y, v, dx, dy, getValue, winLength, map) {
+function countLine(x, y, v, dx, dy, getValue, winLength) {
 	let l = 0;
 	let i = -1;
-	while (getValue(x + i * dx, y + i * dy, map) === v) {
+	while (getValue(x + i * dx, y + i * dy) === v) {
 		let d = 0;
 		let nx = x + i * dx;
 		let ny = y + i * dy;
-		while (getValue(nx, ny, map) === v || (nx === x && ny === y)) {
+		while (getValue(nx, ny) === v || (nx === x && ny === y)) {
 			d++;
 			nx += dx;
 			ny += dy;
@@ -14,7 +14,7 @@ function countLine(x, y, v, dx, dy, getValue, winLength, map) {
 			for (let j = d; j <= winLength; j++) {
 				let nx2 = x + (i + j) * dx;
 				let ny2 = y + (i + j) * dy;
-				if (getValue(nx2, ny2, map) !== v && getValue(nx2, ny2, map) !== 0) {
+				if (getValue(nx2, ny2) !== v && getValue(nx2, ny2) !== 0) {
 					d = 0;
 					break;
 				}
@@ -35,7 +35,7 @@ export class Fuzzy {
 		this.icon = icon;
 		this.pCount = pCount;
 	}
-	doTurn(placements, map) {
+	doTurn(placements) {
 		let highAtt = 0;
 		let highDef = 0;
 		let heatMap = [];
@@ -45,7 +45,7 @@ export class Fuzzy {
 					if (x === 0 && y === 0) {
 						continue;
 					}
-					if (this.getValue(e.x + x, e.y + y, map) !== 0) {
+					if (this.getValue(e.x + x, e.y + y) !== 0) {
 						continue;
 					}
 					let flag = false;
@@ -61,24 +61,24 @@ export class Fuzzy {
 						x: e.x + x,
 						y: e.y + y,
 						att: Math.max(
-							countLine(e.x + x, e.y + y, this.icon, 1, 0, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 1, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 0, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, 0, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, -1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 0, -1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 1, -1, this.getValue, this.winLength, map)),
+							countLine(e.x + x, e.y + y, this.icon, 1, 0, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 1, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 0, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, 0, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, -1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 0, -1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 1, -1, this.getValue, this.winLength)),
 						def: Math.max(...Array(this.pCount).fill(0).map((_, i) => {
 							return Math.max(
-								countLine(e.x + x, e.y + y, i + 1, 1, 0, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 1, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 0, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, 0, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, -1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 0, -1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 1, -1, this.getValue, this.winLength, map))
+								countLine(e.x + x, e.y + y, i + 1, 1, 0, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 1, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 0, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, 0, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, -1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 0, -1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 1, -1, this.getValue, this.winLength))
 						}).filter((_, i) => i !== this.icon - 1))
 					};
 					if (o.att > highAtt) {
@@ -115,7 +115,7 @@ export class Elk {
 		this.icon = icon;
 		this.pCount = pCount;
 	}
-	doTurn(placements, map) {
+	doTurn(placements) {
 		let highAtt = 0;
 		let highDef = 0;
 		let heatMap = [];
@@ -125,7 +125,7 @@ export class Elk {
 					if (x === 0 && y === 0) {
 						continue;
 					}
-					if (this.getValue(e.x + x, e.y + y, map) !== 0) {
+					if (this.getValue(e.x + x, e.y + y) !== 0) {
 						continue;
 					}
 					let flag = false;
@@ -141,24 +141,24 @@ export class Elk {
 						x: e.x + x,
 						y: e.y + y,
 						att: Math.max(
-							countLine(e.x + x, e.y + y, this.icon, 1, 0, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 1, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 0, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, 0, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, -1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 0, -1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 1, -1, this.getValue, this.winLength, map)),
+							countLine(e.x + x, e.y + y, this.icon, 1, 0, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 1, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 0, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, 0, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, -1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 0, -1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 1, -1, this.getValue, this.winLength)),
 						def: Math.max(...Array(this.pCount).fill(0).map((_, i) => {
 							return Math.max(
-								countLine(e.x + x, e.y + y, i + 1, 1, 0, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 1, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 0, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, 0, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, -1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 0, -1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 1, -1, this.getValue, this.winLength, map))
+								countLine(e.x + x, e.y + y, i + 1, 1, 0, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 1, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 0, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, 0, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, -1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 0, -1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 1, -1, this.getValue, this.winLength))
 						}).filter((_, i) => i !== this.icon - 1))
 					};
 					if (o.att > highAtt) {
@@ -189,7 +189,7 @@ export class ElkAtt {
 		this.icon = icon;
 		this.pCount = pCount;
 	}
-	doTurn(placements, map) {
+	doTurn(placements) {
 		let highAtt = 0;
 		let highDef = 0;
 		let heatMap = [];
@@ -199,7 +199,7 @@ export class ElkAtt {
 					if (x === 0 && y === 0) {
 						continue;
 					}
-					if (this.getValue(e.x + x, e.y + y, map) !== 0) {
+					if (this.getValue(e.x + x, e.y + y) !== 0) {
 						continue;
 					}
 					let flag = false;
@@ -215,24 +215,24 @@ export class ElkAtt {
 						x: e.x + x,
 						y: e.y + y,
 						att: Math.max(
-							countLine(e.x + x, e.y + y, this.icon, 1, 0, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 1, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 0, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, 0, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, -1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 0, -1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 1, -1, this.getValue, this.winLength, map)),
+							countLine(e.x + x, e.y + y, this.icon, 1, 0, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 1, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 0, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, 0, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, -1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 0, -1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 1, -1, this.getValue, this.winLength)),
 						def: Math.max(...Array(this.pCount).fill(0).map((_, i) => {
 							return Math.max(
-								countLine(e.x + x, e.y + y, i + 1, 1, 0, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 1, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 0, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, 0, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, -1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 0, -1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 1, -1, this.getValue, this.winLength, map))
+								countLine(e.x + x, e.y + y, i + 1, 1, 0, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 1, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 0, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, 0, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, -1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 0, -1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 1, -1, this.getValue, this.winLength))
 						}).filter((_, i) => i !== this.icon - 1))
 					};
 					if (o.att > highAtt) {
@@ -262,7 +262,7 @@ export class ElkDef {
 		this.icon = icon;
 		this.pCount = pCount;
 	}
-	doTurn(placements, map) {
+	doTurn(placements) {
 		let highAtt = 0;
 		let highDef = 0;
 		let heatMap = [];
@@ -272,7 +272,7 @@ export class ElkDef {
 					if (x === 0 && y === 0) {
 						continue;
 					}
-					if (this.getValue(e.x + x, e.y + y, map) !== 0) {
+					if (this.getValue(e.x + x, e.y + y) !== 0) {
 						continue;
 					}
 					let flag = false;
@@ -288,24 +288,24 @@ export class ElkDef {
 						x: e.x + x,
 						y: e.y + y,
 						att: Math.max(
-							countLine(e.x + x, e.y + y, this.icon, 1, 0, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 1, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 0, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, 1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, 0, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, -1, -1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 0, -1, this.getValue, this.winLength, map),
-							countLine(e.x + x, e.y + y, this.icon, 1, -1, this.getValue, this.winLength, map)),
+							countLine(e.x + x, e.y + y, this.icon, 1, 0, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 1, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 0, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, 1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, 0, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, -1, -1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 0, -1, this.getValue, this.winLength),
+							countLine(e.x + x, e.y + y, this.icon, 1, -1, this.getValue, this.winLength)),
 						def: Math.max(...Array(this.pCount).fill(0).map((_, i) => {
 							return Math.max(
-								countLine(e.x + x, e.y + y, i + 1, 1, 0, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 1, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 0, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, 1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, 0, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, -1, -1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 0, -1, this.getValue, this.winLength, map),
-								countLine(e.x + x, e.y + y, i + 1, 1, -1, this.getValue, this.winLength, map))
+								countLine(e.x + x, e.y + y, i + 1, 1, 0, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 1, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 0, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, 1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, 0, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, -1, -1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 0, -1, this.getValue, this.winLength),
+								countLine(e.x + x, e.y + y, i + 1, 1, -1, this.getValue, this.winLength))
 						}).filter((_, i) => i !== this.icon - 1))
 					};
 					if (o.att > highAtt) {

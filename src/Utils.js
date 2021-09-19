@@ -10,8 +10,6 @@ export function flatten(x, d) {
 }
 
 export const CONFIG = {
-	SIZE: 10,
-	S_SIZE: 40,
 	player_colors: [
 		'#5588ff',
 		'#ff3344',
