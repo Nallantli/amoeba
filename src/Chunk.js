@@ -4,9 +4,6 @@ import { Space, spaceSize } from "./Space";
 export const chunkSize = 3;
 
 export class Chunk extends React.Component {
-	constructor(props) {
-		super(props);
-	}
 	processClick(x, y) {
 		const { chunkX, chunkY, selectSquare } = this.props;
 		selectSquare({ detail: { x: chunkX * chunkSize + x, y: chunkY * chunkSize + y } });
@@ -28,6 +25,7 @@ export class Chunk extends React.Component {
 				{chunkData.map((col, x) => {
 					return col.map((cell, y) =>
 						<Space
+							key={`${x + chunkX * chunkSize}_${y + chunkY * chunkSize}`}
 							id={`${x + chunkX * chunkSize}_${y + chunkY * chunkSize}`}
 							value={cell}
 							x={x}

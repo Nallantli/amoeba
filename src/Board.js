@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Chunk, chunkSize } from './Chunk';
 import { spaceSize } from './Space';
 import { Fuzzy, Elk, ElkAtt, ElkDef } from './ai';
@@ -35,7 +35,9 @@ class ScoreScreen extends React.Component {
 				id="score-dialog"
 			>
 				<table>
-					{this.props.playerScores.map((score, i) => <tr><td style={{ width: "40px" }}><img className="svg" src={CONFIG.player_icons[i]} /></td><td>{score}</td></tr>)}
+					<tbody>
+						{this.props.playerScores.map((score, i) => <tr key={i}><td style={{ width: "40px" }}><img alt={`player-${i + 1}-icon`} className="svg" src={CONFIG.player_icons[i]} /></td><td>{score}</td></tr>)}
+					</tbody>
 				</table>
 			</div>
 		);
@@ -215,7 +217,7 @@ export class Board extends React.Component {
 	getValue(x, y) {
 		let { map } = this.state;
 		let chunk = map[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)];
-		if (chunk == undefined) {
+		if (chunk === undefined) {
 			return 0;
 		}
 		return chunk.chunkData[flatten(x, chunkSize)][flatten(y, chunkSize)];
@@ -312,7 +314,7 @@ export class Board extends React.Component {
 				}
 			}
 			this.setState(newState, () => {
-				if (this.state.AIs[this.state.turn] != undefined) {
+				if (this.state.AIs[this.state.turn] !== undefined) {
 					const pos = this.state.AIs[this.state.turn].doTurn(this.state.placements);
 					setTimeout(() => this.boardRef.current.dispatchEvent(new CustomEvent('selectSquare', { detail: { x: pos.x, y: pos.y } })));
 				}
@@ -339,7 +341,7 @@ export class Board extends React.Component {
 	}
 	addChunk(x, y, newState) {
 		let { map, xLow, yLow, xHigh, yHigh, offsetX, offsetY } = newState || this.state;
-		if (map[x + '_' + y] != undefined) {
+		if (map[x + '_' + y] !== undefined) {
 			return;
 		}
 		let chunkData = [];
@@ -386,6 +388,15 @@ export class Board extends React.Component {
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
 		return (
 			<div id="screen">
+				<div id="player-bar"
+					style={{
+						background: (this.state.win ?
+							CONFIG.player_colors[flatten((this.props.isLimited ?
+								this.state.playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i
+								: this.state.turn - 1), this.props.playerCount)]
+							: CONFIG.player_colors[this.state.turn])
+					}}
+				/>
 				{this.props.isLimited && <Limit moveLimit={this.state.moveLimit} />}
 				{this.props.isLimited && <ScoreScreen playerScores={this.state.playerScores} />}
 				<div className="board" ref={this.boardRef}>
@@ -403,6 +414,7 @@ export class Board extends React.Component {
 					>
 						{Object.values(this.state.map).map(value =>
 							<Chunk
+								key={value.x + '_' + value.y}
 								posX={value.x - xLow}
 								posY={value.y - yLow}
 								chunkX={value.x}

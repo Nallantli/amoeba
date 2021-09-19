@@ -13,8 +13,8 @@ export const CONFIG = {
 	player_colors: [
 		'#5588ff',
 		'#ff3344',
-		'#ffcc33',
-		"#33ff44"
+		"#33ff44",
+		'#ffcc33'
 	],
 	player_icons: [
 		SVGCircle,

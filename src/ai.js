@@ -96,7 +96,6 @@ export class Fuzzy {
 		} else {
 			const attMap = heatMap.filter(e => e.att === highAtt);
 			const defMap = heatMap.filter(e => e.def === highDef);
-			console.log({ highAtt, highDef, attMap, defMap });
 			if (highAtt >= this.winLength) {
 				return attMap[Math.floor(Math.random() * attMap.length)];
 			}
@@ -176,7 +175,6 @@ export class Elk {
 		} else {
 			const attMap = heatMap.filter(e => e.att === highAtt);
 			const defMap = heatMap.filter(e => e.def === highDef);
-			console.log({ highAtt, highDef, attMap, defMap });
 			return (highAtt - highDef) > 0 ? attMap[Math.floor(Math.random() * attMap.length)] : defMap[Math.floor(Math.random() * defMap.length)];
 		}
 	}
@@ -250,7 +248,6 @@ export class ElkAtt {
 		} else {
 			const attMap = heatMap.filter(e => e.att === highAtt);
 			const defMap = heatMap.filter(e => e.def === highDef);
-			console.log({ highAtt, highDef, attMap, defMap });
 			return (highAtt - highDef) > -1 ? attMap[Math.floor(Math.random() * attMap.length)] : defMap[Math.floor(Math.random() * defMap.length)];
 		}
 	}
@@ -323,7 +320,6 @@ export class ElkDef {
 		} else {
 			const attMap = heatMap.filter(e => e.att === highAtt);
 			const defMap = heatMap.filter(e => e.def === highDef);
-			console.log({ highAtt, highDef, attMap, defMap });
 			return (highAtt - highDef) > 1 ? attMap[Math.floor(Math.random() * attMap.length)] : defMap[Math.floor(Math.random() * defMap.length)];
 		}
 	}

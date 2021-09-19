@@ -17,7 +17,7 @@ export class Space extends React.Component {
 				top: `${this.props.y * spaceSize}px`
 			}}
 		>
-			{this.props.value > 0 && <img className="player-icon" src={CONFIG.player_icons[this.props.value - 1]} />}
+			{this.props.value > 0 && <img alt={`player-${this.props.value}-icon`} className="player-icon" src={CONFIG.player_icons[this.props.value - 1]} />}
 		</button>);
 	}
 }
