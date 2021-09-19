@@ -36,7 +36,7 @@ class ScoreScreen extends React.Component {
 			>
 				<table>
 					<tbody>
-						{this.props.playerScores.map((score, i) => <tr key={i}><td style={{ width: "40px" }}><img alt={`player-${i + 1}-icon`} className="svg" src={CONFIG.player_icons[i]} /></td><td>{score}</td></tr>)}
+						{this.props.playerScores.map((score, i) => <tr key={i}><td style={{ width: "40px" }}>{React.createElement(CONFIG.player_icons[i], { color: CONFIG.player_colors[i] })}</td><td>{score}</td></tr>)}
 					</tbody>
 				</table>
 			</div>
@@ -62,6 +62,7 @@ export class Board extends React.Component {
 		this.diagonalUp = this.diagonalUp.bind(this);
 		this.diagonalDown = this.diagonalDown.bind(this);
 		this.calculateLimitScore = this.calculateLimitScore.bind(this);
+		this.handleZoom = this.handleZoom.bind(this);
 
 		this.boardRef = React.createRef();
 
@@ -92,8 +93,11 @@ export class Board extends React.Component {
 			turn: 0,
 			AIs: AIs,
 			win: false,
-			offsetX: 0,
-			offsetY: 0,
+			view: {
+				offsetX: 0,
+				offsetY: 0,
+				spaceSize: 50
+			},
 			xLow: 0,
 			xHigh: 0,
 			yLow: 0,
@@ -148,6 +152,17 @@ export class Board extends React.Component {
 		}
 		return { ps, type: 3 };
 	}
+	handleZoom(v) {
+		let { offsetX, offsetY, spaceSize } = this.state.view;
+		if ((spaceSize < 15 && v < 1) || (spaceSize > 160 && v > 1)) return;
+		this.setState({
+			view: {
+				offsetX: offsetX * v,
+				offsetY: offsetY * v,
+				spaceSize: spaceSize * v
+			}
+		});
+	}
 	calculateLimitScore() {
 		const { playerCount, winLength } = this.props;
 		const { placements } = this.state;
@@ -196,10 +211,15 @@ export class Board extends React.Component {
 	}
 	handleScroll(e) {
 		e.preventDefault();
-		const { offsetX, offsetY } = this.state;
+		const { offsetX, offsetY, spaceSize } = this.state.view;
+		const deltaX = e.deltaX * 0.25;
+		const deltaY = e.deltaY * 0.25;
 		this.setState({
-			offsetX: offsetX - e.deltaX / 2,
-			offsetY: offsetY - e.deltaY / 2
+			view: {
+				offsetX: offsetX - deltaX,
+				offsetY: offsetY - deltaY,
+				spaceSize: spaceSize
+			}
 		})
 	}
 	handleTouchMove(e) {
@@ -224,11 +244,15 @@ export class Board extends React.Component {
 		e.preventDefault();
 		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
 		var touch = evt.touches[0] || evt.changedTouches[0];
-		const { offsetX, offsetY, touchStart, touchOffset } = this.state;
+		const { view, touchStart, touchOffset } = this.state;
+		const { offsetX, offsetY, spaceSize } = view;
 		this.setState({
 			isTouching: false,
-			offsetX: offsetX + (touchOffset.x - touchStart.x),
-			offsetY: offsetY + (touchOffset.y - touchStart.y)
+			view: {
+				offsetX: offsetX + (touchOffset.x - touchStart.x),
+				offsetY: offsetY + (touchOffset.y - touchStart.y),
+				spaceSize: spaceSize
+			}
 		}, () => {
 			if (Math.pow(touchStart.x - touch.pageX, 2) + Math.pow(touchStart.y - touch.pageY, 2) < 10) {
 				touch.target.click();
@@ -253,7 +277,11 @@ export class Board extends React.Component {
 			() => {
 				if (this.state.AIs[this.state.turn] !== undefined) {
 					const pos = this.state.AIs[this.state.turn].doTurn(this.state.placements);
-					setTimeout(() => this.boardRef.current.dispatchEvent(new CustomEvent('selectSquare', { detail: { x: pos.x, y: pos.y } })));
+					setTimeout(
+						() => this.boardRef.current.dispatchEvent(
+							new CustomEvent('selectSquare',
+								{ detail: { x: pos.x, y: pos.y } })),
+						this.props.turnDelay);
 				}
 			}
 		);
@@ -360,7 +388,11 @@ export class Board extends React.Component {
 			this.setState(newState, () => {
 				if (this.state.AIs[this.state.turn] !== undefined) {
 					const pos = this.state.AIs[this.state.turn].doTurn(this.state.placements);
-					setTimeout(() => this.boardRef.current.dispatchEvent(new CustomEvent('selectSquare', { detail: { x: pos.x, y: pos.y } })));
+					setTimeout(
+						() => this.boardRef.current.dispatchEvent(
+							new CustomEvent('selectSquare',
+								{ detail: { x: pos.x, y: pos.y } })),
+						this.props.turnDelay);
 				}
 			});
 		}
@@ -384,7 +416,8 @@ export class Board extends React.Component {
 		});
 	}
 	addChunk(x, y, newState) {
-		let { map, xLow, yLow, xHigh, yHigh, offsetX, offsetY } = newState || this.state;
+		let { map, xLow, yLow, xHigh, yHigh, view } = newState || this.state;
+		let { offsetX, offsetY, spaceSize } = view;
 		if (map[x + '_' + y] !== undefined) {
 			return;
 		}
@@ -422,12 +455,16 @@ export class Board extends React.Component {
 			yLow: yLow,
 			xHigh: xHigh,
 			yHigh: yHigh,
-			offsetX: offsetX,
-			offsetY: offsetY
+			view: {
+				offsetX: offsetX,
+				offsetY: offsetY,
+				spaceSize: spaceSize
+			}
 		};
 	}
 	render() {
-		let { offsetX, offsetY, isTouching, touchOffset, touchStart, xLow, yLow, xHigh, yHigh } = this.state;
+		let { view, isTouching, touchOffset, touchStart, xLow, yLow, xHigh, yHigh } = this.state;
+		let { offsetX, offsetY, spaceSize } = view;
 		if (isTouching) {
 			offsetX = offsetX + (touchOffset.x - touchStart.x);
 			offsetY = offsetY + (touchOffset.y - touchStart.y);
@@ -445,6 +482,10 @@ export class Board extends React.Component {
 							: CONFIG.player_colors[this.state.turn])
 					}}
 				/>
+				<div id="zoom-bar">
+					<button id="zoom-in" onClick={() => this.handleZoom(3 / 2)}>+</button>
+					<button id="zoom-out" onClick={() => this.handleZoom(2 / 3)}>-</button>
+				</div>
 				{this.props.isLimited && <Limit moveLimit={this.state.moveLimit} />}
 				{this.props.isLimited && <ScoreScreen playerScores={this.state.playerScores} />}
 				<div className="board" ref={this.boardRef}>
@@ -471,6 +512,8 @@ export class Board extends React.Component {
 								addChunk={this.addChunk}
 								selectSquare={this.selectSquare}
 								win={this.state.win}
+								canPlayerMove={this.state.AIs[this.state.turn] === undefined}
+								view={view}
 							/>
 						)}
 					</div>

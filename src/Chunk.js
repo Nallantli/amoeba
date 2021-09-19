@@ -1,23 +1,28 @@
 import React from "react";
-import { Space, spaceSize } from "./Space";
+import { Space } from "./Space";
 
 export const chunkSize = 3;
 
 export class Chunk extends React.Component {
+	constructor(props) {
+		super(props);
+		this.processClick = this.processClick.bind(this);
+	}
 	processClick(x, y) {
 		const { chunkX, chunkY, selectSquare } = this.props;
 		selectSquare({ detail: { x: chunkX * chunkSize + x, y: chunkY * chunkSize + y } });
 	}
 	render() {
-		const { chunkData, posX, posY, chunkX, chunkY } = this.props;
+		const { chunkData, posX, posY, chunkX, chunkY, win, canPlayerMove, view } = this.props;
+		const { spaceSize } = view;
 		return (
 			<div
 				className="chunk"
 				style={{
 					width: `${chunkSize * spaceSize}px`,
 					height: `${chunkSize * spaceSize}px`,
-					display: "block",
-					position: "absolute",
+					display: 'block',
+					position: 'absolute',
 					left: `${posX * chunkSize * spaceSize}px`,
 					top: `${posY * chunkSize * spaceSize}px`,
 				}}
@@ -31,7 +36,9 @@ export class Chunk extends React.Component {
 							x={x}
 							y={y}
 							onClick={() => this.processClick(x, y)}
-							win={this.props.win}
+							win={win}
+							canPlayerMove={canPlayerMove}
+							view={view}
 						/>
 					);
 				})}

@@ -1,23 +1,23 @@
 import React from "react";
 import { CONFIG } from "./Utils";
 
-export const spaceSize = 40;
-
 export class Space extends React.Component {
 	render() {
+		const { x, y, id, value, win, canPlayerMove, onClick, view } = this.props;
+		const { spaceSize } = view;
 		return (<button
-			id={this.props.id}
-			onClick={this.props.value === 0 && !this.props.win ? this.props.onClick : () => { }}
+			id={id}
+			onClick={value === 0 && !win && canPlayerMove ? onClick : () => { }}
 			className="space"
 			style={{
 				width: `${spaceSize}px`,
 				height: `${spaceSize}px`,
 				position: "absolute",
-				left: `${this.props.x * spaceSize}px`,
-				top: `${this.props.y * spaceSize}px`
+				left: `${x * spaceSize}px`,
+				top: `${y * spaceSize}px`
 			}}
 		>
-			{this.props.value > 0 && <img alt={`player-${this.props.value}-icon`} className="player-icon" src={CONFIG.player_icons[this.props.value - 1]} />}
+			{value > 0 && React.createElement(CONFIG.player_icons[value - 1], { color: CONFIG.player_colors[value - 1] })}
 		</button>);
 	}
 }

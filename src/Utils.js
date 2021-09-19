@@ -1,7 +1,7 @@
-import SVGCross from './img/cross.svg';
-import SVGCircle from './img/circle.svg';
-import SVGDiamond from './img/diamond.svg';
-import SVGSquare from './img/square.svg';
+import { CircleIcon } from "./assets/CircleIcon";
+import { CrossIcon } from "./assets/CrossIcon";
+import { DiamondIcon } from "./assets/DiamondIcon";
+import { SquareIcon } from "./assets/SquareIcon";
 
 export function flatten(x, d) {
 	while (x < 0)
@@ -17,9 +17,9 @@ export const CONFIG = {
 		'#ffcc33'
 	],
 	player_icons: [
-		SVGCircle,
-		SVGCross,
-		SVGDiamond,
-		SVGSquare
+		CircleIcon,
+		CrossIcon,
+		DiamondIcon,
+		SquareIcon
 	]
 };
