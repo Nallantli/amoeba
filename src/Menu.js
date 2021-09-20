@@ -1,5 +1,4 @@
 import React from "react";
-import { CONFIG } from "./Utils";
 
 class MenuItem extends React.Component {
 	constructor(props) {
@@ -10,18 +9,18 @@ class MenuItem extends React.Component {
 		console.log({e, id});
 	}
 	render() {
-		const { isPlayer, id, color } = this.props;
-		const Icon = CONFIG.player_icons[id];
+		const { isPlayer, id, color, config } = this.props;
+		const Icon = config.player_icons[id];
 		return (
 			<div className="menu-item">
 				<div className="menu-item-name">
 					Player {id + 1}
 				</div>
 				<div className="menu-item-icon">
-					<Icon color={CONFIG.player_colors[id]} />
+					<Icon color={config.player_colors[id]} />
 				</div>
 				<div className="menu-item-color">
-					<input type="text" value={CONFIG.player_colors[id]} onChange={(e) => this.handleColorChange(e, id)} />
+					<input type="text" value={config.player_colors[id]} onChange={(e) => this.handleColorChange(e, id)} />
 				</div>
 			</div>
 		)
@@ -34,7 +33,7 @@ export class Menu extends React.Component {
 		let players = [];
 		for (let i = 0; i < props.playerCount; i++) {
 			players.push({
-				color: CONFIG.player_colors[i],
+				color: props.config.player_colors[i],
 				isPlayer: true
 			});
 		}

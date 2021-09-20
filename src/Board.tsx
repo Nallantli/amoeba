@@ -1,51 +1,81 @@
 import React from 'react';
 import { Chunk, chunkSize } from './Chunk';
-import { spaceSize } from './Space';
-import { Fuzzy, Elk, ElkAtt, ElkDef } from './ai';
-import { CONFIG } from './Utils';
+import { Fuzzy } from './ais/Fuzzy';
+import { AI } from './AI';
+import { Elk } from './ais/Elk';
+import { ElkAtt } from './ais/ElkAtt';
+import { ElkDef } from './ais/ElkDef';
 
-export function flatten(x, d) {
+export type ConfigType = {
+	playerIcons: any[];
+	playerColors: string[];
+};
+
+function flatten(x: number, d: number): number {
 	while (x < 0)
 		x += d;
 	return x % d;
 }
 
 /* carter code */
-const fib = n => {
+function fib(n: number): number {
 	if (n === 1 || n === 0)
 		return n;
 	else
 		return fib(n - 2) + fib(n - 1);
 }
 
-class Limit extends React.Component {
-	render() {
-		return (
-			<div
-				id="limit-dialog"
-			>Turns Left: {this.props.moveLimit}</div>
-		);
-	}
+const Limit = (props: { moveLimit: number }) => {
+	return (<div id="limit-dialog">Turns Left: {props.moveLimit}</div>);
 }
 
-class ScoreScreen extends React.Component {
-	render() {
-		return (
-			<div
-				id="score-dialog"
-			>
-				<table>
-					<tbody>
-						{this.props.playerScores.map((score, i) => <tr key={i}><td style={{ width: "40px" }}>{React.createElement(CONFIG.player_icons[i], { color: CONFIG.player_colors[i] })}</td><td>{score}</td></tr>)}
-					</tbody>
-				</table>
-			</div>
-		);
-	}
+const ScoreScreen = (props: { playerScores: number[], config: ConfigType }) => {
+	return (
+		<div id="score-dialog">
+			<table>
+				<tbody>
+					{props.playerScores.map((score, i) => <tr key={i}><td style={{ width: "40px" }}>{React.createElement(props.config.playerIcons[i], { color: props.config.playerColors[i] })}</td><td>{score}</td></tr>)}
+				</tbody>
+			</table>
+		</div>
+	);
 }
 
-export class Board extends React.Component {
-	constructor(props) {
+type BoardProps = {
+	params: any;
+	playerCount: number;
+	winLength: number;
+	limit: number;
+	turnDelay: number;
+	isLimited: boolean;
+	config: ConfigType;
+};
+
+type BoardState = {
+	map: { [key: string]: { x: number, y: number, chunkData: number[][] } };
+	placements: { x: number, y: number, v: number }[];
+	turn: number;
+	AIs: (AI | undefined)[];
+	win: boolean;
+	view: {
+		offsetX: number;
+		offsetY: number;
+		spaceSize: number;
+	};
+	xLow: number;
+	xHigh: number;
+	yLow: number;
+	yHigh: number;
+	playerScores: number[];
+	moveLimit: number;
+	isTouching: boolean;
+	touchStart: { x: number, y: number };
+	touchOffset: { x: number, y: number };
+};
+
+export class Board extends React.Component<BoardProps, BoardState> {
+	boardRef: React.RefObject<HTMLDivElement>;
+	constructor(props: BoardProps) {
 		super(props);
 
 		this.getValue = this.getValue.bind(this);
@@ -66,7 +96,7 @@ export class Board extends React.Component {
 
 		this.boardRef = React.createRef();
 
-		let AIs = [];
+		let AIs: (AI | undefined)[] = [];
 		for (let i = 0; i < props.playerCount; i++) {
 			switch (props.params.get(`p${i + 1}`)) {
 				case "fuzzy":
@@ -109,7 +139,7 @@ export class Board extends React.Component {
 			touchOffset: { x: 0, y: 0 }
 		}
 	}
-	sharePoint(a, b) {
+	sharePoint(a: { x: number, y: number }[], b: { x: number, y: number }[]) {
 		for (let i = 0; i < a.length; i++) {
 			for (let j = 0; j < b.length; j++) {
 				if (a[i].x === b[j].x && a[i].y === b[j].y)
@@ -118,7 +148,7 @@ export class Board extends React.Component {
 		}
 		return false;
 	}
-	horizontalCount(x, y, v) {
+	horizontalCount(x: number, y: number, v: number) {
 		let ps = [];
 		while (this.getValue(x, y) === v) {
 			ps.push({ x, y });
@@ -126,7 +156,7 @@ export class Board extends React.Component {
 		}
 		return { ps, type: 0 };
 	}
-	verticalCount(x, y, v) {
+	verticalCount(x: number, y: number, v: number) {
 		let ps = [];
 		while (this.getValue(x, y) === v) {
 			ps.push({ x, y });
@@ -134,7 +164,7 @@ export class Board extends React.Component {
 		}
 		return { ps, type: 1 };
 	}
-	diagonalUp(x, y, v) {
+	diagonalUp(x: number, y: number, v: number) {
 		let ps = [];
 		while (this.getValue(x, y) === v) {
 			ps.push({ x, y });
@@ -143,7 +173,7 @@ export class Board extends React.Component {
 		}
 		return { ps, type: 2 };
 	}
-	diagonalDown(x, y, v) {
+	diagonalDown(x: number, y: number, v: number) {
 		let ps = [];
 		while (this.getValue(x, y) === v) {
 			ps.push({ x, y });
@@ -152,7 +182,7 @@ export class Board extends React.Component {
 		}
 		return { ps, type: 3 };
 	}
-	handleZoom(v) {
+	handleZoom(v: number) {
 		let { offsetX, offsetY, spaceSize } = this.state.view;
 		if ((spaceSize < 15 && v < 1) || (spaceSize > 160 && v > 1)) return;
 		this.setState({
@@ -166,11 +196,11 @@ export class Board extends React.Component {
 	calculateLimitScore() {
 		const { playerCount, winLength } = this.props;
 		const { placements } = this.state;
-		let matches = [];
+		let matches: { type: number, ps: { x: number, y: number }[], old?: boolean }[][] = [];
 		for (let i = 0; i < playerCount; i++) {
 			matches.push([]);
 		}
-		placements.forEach(placement => {
+		placements.forEach((placement: { x: number, y: number, v: number }) => {
 			[
 				this.horizontalCount(placement.x, placement.y, placement.v),
 				this.verticalCount(placement.x, placement.y, placement.v),
@@ -181,8 +211,8 @@ export class Board extends React.Component {
 					return;
 				}
 				let flag = false;
-				let removes = [];
-				matches[placement.v - 1].forEach((p, i) => {
+				let removes: number[] = [];
+				matches[placement.v - 1].forEach((p: { type: number, ps: { x: number, y: number }[] }, i: number) => {
 					if (p.type === e.type && this.sharePoint(p.ps, e.ps)) {
 						if (p.ps.length < e.ps.length) {
 							removes.push(i);
@@ -197,7 +227,7 @@ export class Board extends React.Component {
 				}
 			});
 		});
-		let playerScores = [];
+		let playerScores: number[] = [];
 		matches.map(m => m.filter(e => e.old === undefined));
 		matches.forEach(e => {
 			let score = 0;
@@ -208,7 +238,7 @@ export class Board extends React.Component {
 		});
 		return playerScores;
 	}
-	handleScroll(e) {
+	handleScroll(e: any) {
 		e.preventDefault();
 		const { offsetX, offsetY, spaceSize } = this.state.view;
 		const deltaX = e.deltaX * 0.25;
@@ -221,7 +251,7 @@ export class Board extends React.Component {
 			}
 		})
 	}
-	handleTouchMove(e) {
+	handleTouchMove(e: any) {
 		e.preventDefault();
 		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
 		var touch = evt.touches[0] || evt.changedTouches[0];
@@ -229,7 +259,7 @@ export class Board extends React.Component {
 			touchOffset: { x: touch.pageX, y: touch.pageY }
 		});
 	}
-	handleTouchStart(e) {
+	handleTouchStart(e: any) {
 		e.preventDefault();
 		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
 		var touch = evt.touches[0] || evt.changedTouches[0];
@@ -239,7 +269,7 @@ export class Board extends React.Component {
 			touchOffset: { x: touch.pageX, y: touch.pageY }
 		});
 	}
-	handleTouchEnd(e) {
+	handleTouchEnd(e: any) {
 		e.preventDefault();
 		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
 		var touch = evt.touches[0] || evt.changedTouches[0];
@@ -264,7 +294,7 @@ export class Board extends React.Component {
 		window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
 		window.addEventListener('touchend', this.handleTouchEnd, { passive: false });
 		window.addEventListener('touchcancel', this.handleTouchEnd, { passive: false });
-		this.boardRef.current.addEventListener('selectSquare', this.selectSquare);
+		this.boardRef.current?.addEventListener('selectSquare', this.selectSquare);
 		let newState = { ...this.state };
 		for (let i = -1; i <= 1; i++) {
 			for (let j = -1; j <= 1; j++) {
@@ -275,17 +305,17 @@ export class Board extends React.Component {
 			{ ...newState },
 			() => {
 				if (this.state.AIs[this.state.turn] !== undefined) {
-					const pos = this.state.AIs[this.state.turn].doTurn(this.state.placements);
+					const pos = this.state.AIs[this.state.turn]?.doTurn(this.state.placements);
 					setTimeout(
-						() => this.boardRef.current.dispatchEvent(
+						() => this.boardRef.current?.dispatchEvent(
 							new CustomEvent('selectSquare',
-								{ detail: { x: pos.x, y: pos.y } })),
+								{ detail: { x: pos?.x, y: pos?.y } })),
 						this.props.turnDelay);
 				}
 			}
 		);
 	}
-	getValue(x, y) {
+	getValue(x: number, y: number) {
 		let { map } = this.state;
 		let chunk = map[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)];
 		if (chunk === undefined) {
@@ -293,7 +323,7 @@ export class Board extends React.Component {
 		}
 		return chunk.chunkData[flatten(x, chunkSize)][flatten(y, chunkSize)];
 	}
-	checkWin(lastMove) {
+	checkWin(lastMove: { x: number, y: number }) {
 		const { x, y } = lastMove;
 		const { moveLimit } = this.state;
 		const { winLength, isLimited } = this.props
@@ -306,7 +336,7 @@ export class Board extends React.Component {
 		} else {
 			let check = this.getValue(x, y);
 			if (check === 0)
-				return { win: false };
+				return { win: false, playerScores: [] };
 			for (let i = 0; i < winLength; i++) {
 				let squares = [];
 				for (let j = 0; j < winLength; j++) {
@@ -318,8 +348,8 @@ export class Board extends React.Component {
 					squares.push((x - i + j) + "_" + y);
 				}
 				if (squares.length === winLength) {
-					squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
-					return { win: true };
+					squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
+					return { win: true, playerScores: [] };
 				}
 			}
 			for (let i = 0; i < winLength; i++) {
@@ -333,8 +363,8 @@ export class Board extends React.Component {
 					squares.push(x + "_" + (y - i + j));
 				}
 				if (squares.length === winLength) {
-					squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
-					return { win: true };
+					squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
+					return { win: true, playerScores: [] };
 				}
 			}
 			for (let i = 0; i < winLength; i++) {
@@ -348,8 +378,8 @@ export class Board extends React.Component {
 					squares.push((x - i + j) + "_" + (y - i + j));
 				}
 				if (squares.length === winLength) {
-					squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
-					return { win: true };
+					squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
+					return { win: true, playerScores: [] };
 				}
 			}
 			for (let i = 0; i < winLength; i++) {
@@ -363,14 +393,14 @@ export class Board extends React.Component {
 					squares.push((x - i + j) + "_" + (y + i - j));
 				}
 				if (squares.length === winLength) {
-					squares.forEach((e) => document.getElementById(e).classList.add("win-square"));
-					return { win: true };
+					squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
+					return { win: true, playerScores: [] };
 				}
 			}
 		}
-		return { win: false };
+		return { win: false, playerScores: [] };
 	}
-	postMove(lastMove) {
+	postMove(lastMove: { x: number, y: number, v: number }) {
 		const { win, playerScores } = this.checkWin(lastMove);
 		let newState = { ...this.state, playerScores };
 		if (win) {
@@ -386,17 +416,17 @@ export class Board extends React.Component {
 			}
 			this.setState(newState, () => {
 				if (this.state.AIs[this.state.turn] !== undefined) {
-					const pos = this.state.AIs[this.state.turn].doTurn(this.state.placements);
+					const pos = this.state.AIs[this.state.turn]?.doTurn(this.state.placements);
 					setTimeout(
-						() => this.boardRef.current.dispatchEvent(
+						() => this.boardRef.current?.dispatchEvent(
 							new CustomEvent('selectSquare',
-								{ detail: { x: pos.x, y: pos.y } })),
+								{ detail: { x: pos?.x, y: pos?.y } })),
 						this.props.turnDelay);
 				}
 			});
 		}
 	}
-	selectSquare(e) {
+	selectSquare(e: any) {
 		const { x, y } = e.detail;
 		let { map, turn, moveLimit } = this.state;
 		let v = turn + 1;
@@ -414,13 +444,13 @@ export class Board extends React.Component {
 			this.postMove({ x, y, v });
 		});
 	}
-	addChunk(x, y, newState) {
+	addChunk(x: number, y: number, newState: BoardState) {
 		let { map, xLow, yLow, xHigh, yHigh, view } = newState || this.state;
 		let { offsetX, offsetY, spaceSize } = view;
 		if (map[x + '_' + y] !== undefined) {
 			return;
 		}
-		let chunkData = [];
+		let chunkData: number[][] = [];
 		for (let i = 0; i < chunkSize; i++) {
 			chunkData[i] = [];
 			for (let j = 0; j < chunkSize; j++) {
@@ -462,7 +492,8 @@ export class Board extends React.Component {
 		};
 	}
 	render() {
-		let { view, isTouching, touchOffset, touchStart, xLow, yLow, xHigh, yHigh } = this.state;
+		const { config, isLimited, playerCount } = this.props;
+		const { view, isTouching, touchOffset, touchStart, xLow, yLow, xHigh, yHigh, moveLimit, playerScores, win, turn, map, AIs } = this.state;
 		let { offsetX, offsetY, spaceSize } = view;
 		if (isTouching) {
 			offsetX = offsetX + (touchOffset.x - touchStart.x);
@@ -474,19 +505,19 @@ export class Board extends React.Component {
 			<div id="screen">
 				<div id="player-bar"
 					style={{
-						background: (this.state.win ?
-							CONFIG.player_colors[flatten((this.props.isLimited ?
-								this.state.playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i
-								: this.state.turn - 1), this.props.playerCount)]
-							: CONFIG.player_colors[this.state.turn])
+						background: (win ?
+							config.playerColors[flatten((isLimited ?
+								playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i
+								: turn - 1), playerCount)]
+							: config.playerColors[turn])
 					}}
 				/>
 				<div id="zoom-bar">
 					<button id="zoom-in" onClick={() => this.handleZoom(3 / 2)}>+</button>
 					<button id="zoom-out" onClick={() => this.handleZoom(2 / 3)}>-</button>
 				</div>
-				{this.props.isLimited && <Limit moveLimit={this.state.moveLimit} />}
-				{this.props.isLimited && <ScoreScreen playerScores={this.state.playerScores} />}
+				{isLimited && <Limit moveLimit={moveLimit} />}
+				{isLimited && <ScoreScreen playerScores={playerScores} config={config} />}
 				<div className="board" ref={this.boardRef}>
 					<div
 						className="chunk-container"
@@ -500,18 +531,18 @@ export class Board extends React.Component {
 							marginLeft: `${-width / 2 + offsetX}px`
 						}}
 					>
-						{Object.values(this.state.map).map(value =>
+						{Object.values(map).map(value =>
 							<Chunk
+								config={config}
 								key={value.x + '_' + value.y}
 								posX={value.x - xLow}
 								posY={value.y - yLow}
 								chunkX={value.x}
 								chunkY={value.y}
 								chunkData={value.chunkData}
-								addChunk={this.addChunk}
 								selectSquare={this.selectSquare}
-								win={this.state.win}
-								canPlayerMove={this.state.AIs[this.state.turn] === undefined}
+								win={win}
+								canPlayerMove={AIs[turn] === undefined}
 								view={view}
 							/>
 						)}
