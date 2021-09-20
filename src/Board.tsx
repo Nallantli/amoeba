@@ -294,7 +294,9 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			}
 		}, () => {
 			if (Math.pow(touchStart.x - touch.pageX, 2) + Math.pow(touchStart.y - touch.pageY, 2) < 10) {
-				touch.target.click();
+				if (touch.target.click !== undefined) {
+					touch.target.click();
+				}
 			}
 		});
 	}
