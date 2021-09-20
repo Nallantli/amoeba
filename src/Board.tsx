@@ -422,9 +422,56 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		return { win: false, playerScores: [] };
 	}
 	postMove(lastMove: { x: number, y: number, v: number }) {
+		const { config, isLimited, playerCount } = this.props;
+		const { placements, turn } = this.state;
 		const { win, playerScores } = this.checkWin(lastMove);
 		let newState = { ...this.state, playerScores };
 		if (win) {
+			const winner =
+				flatten(
+					(isLimited ?
+						playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i
+						: turn - 1),
+					playerCount
+				);
+			placements.forEach(placement => {
+				let element = document.getElementById(placement.x + "_" + placement.y) as HTMLElement;
+				element.classList.add("amoeba-square");
+				let shadow = [];
+				if (this.getValue(placement.x, placement.y + 1) === 0) {
+					shadow.push(`${config.playerColors[winner]} 0px 5px`);
+				}
+				if (this.getValue(placement.x + 1, placement.y) === 0
+					&& this.getValue(placement.x, placement.y + 1) === 0
+					&& this.getValue(placement.x + 1, placement.y + 1) === 0) {
+					shadow.push(`${config.playerColors[winner]} 5px 5px`);
+				}
+				if (this.getValue(placement.x + 1, placement.y) === 0) {
+					shadow.push(`${config.playerColors[winner]} 5px 0px`);
+				}
+				if (this.getValue(placement.x + 1, placement.y) === 0
+					&& this.getValue(placement.x, placement.y - 1) === 0
+					&& this.getValue(placement.x + 1, placement.y - 1) === 0) {
+					shadow.push(`${config.playerColors[winner]} 5px -5px`);
+				}
+				if (this.getValue(placement.x, placement.y - 1) === 0) {
+					shadow.push(`${config.playerColors[winner]} 0px -5px`);
+				}
+				if (this.getValue(placement.x - 1, placement.y) === 0
+					&& this.getValue(placement.x, placement.y + 1) === 0
+					&& this.getValue(placement.x - 1, placement.y + 1) === 0) {
+					shadow.push(`${config.playerColors[winner]} -5px 5px`);
+				}
+				if (this.getValue(placement.x - 1, placement.y) === 0) {
+					shadow.push(`${config.playerColors[winner]} -5px 0px`);
+				}
+				if (this.getValue(placement.x - 1, placement.y) === 0
+					&& this.getValue(placement.x, placement.y - 1) === 0
+					&& this.getValue(placement.x - 1, placement.y - 1) === 0) {
+					shadow.push(`${config.playerColors[winner]} -5px -5px`);
+				}
+				element.style.boxShadow = shadow.join(", ");
+			});
 			this.setState({ ...newState, win: true });
 		} else {
 			const chunkX = Math.floor(lastMove.x / chunkSize);
