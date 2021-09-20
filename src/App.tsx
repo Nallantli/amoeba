@@ -1,14 +1,12 @@
-import './App.css';
 import { Board } from './Board';
-import React from 'react';
 import { Menu } from './Menu';
 import { CircleIcon } from './assets/CircleIcon';
 import { CrossIcon } from './assets/CrossIcon';
 import { DiamondIcon } from './assets/DiamondIcon';
 import { SquareIcon } from './assets/SquareIcon';
 
-function App() {
-	const params = new URLSearchParams(window.location.search);
+function App(props: any) {
+	const { params } = props;
 	const winLength = params.get('win') ? parseInt(params.get('win') as string, 10) : 5;
 	const playerCount = params.get('count') ? parseInt(params.get('count') as string, 10) : 2;
 	const limit = params.get('limit') ? parseInt(params.get('limit') as string, 10) : 0;

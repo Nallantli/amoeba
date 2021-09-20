@@ -458,6 +458,9 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				let element = document.getElementById(placement.x + "_" + placement.y) as HTMLElement;
 				element.classList.add("amoeba-square");
 				let shadow = [];
+				if (window.getComputedStyle(element).boxShadow !== "none") {
+					shadow.push(window.getComputedStyle(element).boxShadow);
+				}
 				if (this.getValue(placement.x, placement.y + 1) === 0) {
 					shadow.push(`${config.playerColors[winner]} 0px 5px`);
 				}
@@ -516,6 +519,9 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	}
 	selectSquare(e: any) {
 		const { x, y } = e.detail;
+
+		document.getElementById(x + "_" + y)?.classList.add("space-pressed");
+
 		let { map, turn, moveLimit } = this.state;
 		let v = turn + 1;
 		let chunk = map[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)];
