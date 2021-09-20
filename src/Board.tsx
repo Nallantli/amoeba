@@ -71,6 +71,7 @@ type BoardState = {
 	isTouching: boolean;
 	touchStart: { x: number, y: number };
 	touchOffset: { x: number, y: number };
+	shiftScroll: boolean;
 };
 
 export class Board extends React.Component<BoardProps, BoardState> {
@@ -93,6 +94,8 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		this.diagonalDown = this.diagonalDown.bind(this);
 		this.calculateLimitScore = this.calculateLimitScore.bind(this);
 		this.handleZoom = this.handleZoom.bind(this);
+		this.handleKeyDown = this.handleKeyDown.bind(this);
+		this.handleKeyUp = this.handleKeyUp.bind(this);
 
 		this.boardRef = React.createRef();
 
@@ -136,7 +139,8 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			moveLimit: props.limit,
 			isTouching: false,
 			touchStart: { x: 0, y: 0 },
-			touchOffset: { x: 0, y: 0 }
+			touchOffset: { x: 0, y: 0 },
+			shiftScroll: false
 		}
 	}
 	sharePoint(a: { x: number, y: number }[], b: { x: number, y: number }[]) {
@@ -240,13 +244,14 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	}
 	handleScroll(e: any) {
 		e.preventDefault();
+		const { shiftScroll } = this.state;
 		const { offsetX, offsetY, spaceSize } = this.state.view;
 		const deltaX = e.deltaX * 0.25;
 		const deltaY = e.deltaY * 0.25;
 		this.setState({
 			view: {
-				offsetX: offsetX - deltaX,
-				offsetY: offsetY - deltaY,
+				offsetX: offsetX - (shiftScroll ? deltaY : deltaX),
+				offsetY: offsetY - (shiftScroll ? deltaX : deltaY),
 				spaceSize: spaceSize
 			}
 		})
@@ -288,12 +293,28 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			}
 		});
 	}
+	handleKeyDown(e: any) {
+		if (e.key === 'Shift') {
+			this.setState({
+				shiftScroll: true
+			});
+		}
+	}
+	handleKeyUp(e: any) {
+		if (e.key === 'Shift') {
+			this.setState({
+				shiftScroll: false
+			});
+		}
+	}
 	componentDidMount() {
 		window.addEventListener('wheel', this.handleScroll, { passive: false });
 		window.addEventListener('touchstart', this.handleTouchStart, { passive: false });
 		window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
 		window.addEventListener('touchend', this.handleTouchEnd, { passive: false });
 		window.addEventListener('touchcancel', this.handleTouchEnd, { passive: false });
+		window.addEventListener('keydown', this.handleKeyDown, { passive: false });
+		window.addEventListener('keyup', this.handleKeyUp, { passive: false });
 		this.boardRef.current?.addEventListener('selectSquare', this.selectSquare);
 		let newState = { ...this.state };
 		for (let i = -1; i <= 1; i++) {
