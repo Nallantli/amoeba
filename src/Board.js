@@ -10,7 +10,7 @@ export function flatten(x, d) {
 	return x % d;
 }
 
-// carter code
+/* carter code */
 const fib = n => {
 	if (n === 1 || n === 0)
 		return n;
@@ -180,7 +180,6 @@ export class Board extends React.Component {
 				if (e.ps.length < winLength) {
 					return;
 				}
-				//if (placement.v === 1) {
 				let flag = false;
 				let removes = [];
 				matches[placement.v - 1].forEach((p, i) => {
