@@ -72,6 +72,7 @@ type BoardState = {
 	touchStart: { x: number, y: number };
 	touchOffset: { x: number, y: number };
 	shiftScroll: boolean;
+	ctrlScroll: boolean;
 };
 
 export class Board extends React.Component<BoardProps, BoardState> {
@@ -140,7 +141,8 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			isTouching: false,
 			touchStart: { x: 0, y: 0 },
 			touchOffset: { x: 0, y: 0 },
-			shiftScroll: false
+			shiftScroll: false,
+			ctrlScroll: false
 		}
 	}
 	sharePoint(a: { x: number, y: number }[], b: { x: number, y: number }[]) {
@@ -244,17 +246,21 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	}
 	handleScroll(e: any) {
 		e.preventDefault();
-		const { shiftScroll } = this.state;
+		const { shiftScroll, ctrlScroll } = this.state;
 		const { offsetX, offsetY, spaceSize } = this.state.view;
-		const deltaX = e.deltaX * 0.25;
-		const deltaY = e.deltaY * 0.25;
-		this.setState({
-			view: {
-				offsetX: offsetX - (shiftScroll ? deltaY : deltaX),
-				offsetY: offsetY - (shiftScroll ? deltaX : deltaY),
-				spaceSize: spaceSize
-			}
-		})
+		if (ctrlScroll) {
+			this.handleZoom(Math.exp(e.deltaY / 200));
+		} else {
+			const deltaX = e.deltaX * 0.25;
+			const deltaY = e.deltaY * 0.25;
+			this.setState({
+				view: {
+					offsetX: offsetX - (shiftScroll ? deltaY : deltaX),
+					offsetY: offsetY - (shiftScroll ? deltaX : deltaY),
+					spaceSize: spaceSize
+				}
+			});
+		}
 	}
 	handleTouchMove(e: any) {
 		e.preventDefault();
@@ -294,17 +300,32 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		});
 	}
 	handleKeyDown(e: any) {
-		if (e.key === 'Shift') {
-			this.setState({
-				shiftScroll: true
-			});
+		console.log(e);
+		switch (e.key) {
+			case 'Shift':
+				this.setState({
+					shiftScroll: true
+				});
+				break;
+			case 'Control':
+				this.setState({
+					ctrlScroll: true
+				});
+				break;
 		}
 	}
 	handleKeyUp(e: any) {
-		if (e.key === 'Shift') {
-			this.setState({
-				shiftScroll: false
-			});
+		switch (e.key) {
+			case 'Shift':
+				this.setState({
+					shiftScroll: false
+				});
+				break;
+			case 'Control':
+				this.setState({
+					ctrlScroll: false
+				});
+				break;
 		}
 	}
 	componentDidMount() {
