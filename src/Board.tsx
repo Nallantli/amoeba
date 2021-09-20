@@ -190,12 +190,11 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	}
 	handleZoom(v: number) {
 		let { offsetX, offsetY, spaceSize } = this.state.view;
-		if ((spaceSize < 15 && v < 1) || (spaceSize > 160 && v > 1)) return;
 		this.setState({
 			view: {
 				offsetX: offsetX * v,
 				offsetY: offsetY * v,
-				spaceSize: spaceSize * v
+				spaceSize: Math.max(15, Math.min(160, spaceSize * v))
 			}
 		});
 	}
