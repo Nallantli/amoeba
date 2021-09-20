@@ -11,7 +11,7 @@ function App() {
 	const delay = params.get('delay') ? parseInt(params.get('delay'), 10) : 0;
 
 	switch (window.location.pathname) {
-		case '/':
+		default:
 			return (<Board
 				params={params}
 				winLength={winLength}
