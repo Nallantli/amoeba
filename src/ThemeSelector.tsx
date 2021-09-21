@@ -7,7 +7,7 @@ import React from 'react';
 const DefaultTheme = React.lazy(() => import('./styles/App'));
 const Win98Theme = React.lazy(() => import('./styles/Win98'));
 
-const ThemeSelector = (props) => (
+const ThemeSelector = (props: { theme: string; children: any; }) => (
   <>
     {/* Conditionally render theme, based on the current client context */}
     <React.Suspense fallback={() => <div />}>

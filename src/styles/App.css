@@ -1,3 +1,7 @@
+html {
+	font-size: 1px;
+}
+
 body {
 	margin          : 0;
 	padding         : 0;
@@ -25,8 +29,8 @@ body {
 }
 
 .space {
-	outline         : 1px solid #242424;
-	outline-offset  : -1px;
+	outline         : 1rem solid #242424;
+	outline-offset  : -1rem;
 	background-color: #121212;
 	border          : none;
 	padding         : 0;
@@ -42,11 +46,13 @@ body {
 
 .chunk-container {
 	display: block;
+	top: 50%;
+	left: 50%;
 }
 
-.player-icon {
+.space svg {
 	display: block;
-	padding: 5px;
+	padding: 10%;
 }
 
 #zoom-bar {
@@ -92,7 +98,7 @@ body {
 	right     : 0;
 	content   : "";
 	z-index   : -1;
-	box-shadow: #242424 5px 5px, #242424 -5px 5px, #242424 5px -5px, #242424 -5px -5px;
+	box-shadow: #242424 5rem 5rem, #242424 -5rem 5rem, #242424 5rem -5rem, #242424 -5rem -5rem;
 }
 
 #limit-dialog {
@@ -100,7 +106,7 @@ body {
 	display         : block;
 	top             : 15px;
 	left            : 10px;
-	font-size       : 1rem;
+	font-size       : 16px;
 	font-family     : 'Iosevka', monospace;
 	padding         : 10px;
 	border          : 1px solid black;
@@ -115,7 +121,7 @@ body {
 	display         : block;
 	bottom          : 10px;
 	left            : 10px;
-	font-size       : 1rem;
+	font-size       : 16px;
 	font-family     : 'Iosevka', monospace;
 	border          : 1px solid black;
 	padding         : 10px;

@@ -21,12 +21,11 @@ export const Chunk = (props: {
 		<div
 			className="chunk"
 			style={{
+				position: 'absolute',
 				width: `${chunkSize * spaceSize}px`,
 				height: `${chunkSize * spaceSize}px`,
-				display: 'block',
-				position: 'absolute',
 				left: `${posX * chunkSize * spaceSize}px`,
-				top: `${posY * chunkSize * spaceSize}px`,
+				top: `${posY * chunkSize * spaceSize}px`
 			}}
 		>
 			{chunkData.map((col, x) => {

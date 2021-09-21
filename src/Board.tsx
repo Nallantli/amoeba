@@ -189,12 +189,13 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		return { ps, type: 3 };
 	}
 	handleZoom(v: number) {
-		let { offsetX, offsetY, spaceSize } = this.state.view;
+		const { offsetX, offsetY, spaceSize } = this.state.view;
+		const newSpaceSize = Math.max(15, Math.min(160, spaceSize * v));
 		this.setState({
 			view: {
-				offsetX: offsetX * v,
-				offsetY: offsetY * v,
-				spaceSize: Math.max(15, Math.min(160, spaceSize * v))
+				offsetX: offsetX * (newSpaceSize / spaceSize),
+				offsetY: offsetY * (newSpaceSize / spaceSize),
+				spaceSize: newSpaceSize
 			}
 		});
 	}
@@ -263,16 +264,16 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	}
 	handleTouchMove(e: any) {
 		e.preventDefault();
-		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
-		var touch = evt.touches[0] || evt.changedTouches[0];
+		const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		const touch = evt.touches[0] || evt.changedTouches[0];
 		this.setState({
 			touchOffset: { x: touch.pageX, y: touch.pageY }
 		});
 	}
 	handleTouchStart(e: any) {
 		e.preventDefault();
-		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
-		var touch = evt.touches[0] || evt.changedTouches[0];
+		const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		const touch = evt.touches[0] || evt.changedTouches[0];
 		this.setState({
 			isTouching: true,
 			touchStart: { x: touch.pageX, y: touch.pageY },
@@ -281,8 +282,8 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	}
 	handleTouchEnd(e: any) {
 		e.preventDefault();
-		var evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
-		var touch = evt.touches[0] || evt.changedTouches[0];
+		const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		const touch = evt.touches[0] || evt.changedTouches[0];
 		const { view, touchStart, touchOffset } = this.state;
 		const { offsetX, offsetY, spaceSize } = view;
 		this.setState({
@@ -301,7 +302,6 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		});
 	}
 	handleKeyDown(e: any) {
-		console.log(e);
 		switch (e.key) {
 			case 'Shift':
 				this.setState({
@@ -359,8 +359,8 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		);
 	}
 	getValue(x: number, y: number) {
-		let { map } = this.state;
-		let chunk = map[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)];
+		const { map } = this.state;
+		const chunk = map[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)];
 		if (chunk === undefined) {
 			return 0;
 		}
@@ -377,7 +377,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			}
 			return { win: false, playerScores };
 		} else {
-			let check = this.getValue(x, y);
+			const check = this.getValue(x, y);
 			if (check === 0)
 				return { win: false, playerScores: [] };
 			for (let i = 0; i < winLength; i++) {
@@ -398,7 +398,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			for (let i = 0; i < winLength; i++) {
 				let squares = [];
 				for (let j = 0; j < winLength; j++) {
-					let s = this.getValue(x, y - i + j);
+					const s = this.getValue(x, y - i + j);
 					if (s === undefined)
 						break;
 					if (s !== check)
@@ -464,36 +464,36 @@ export class Board extends React.Component<BoardProps, BoardState> {
 					shadow.push(window.getComputedStyle(element).boxShadow);
 				}
 				if (this.getValue(placement.x, placement.y + 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} 0px 5px`);
+					shadow.push(`${config.playerColors[winner]} 0rem 5rem`);
 				}
 				if (this.getValue(placement.x + 1, placement.y) === 0
 					&& this.getValue(placement.x, placement.y + 1) === 0
 					&& this.getValue(placement.x + 1, placement.y + 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} 5px 5px`);
+					shadow.push(`${config.playerColors[winner]} 5rem 5rem`);
 				}
 				if (this.getValue(placement.x + 1, placement.y) === 0) {
-					shadow.push(`${config.playerColors[winner]} 5px 0px`);
+					shadow.push(`${config.playerColors[winner]} 5rem 0rem`);
 				}
 				if (this.getValue(placement.x + 1, placement.y) === 0
 					&& this.getValue(placement.x, placement.y - 1) === 0
 					&& this.getValue(placement.x + 1, placement.y - 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} 5px -5px`);
+					shadow.push(`${config.playerColors[winner]} 5rem -5rem`);
 				}
 				if (this.getValue(placement.x, placement.y - 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} 0px -5px`);
+					shadow.push(`${config.playerColors[winner]} 0rem -5rem`);
 				}
 				if (this.getValue(placement.x - 1, placement.y) === 0
 					&& this.getValue(placement.x, placement.y + 1) === 0
 					&& this.getValue(placement.x - 1, placement.y + 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} -5px 5px`);
+					shadow.push(`${config.playerColors[winner]} -5rem 5rem`);
 				}
 				if (this.getValue(placement.x - 1, placement.y) === 0) {
-					shadow.push(`${config.playerColors[winner]} -5px 0px`);
+					shadow.push(`${config.playerColors[winner]} -5rem 0rem`);
 				}
 				if (this.getValue(placement.x - 1, placement.y) === 0
 					&& this.getValue(placement.x, placement.y - 1) === 0
 					&& this.getValue(placement.x - 1, placement.y - 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} -5px -5px`);
+					shadow.push(`${config.playerColors[winner]} -5rem -5rem`);
 				}
 				element.style.boxShadow = shadow.join(", ");
 			});
@@ -525,7 +525,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		document.getElementById(x + "_" + y)?.classList.add("space-pressed");
 
 		let { map, turn, moveLimit } = this.state;
-		let v = turn + 1;
+		const v = turn + 1;
 		let chunk = map[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)];
 		chunk.chunkData[flatten(x, chunkSize)][flatten(y, chunkSize)] = v;
 		this.setState({
@@ -590,11 +590,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	render() {
 		const { config, isLimited, playerCount } = this.props;
 		const { view, isTouching, touchOffset, touchStart, xLow, yLow, xHigh, yHigh, moveLimit, playerScores, win, turn, map, AIs } = this.state;
-		let { offsetX, offsetY, spaceSize } = view;
-		if (isTouching) {
-			offsetX = offsetX + (touchOffset.x - touchStart.x);
-			offsetY = offsetY + (touchOffset.y - touchStart.y);
-		}
+		const { offsetX, offsetY, spaceSize } = view;
 		const width = spaceSize * chunkSize * (xHigh - xLow + 1);
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
 		return (
@@ -621,10 +617,8 @@ export class Board extends React.Component<BoardProps, BoardState> {
 							position: "absolute",
 							width: `${width}px`,
 							height: `${height}px`,
-							top: `50%`,
-							marginTop: `${-height / 2 + offsetY}px`,
-							left: `50%`,
-							marginLeft: `${-width / 2 + offsetX}px`
+							marginTop: `${-height / 2 + offsetY + (isTouching ? (touchOffset.y - touchStart.y) : 0)}px`,
+							marginLeft: `${-width / 2 + offsetX + (isTouching ? (touchOffset.x - touchStart.x) : 0)}px`
 						}}
 					>
 						{Object.values(map).map(value =>

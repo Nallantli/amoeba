@@ -21,9 +21,9 @@ export const Space = (props: SpaceProps) => {
 		onClick={value === 0 && !win && canPlayerMove ? onClick : () => { }}
 		className="space"
 		style={{
+			position: "absolute",
 			width: `${spaceSize}px`,
 			height: `${spaceSize}px`,
-			position: "absolute",
 			left: `${x * spaceSize}px`,
 			top: `${y * spaceSize}px`
 		}}
