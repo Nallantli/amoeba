@@ -61,8 +61,22 @@ export class Fuzzy extends AI {
 		if (heatMap.length === 0) {
 			return { x: 0, y: 0 };
 		} else {
-			const attMap = heatMap.filter(e => e.att === highAtt);
-			const defMap = heatMap.filter(e => e.def === highDef);
+			let maxDef = 0;
+			let maxAtt = 0;
+			let attMap = heatMap.filter(e => e.att === highAtt);
+			attMap.forEach(e => {
+				if (e.def > maxDef) {
+					maxDef = e.def;
+				}
+			});
+			attMap = attMap.filter(e => e.def === maxDef);
+			let defMap = heatMap.filter(e => e.def === highDef);
+			defMap.forEach(e => {
+				if (e.att > maxAtt) {
+					maxAtt = e.att;
+				}
+			});
+			defMap = defMap.filter(e => e.att === maxAtt);
 			if (highAtt >= this.winLength) {
 				return attMap[Math.floor(Math.random() * attMap.length)];
 			}
