@@ -1,27 +1,30 @@
 {
   "files": {
-    "main.js": "/amoeba/static/js/main.52fea77b.chunk.js",
-    "main.js.map": "/amoeba/static/js/main.52fea77b.chunk.js.map",
-    "runtime-main.js": "/amoeba/static/js/runtime-main.623dac10.js",
-    "runtime-main.js.map": "/amoeba/static/js/runtime-main.623dac10.js.map",
-    "static/js/2.0a72cacc.chunk.js": "/amoeba/static/js/2.0a72cacc.chunk.js",
-    "static/js/2.0a72cacc.chunk.js.map": "/amoeba/static/js/2.0a72cacc.chunk.js.map",
-    "static/css/3.891c2612.chunk.css": "/amoeba/static/css/3.891c2612.chunk.css",
-    "static/js/3.634fb4a6.chunk.js": "/amoeba/static/js/3.634fb4a6.chunk.js",
-    "static/js/3.634fb4a6.chunk.js.map": "/amoeba/static/js/3.634fb4a6.chunk.js.map",
+    "main.css": "/amoeba/static/css/main.d58b555b.chunk.css",
+    "main.js": "/amoeba/static/js/main.34cce574.chunk.js",
+    "main.js.map": "/amoeba/static/js/main.34cce574.chunk.js.map",
+    "runtime-main.js": "/amoeba/static/js/runtime-main.0ca0a99e.js",
+    "runtime-main.js.map": "/amoeba/static/js/runtime-main.0ca0a99e.js.map",
+    "static/js/2.eaee5eeb.chunk.js": "/amoeba/static/js/2.eaee5eeb.chunk.js",
+    "static/js/2.eaee5eeb.chunk.js.map": "/amoeba/static/js/2.eaee5eeb.chunk.js.map",
+    "static/css/3.a1bc4589.chunk.css": "/amoeba/static/css/3.a1bc4589.chunk.css",
+    "static/js/3.1d1eefe7.chunk.js": "/amoeba/static/js/3.1d1eefe7.chunk.js",
+    "static/js/3.1d1eefe7.chunk.js.map": "/amoeba/static/js/3.1d1eefe7.chunk.js.map",
     "static/css/4.c831e062.chunk.css": "/amoeba/static/css/4.c831e062.chunk.css",
-    "static/js/4.2128d98e.chunk.js": "/amoeba/static/js/4.2128d98e.chunk.js",
-    "static/js/4.2128d98e.chunk.js.map": "/amoeba/static/js/4.2128d98e.chunk.js.map",
-    "static/js/5.0255afa7.chunk.js": "/amoeba/static/js/5.0255afa7.chunk.js",
-    "static/js/5.0255afa7.chunk.js.map": "/amoeba/static/js/5.0255afa7.chunk.js.map",
+    "static/js/4.b2712d0e.chunk.js": "/amoeba/static/js/4.b2712d0e.chunk.js",
+    "static/js/4.b2712d0e.chunk.js.map": "/amoeba/static/js/4.b2712d0e.chunk.js.map",
+    "static/js/5.4973dc54.chunk.js": "/amoeba/static/js/5.4973dc54.chunk.js",
+    "static/js/5.4973dc54.chunk.js.map": "/amoeba/static/js/5.4973dc54.chunk.js.map",
     "index.html": "/amoeba/index.html",
-    "static/css/3.891c2612.chunk.css.map": "/amoeba/static/css/3.891c2612.chunk.css.map",
+    "static/css/3.a1bc4589.chunk.css.map": "/amoeba/static/css/3.a1bc4589.chunk.css.map",
     "static/css/4.c831e062.chunk.css.map": "/amoeba/static/css/4.c831e062.chunk.css.map",
-    "static/js/2.0a72cacc.chunk.js.LICENSE.txt": "/amoeba/static/js/2.0a72cacc.chunk.js.LICENSE.txt"
+    "static/css/main.d58b555b.chunk.css.map": "/amoeba/static/css/main.d58b555b.chunk.css.map",
+    "static/js/2.eaee5eeb.chunk.js.LICENSE.txt": "/amoeba/static/js/2.eaee5eeb.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.623dac10.js",
-    "static/js/2.0a72cacc.chunk.js",
-    "static/js/main.52fea77b.chunk.js"
+    "static/js/runtime-main.0ca0a99e.js",
+    "static/js/2.eaee5eeb.chunk.js",
+    "static/css/main.d58b555b.chunk.css",
+    "static/js/main.34cce574.chunk.js"
   ]
 }
