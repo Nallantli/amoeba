@@ -610,6 +610,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				</div>
 				{isLimited && <Limit moveLimit={moveLimit} />}
 				{isLimited && <ScoreScreen playerScores={playerScores} config={config} />}
+				<button id="reset-button" onClick={() => window.location.reload()}>Reset Game</button>
 				<div className="board" ref={this.boardRef}>
 					<div
 						className="chunk-container"
