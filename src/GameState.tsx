@@ -1,4 +1,3 @@
-import { AI } from "./AI";
 import { chunkSize } from "./Chunk";
 import { fib, flatten } from "./utils";
 
@@ -10,9 +9,6 @@ export type GameState = {
 	moveLimit: number;
 	isLimited: boolean;
 	turn: number;
-	AIs: (AI | undefined)[];
-	win: boolean;
-	playerScores: number[];
 };
 
 function horizontalCount(gameState: GameState, x: number, y: number, v: number) {
@@ -72,7 +68,7 @@ function sharePoint(a: { x: number, y: number }[], b: { x: number, y: number }[]
 	return false;
 }
 
-function calculateLimitScore(gameState: GameState) {
+export function calculateLimitScore(gameState: GameState) {
 	const { playerCount, winLength, placements } = gameState;
 	let matches: { type: number, ps: { x: number, y: number }[], old?: boolean }[][] = [];
 	for (let i = 0; i < playerCount; i++) {
@@ -117,19 +113,21 @@ function calculateLimitScore(gameState: GameState) {
 	return playerScores;
 }
 
-export function checkWin(gameState: GameState, lastMove: { x: number, y: number }): GameState {
-	const { x, y } = lastMove;
+export function checkWin(gameState: GameState): boolean {
+	if (gameState.placements.length === 0) {
+		return false;
+	}
+	const { x, y } = gameState.placements[gameState.placements.length - 1];
 	const { winLength, isLimited, moveLimit } = gameState;
 	if (isLimited) {
-		const playerScores = calculateLimitScore(gameState);
 		if (moveLimit === 0) {
-			return gameState = { ...gameState, win: true, playerScores };
+			return true;
 		}
-		return gameState = { ...gameState, win: false, playerScores };
+		return false;
 	} else {
 		const check = getValue(gameState, x, y);
 		if (check === 0)
-			return gameState = { ...gameState, win: false, playerScores: [] };
+			return false;
 		for (let i = 0; i < winLength; i++) {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
@@ -142,7 +140,7 @@ export function checkWin(gameState: GameState, lastMove: { x: number, y: number 
 			}
 			if (squares.length === winLength) {
 				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
-				return gameState = { ...gameState, win: true, playerScores: [] };
+				return true;
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -157,7 +155,7 @@ export function checkWin(gameState: GameState, lastMove: { x: number, y: number 
 			}
 			if (squares.length === winLength) {
 				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
-				return gameState = { ...gameState, win: true, playerScores: [] };
+				return true;
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -172,7 +170,7 @@ export function checkWin(gameState: GameState, lastMove: { x: number, y: number 
 			}
 			if (squares.length === winLength) {
 				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
-				return gameState = { ...gameState, win: true, playerScores: [] };
+				return true;
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -187,14 +185,14 @@ export function checkWin(gameState: GameState, lastMove: { x: number, y: number 
 			}
 			if (squares.length === winLength) {
 				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
-				return gameState = { ...gameState, win: true, playerScores: [] };
+				return true;
 			}
 		}
 	}
-	return gameState = { ...gameState, win: false, playerScores: [] };
+	return false;
 }
 
-export function addChunk(gameState: GameState, x: number, y: number) {
+export function addChunk(gameState: GameState, x: number, y: number): GameState {
 	const { map } = gameState;
 	if (map[x + '_' + y] !== undefined) {
 		return gameState;
@@ -219,20 +217,40 @@ export function addChunk(gameState: GameState, x: number, y: number) {
 	};
 }
 
-export function selectSquare(gameState: GameState, x: number, y: number) {
-	const { map, turn, moveLimit, placements, playerCount } = gameState;
+function generateBorderChunks(gameState: GameState, chunkX: number, chunkY: number): GameState {
+	for (let i = chunkX - 1; i <= chunkX + 1; i++) {
+		for (let j = chunkY - 1; j <= chunkY + 1; j++) {
+			gameState = { ...gameState, ...addChunk(gameState, i, j) };
+		}
+	}
+	return gameState;
+}
+
+export function selectSquare(gameState: GameState, x: number, y: number): GameState {
+	const { turn, moveLimit, placements, playerCount } = gameState;
+	const chunkX = Math.floor(x / chunkSize);
+	const chunkY = Math.floor(y / chunkSize);
 	const v = turn + 1;
-	const chunk = map[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)];
+	const chunk = gameState.map[chunkX + '_' + chunkY];
+	if (chunk === undefined) {
+		return selectSquare(
+			addChunk(
+				gameState,
+				chunkX,
+				chunkY),
+			x,
+			y);
+	}
 	chunk.chunkData[flatten(x, chunkSize)][flatten(y, chunkSize)] = v;
-	gameState = {
+	gameState = generateBorderChunks(gameState, chunkX, chunkY);
+	return gameState = {
 		...gameState,
 		map: {
-			...map,
-			[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)]: chunk
+			...gameState.map,
+			[chunkX + '_' + chunkY]: chunk
 		},
 		placements: [...placements, { x, y, v }],
 		turn: (turn + 1) % playerCount,
 		moveLimit: moveLimit - (turn === playerCount - 1 ? 1 : 0)
 	};
-	return { v, gameState };
 }

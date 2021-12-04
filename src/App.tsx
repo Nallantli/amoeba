@@ -3,9 +3,16 @@ import { CircleIcon } from './assets/CircleIcon';
 import { CrossIcon } from './assets/CrossIcon';
 import { DiamondIcon } from './assets/DiamondIcon';
 import { SquareIcon } from './assets/SquareIcon';
+import { GameState } from './GameState';
 
-function App(props: any) {
-	const { params, gameState } = props;
+function App(props: {
+	params: any,
+	gameState: GameState,
+	broadcast: (gameState: GameState) => GameState,
+	doLocalTurn: (gameState: GameState, boardRef: any, turnDelay: number) => void,
+	canMove: (gameState: GameState) => boolean
+}) {
+	const { params, gameState, broadcast, doLocalTurn, canMove } = props;
 	const delay = params.get('delay') ? parseInt(params.get('delay') as string, 10) : 0;
 
 	return (<Board
@@ -25,7 +32,9 @@ function App(props: any) {
 			turnDelay: delay
 		}}
 		gameState={gameState}
-		params={params}
+		broadcast={broadcast}
+		doLocalTurn={doLocalTurn}
+		canMove={canMove}
 	/>);
 }
 
