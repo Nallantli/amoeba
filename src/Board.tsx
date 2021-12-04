@@ -1,6 +1,6 @@
 import React from 'react';
 import { Chunk, chunkSize } from './Chunk';
-import { addChunk, calculateLimitScore, checkWin, GameState, getValue, selectSquare } from './GameState';
+import { calculateLimitScore, checkWin, GameState, getValue, selectSquare } from './GameState';
 import { flatten } from './utils';
 
 export type ConfigType = {
@@ -28,13 +28,12 @@ const ScoreScreen = (props: { playerScores: number[], config: ConfigType }) => {
 type BoardProps = {
 	gameState: GameState;
 	config: ConfigType;
-	broadcast: (gameState: GameState) => GameState;
+	broadcast: (gameState: GameState, callback: (gameState: GameState) => void) => void;
 	doLocalTurn: (gameState: GameState, boardRef: any, turnDelay: number) => void;
 	canMove: (gameState: GameState) => boolean;
 };
 
 type BoardState = {
-	gameState: GameState;
 	view: {
 		offsetX: number;
 		offsetY: number;
@@ -56,7 +55,6 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	constructor(props: BoardProps) {
 		super(props);
 
-		this.addChunk = this.addChunk.bind(this);
 		this.selectSquare = this.selectSquare.bind(this);
 		this.postMove = this.postMove.bind(this);
 		this.handleScroll = this.handleScroll.bind(this);
@@ -70,7 +68,6 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		this.boardRef = React.createRef();
 
 		this.state = {
-			gameState: this.props.gameState,
 			view: {
 				offsetX: 0,
 				offsetY: 0,
@@ -192,11 +189,11 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		window.addEventListener('keydown', this.handleKeyDown, { passive: false });
 		window.addEventListener('keyup', this.handleKeyUp, { passive: false });
 		this.boardRef.current?.addEventListener('selectSquare', this.selectSquare);
-		this.props.doLocalTurn(this.state.gameState, this.boardRef, this.props.config.turnDelay);
+		this.props.doLocalTurn(this.props.gameState, this.boardRef, this.props.config.turnDelay);
 	}
-	postMove() {
+	postMove(gameState: GameState) {
 		const { config } = this.props;
-		const { gameState, gameState: { isLimited, playerCount, placements, turn } } = this.state;
+		const { isLimited, playerCount, placements, turn } = gameState;
 		if (checkWin(gameState)) {
 			const winner =
 				flatten(
@@ -251,58 +248,18 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		}
 	}
 	selectSquare(e: any) {
-		const { broadcast } = this.props;
-		const oldGameState = this.state.gameState;
+		const { broadcast, gameState } = this.props;
 		const { x, y } = e.detail;
-
 		document.getElementById(x + "_" + y)?.classList.add("space-pressed");
-		this.setState({
-			gameState: broadcast(selectSquare(oldGameState, x, y))
-		}, () => {
-			this.postMove();
-		});
-	}
-	addChunk(x: number, y: number, newState: BoardState) {
-		const { broadcast } = this.props;
-		let { gameState, xLow, yLow, xHigh, yHigh, view } = newState;
-		let { offsetX, offsetY, spaceSize } = view;
-		if (x < xLow) {
-			xLow = x;
-			offsetX -= chunkSize * spaceSize / 2;
-		}
-		if (y < yLow) {
-			yLow = y;
-			offsetY -= chunkSize * spaceSize / 2;
-		}
-		if (x > xHigh) {
-			xHigh = x;
-			offsetX += chunkSize * spaceSize / 2;
-		}
-		if (y > yHigh) {
-			yHigh = y;
-			offsetY += chunkSize * spaceSize / 2;
-		}
-		return {
-			gameState: broadcast(addChunk(gameState, x, y)),
-			xLow: xLow,
-			yLow: yLow,
-			xHigh: xHigh,
-			yHigh: yHigh,
-			view: {
-				offsetX: offsetX,
-				offsetY: offsetY,
-				spaceSize: spaceSize
-			}
-		};
+		broadcast(selectSquare(gameState, x, y), this.postMove);
 	}
 	render() {
-		const { config, canMove } = this.props;
+		const { config, canMove, gameState,
+			gameState: { moveLimit, turn, map, isLimited, playerCount } } = this.props;
 		const { view,
 			view: { offsetX, offsetY, spaceSize },
 			isTouching, touchOffset, touchStart,
-			xLow, yLow, xHigh, yHigh,
-			gameState,
-			gameState: { moveLimit, turn, map, isLimited, playerCount }
+			xLow, yLow, xHigh, yHigh
 		} = this.state;
 		const width = spaceSize * chunkSize * (xHigh - xLow + 1);
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
