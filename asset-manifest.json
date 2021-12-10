@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/amoeba/static/css/main.d58b555b.chunk.css",
-    "main.js": "/amoeba/static/js/main.6ff85e49.chunk.js",
-    "main.js.map": "/amoeba/static/js/main.6ff85e49.chunk.js.map",
+    "main.js": "/amoeba/static/js/main.949507e6.chunk.js",
+    "main.js.map": "/amoeba/static/js/main.949507e6.chunk.js.map",
     "runtime-main.js": "/amoeba/static/js/runtime-main.0f3d8709.js",
     "runtime-main.js.map": "/amoeba/static/js/runtime-main.0f3d8709.js.map",
     "static/js/2.855a2fb0.chunk.js": "/amoeba/static/js/2.855a2fb0.chunk.js",
@@ -25,6 +25,6 @@
     "static/js/runtime-main.0f3d8709.js",
     "static/js/2.855a2fb0.chunk.js",
     "static/css/main.d58b555b.chunk.css",
-    "static/js/main.6ff85e49.chunk.js"
+    "static/js/main.949507e6.chunk.js"
   ]
 }
