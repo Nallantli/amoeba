@@ -30,7 +30,7 @@ type BoardProps = {
 	config: ConfigType;
 	broadcast: (gameState: GameState, callback: (gameState: GameState) => void) => void;
 	doLocalTurn: (gameState: GameState, boardRef: any, turnDelay: number) => void;
-	canMove: (gameState: GameState) => boolean;
+	canMove: boolean;
 };
 
 type BoardState = {
@@ -305,7 +305,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 								chunkData={value.chunkData}
 								selectSquare={this.selectSquare}
 								win={win}
-								canPlayerMove={canMove(gameState)}
+								canPlayerMove={canMove}
 								view={view}
 							/>
 						)}

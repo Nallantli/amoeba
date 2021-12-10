@@ -90,7 +90,7 @@ function App() {
 			callback(gs);
 		}}
 		doLocalTurn={doLocalTurn}
-		canMove={(gameState: GameState) => AIs[gameState.turn] === undefined}
+		canMove={AIs[gameState.turn] === undefined}
 	/>);
 }
 
