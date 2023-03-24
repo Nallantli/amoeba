@@ -1,3 +1,4 @@
+import { AI } from "./AI";
 import { chunkSize } from "./Chunk";
 import { fib, flatten } from "./utils";
 
@@ -9,6 +10,8 @@ export type GameState = {
 	moveLimit: number;
 	isLimited: boolean;
 	turn: number;
+	delay: number;
+	AIs: (AI | undefined)[];
 };
 
 function horizontalCount(gameState: GameState, x: number, y: number, v: number) {

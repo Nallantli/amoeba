@@ -1,24 +1,20 @@
 import React from 'react';
 import { Chunk, chunkSize } from './Chunk';
 import { calculateLimitScore, checkWin, GameState, getValue, selectSquare } from './GameState';
+import { IconConfig } from './IconConfig';
 import { flatten } from './utils';
-
-export type ConfigType = {
-	playerIcons: any[];
-	playerColors: string[];
-	turnDelay: number;
-};
 
 const Limit = (props: { moveLimit: number }) => {
 	return (<div id="limit-dialog">Turns Left: {props.moveLimit}</div>);
 }
 
-const ScoreScreen = (props: { playerScores: number[], config: ConfigType }) => {
+const ScoreScreen = (props: { playerScores: number[], iconConfig: IconConfig }) => {
+	const { playerScores, iconConfig } = props;
 	return (
 		<div id="score-dialog">
 			<table>
 				<tbody>
-					{props.playerScores.map((score, i) => <tr key={i}><td style={{ width: "40px" }}>{React.createElement(props.config.playerIcons[i], { color: props.config.playerColors[i] })}</td><td>{score}</td></tr>)}
+					{playerScores.map((score, i) => <tr key={i}><td style={{ width: "40px" }}>{React.createElement(iconConfig.playerIcons[i], { color: iconConfig.playerColors[i] })}</td><td>{score}</td></tr>)}
 				</tbody>
 			</table>
 		</div>
@@ -27,7 +23,7 @@ const ScoreScreen = (props: { playerScores: number[], config: ConfigType }) => {
 
 type BoardProps = {
 	gameState: GameState;
-	config: ConfigType;
+	iconConfig: IconConfig;
 	broadcast: (gameState: GameState, callback: (gameState: GameState) => void) => void;
 	doLocalTurn: (gameState: GameState, boardRef: any, turnDelay: number) => void;
 	canMove: boolean;
@@ -189,10 +185,10 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		window.addEventListener('keydown', this.handleKeyDown, { passive: false });
 		window.addEventListener('keyup', this.handleKeyUp, { passive: false });
 		this.boardRef.current?.addEventListener('selectSquare', this.selectSquare);
-		this.props.doLocalTurn(this.props.gameState, this.boardRef, this.props.config.turnDelay);
+		this.props.doLocalTurn(this.props.gameState, this.boardRef, this.props.gameState.delay);
 	}
 	postMove(gameState: GameState) {
-		const { config } = this.props;
+		const { iconConfig } = this.props;
 		const { isLimited, playerCount, placements, turn } = gameState;
 		if (checkWin(gameState)) {
 			const winner =
@@ -210,41 +206,41 @@ export class Board extends React.Component<BoardProps, BoardState> {
 					shadow.push(window.getComputedStyle(element).boxShadow);
 				}
 				if (getValue(gameState, placement.x, placement.y + 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} 0rem 5rem`);
+					shadow.push(`${iconConfig.playerColors[winner]} 0rem 5rem`);
 				}
 				if (getValue(gameState, placement.x + 1, placement.y) === 0
 					&& getValue(gameState, placement.x, placement.y + 1) === 0
 					&& getValue(gameState, placement.x + 1, placement.y + 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} 5rem 5rem`);
+					shadow.push(`${iconConfig.playerColors[winner]} 5rem 5rem`);
 				}
 				if (getValue(gameState, placement.x + 1, placement.y) === 0) {
-					shadow.push(`${config.playerColors[winner]} 5rem 0rem`);
+					shadow.push(`${iconConfig.playerColors[winner]} 5rem 0rem`);
 				}
 				if (getValue(gameState, placement.x + 1, placement.y) === 0
 					&& getValue(gameState, placement.x, placement.y - 1) === 0
 					&& getValue(gameState, placement.x + 1, placement.y - 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} 5rem -5rem`);
+					shadow.push(`${iconConfig.playerColors[winner]} 5rem -5rem`);
 				}
 				if (getValue(gameState, placement.x, placement.y - 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} 0rem -5rem`);
+					shadow.push(`${iconConfig.playerColors[winner]} 0rem -5rem`);
 				}
 				if (getValue(gameState, placement.x - 1, placement.y) === 0
 					&& getValue(gameState, placement.x, placement.y + 1) === 0
 					&& getValue(gameState, placement.x - 1, placement.y + 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} -5rem 5rem`);
+					shadow.push(`${iconConfig.playerColors[winner]} -5rem 5rem`);
 				}
 				if (getValue(gameState, placement.x - 1, placement.y) === 0) {
-					shadow.push(`${config.playerColors[winner]} -5rem 0rem`);
+					shadow.push(`${iconConfig.playerColors[winner]} -5rem 0rem`);
 				}
 				if (getValue(gameState, placement.x - 1, placement.y) === 0
 					&& getValue(gameState, placement.x, placement.y - 1) === 0
 					&& getValue(gameState, placement.x - 1, placement.y - 1) === 0) {
-					shadow.push(`${config.playerColors[winner]} -5rem -5rem`);
+					shadow.push(`${iconConfig.playerColors[winner]} -5rem -5rem`);
 				}
 				element.style.boxShadow = shadow.join(", ");
 			});
 		} else {
-			this.props.doLocalTurn(gameState, this.boardRef, config.turnDelay);
+			this.props.doLocalTurn(gameState, this.boardRef, gameState.delay);
 		}
 	}
 	selectSquare(e: any) {
@@ -254,7 +250,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		broadcast(selectSquare(gameState, x, y), this.postMove);
 	}
 	render() {
-		const { config, canMove, gameState,
+		const { iconConfig, canMove, gameState,
 			gameState: { moveLimit, turn, map, isLimited, playerCount } } = this.props;
 		const { view,
 			view: { offsetX, offsetY, spaceSize },
@@ -270,10 +266,10 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				<div id="player-bar"
 					style={{
 						background: (win ?
-							config.playerColors[flatten((isLimited ?
+							iconConfig.playerColors[flatten((isLimited ?
 								playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i
 								: turn - 1), playerCount)]
-							: config.playerColors[turn])
+							: iconConfig.playerColors[turn])
 					}}
 				/>
 				<div id="zoom-bar">
@@ -281,7 +277,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 					<button id="zoom-out" onClick={() => this.handleZoom(2 / 3)}>-</button>
 				</div>
 				{isLimited && <Limit moveLimit={moveLimit} />}
-				{isLimited && <ScoreScreen playerScores={playerScores} config={config} />}
+				{isLimited && <ScoreScreen playerScores={playerScores} iconConfig={iconConfig} />}
 				<button id="reset-button" onClick={() => window.location.reload()}>Reset Game</button>
 				<div className="board" ref={this.boardRef}>
 					<div
@@ -296,7 +292,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 					>
 						{Object.values(map).map(value =>
 							<Chunk
-								config={config}
+								iconConfig={iconConfig}
 								key={value.x + '_' + value.y}
 								posX={value.x - xLow}
 								posY={value.y - yLow}

@@ -1,7 +1,7 @@
 :root {
-	--primary-color  : #1f1f1f;
+	--primary-color: #1f1f1f;
 	--secondary-color: #0c0c0c;
-	--tertiary-color : #080808;
+	--tertiary-color: #080808;
 }
 
 html {
@@ -9,30 +9,30 @@ html {
 }
 
 body {
-	margin          : 0;
-	padding         : 0;
-	overflow        : hidden;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
 	background-color: var(--tertiary-color);
-	width           : 100vw;
-	height          : 100vh;
+	width: 100vw;
+	height: 100vh;
 }
 
 * {
-	touch-action    : none;
-	border-radius   : 0;
+	touch-action: none;
+	border-radius: 0;
 	-ms-touch-action: none;
 }
 
 .space {
-	outline         : 1rem solid var(--primary-color);
-	outline-offset  : -1rem;
+	outline: 1rem solid var(--primary-color);
+	outline-offset: -1rem;
 	background-color: var(--secondary-color);
-	border          : none;
-	padding         : 0;
-	margin          : 0;
-	transition      : background-color 0.5s;
-	z-index         : 1;
-	border-radius   : 0;
+	border: none;
+	padding: 0;
+	margin: 0;
+	transition: background-color 0.5s;
+	z-index: 1;
+	border-radius: 0;
 }
 
 .space:hover {
@@ -41,8 +41,8 @@ body {
 
 .chunk-container {
 	display: block;
-	top    : 50%;
-	left   : 50%;
+	top: 50%;
+	left: 50%;
 }
 
 .space svg {
@@ -52,8 +52,8 @@ body {
 
 .win-square {
 	background-color: white;
-	outline         : none;
-	z-index         : 3 !important;
+	outline: none;
+	z-index: 3 !important;
 }
 
 .chunk {
@@ -61,16 +61,61 @@ body {
 }
 
 .chunk::before {
-	position  : absolute;
-	top       : 0;
-	bottom    : 0;
-	left      : 0;
-	right     : 0;
-	content   : "";
-	z-index   : -1;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	content: "";
+	z-index: -1;
 	box-shadow: var(--primary-color) 5rem 5rem, var(--primary-color) -5rem 5rem, var(--primary-color) 5rem -5rem, var(--primary-color) -5rem -5rem;
 }
 
 .amoeba-square {
 	z-index: 2;
+}
+
+#menu {
+	padding: 15px;
+	background-color: white;
+	width: 300px;
+	height: 100vh;
+	color: black;
+	font-size: 12px;
+}
+
+#menu-players {
+	border: 2px black solid;
+}
+
+.menu-playerItem {
+	position: relative;
+	box-sizing: border-box;
+	border: none;
+	padding: 10px;
+	border-radius: 0;
+	height: 70px;
+	background: #c0c0c0;
+	box-shadow:
+		inset -2rem -2rem #0a0a0a,
+		inset 2rem 2rem #ffffff,
+		inset -4rem -4rem #808080,
+		inset 4rem 4rem #dfdfdf;
+}
+
+.menu-playerItem-icon {
+	height: 50px;
+	width: 50px;
+	float: left;
+}
+
+.menu-playerItem-body {
+	float: right;
+	padding: 15px;
+}
+
+.menu-playerItem-remove {
+	position: absolute;
+	top: 0;
+	right: 0;
 }

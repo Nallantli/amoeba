@@ -1,4 +1,4 @@
-import { ConfigType } from "./Board";
+import { IconConfig } from "./IconConfig";
 import { Space } from "./Space";
 
 export const chunkSize = 3;
@@ -13,9 +13,9 @@ export const Chunk = (props: {
 	win: boolean;
 	canPlayerMove: boolean;
 	view: { spaceSize: number; };
-	config: ConfigType;
+	iconConfig: IconConfig;
 }) => {
-	const { chunkData, posX, posY, chunkX, chunkY, win, canPlayerMove, view, selectSquare, config } = props;
+	const { chunkData, posX, posY, chunkX, chunkY, win, canPlayerMove, view, selectSquare, iconConfig } = props;
 	const { spaceSize } = view;
 	return (
 		<div
@@ -40,7 +40,7 @@ export const Chunk = (props: {
 						win={win}
 						canPlayerMove={canPlayerMove}
 						view={view}
-						config={config}
+						iconConfig={iconConfig}
 					/>
 				);
 			})}

@@ -1,5 +1,5 @@
 import React from "react";
-import { ConfigType } from "./Board";
+import { IconConfig } from "./IconConfig";
 
 type SpaceProps = {
 	x: number;
@@ -10,11 +10,11 @@ type SpaceProps = {
 	canPlayerMove: boolean;
 	onClick: (e: any) => void;
 	view: { spaceSize: number };
-	config: ConfigType;
+	iconConfig: IconConfig;
 };
 
 export const Space = (props: SpaceProps) => {
-	const { x, y, id, value, win, canPlayerMove, onClick, view, config } = props;
+	const { x, y, id, value, win, canPlayerMove, onClick, view, iconConfig } = props;
 	const { spaceSize } = view;
 	return (<button
 		id={id}
@@ -28,6 +28,6 @@ export const Space = (props: SpaceProps) => {
 			top: `${y * spaceSize}px`
 		}}
 	>
-		{value > 0 && React.createElement(config.playerIcons[value - 1], { color: config.playerColors[value - 1] })}
+		{value > 0 && React.createElement(iconConfig.playerIcons[value - 1], { color: iconConfig.playerColors[value - 1] })}
 	</button>);
 }
