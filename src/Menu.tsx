@@ -34,13 +34,20 @@ function PlayerItem(props: PlayerItemProps) {
 		</div>)
 }
 
-export class Menu extends React.Component<GameProps, GameProps> {
+interface MenuState extends GameProps {
+	tab: string;
+};
+
+export class Menu extends React.Component<GameProps, MenuState> {
 	constructor(props: GameProps) {
 		super(props);
-		this.state = props;
+		this.state = {
+			...props,
+			tab: 'regular'
+		};
 	}
 	render() {
-		const { winLength, limit, delay, AINames, iconConfig } = this.state
+		const { winLength, limit, delay, AINames, iconConfig, tab } = this.state
 		const removeItem = (index: number) => {
 			let newAINames = [...this.state.AINames];
 			newAINames.splice(index, 1);
@@ -50,7 +57,10 @@ export class Menu extends React.Component<GameProps, GameProps> {
 			})
 		};
 		const playGame = () => {
-			let url = `win=${winLength}&limit=${limit}&count=${AINames.length}&delay=${delay}`;
+			let url = `win=${winLength}&count=${AINames.length}&delay=${delay}`;
+			if (tab === "limit") {
+				url += `&limit=${limit}`;
+			}
 			for (let i = 0; i < AINames.length; i++) {
 				if (AINames[i] !== 'player') {
 					url += `&p${i + 1}=${AINames[i]}`;
@@ -69,32 +79,42 @@ export class Menu extends React.Component<GameProps, GameProps> {
 		const canDelete = (AINames.length > 1);
 		return (
 			<div id="menu">
-				<div id="menu-winLength">
-					<span>Length to Win:</span>
-					<input id="input-winLength" type="text" defaultValue={winLength} onChange={(e) => {
-						this.setState({
-							...this.state,
-							winLength: parseInt(e.target.value, 10)
-						})
-					}}></input>
+				<div id="tabs">
+					<button className={`tablinks-${tab === "regular" ? "active" : "inactive"}`} onClick={() => this.setState({ ...this.state, tab: "regular"})}>Regular Mode</button>
+					<button className={`tablinks-${tab === "limit" ? "active" : "inactive"}`} onClick={() => this.setState({ ...this.state, tab: "limit"})}>Limit Mode</button>
 				</div>
-				<div id="menu-limit">
-					<span>Maximum Amount of Rounds:</span>
-					<input id="input-limit" type="text" defaultValue={limit} onChange={(e) => {
-						this.setState({
-							...this.state,
-							limit: parseInt(e.target.value, 10)
-						})
-					}}></input>
+				<div id={`menu-options-${tab === "regular" ? "active" : "inactive"}`}>
 				</div>
-				<div id="menu-delay">
-					<span>Millisecond Delay Between Moves:</span>
-					<input id="input-delay" type="text" defaultValue={delay} onChange={(e) => {
-						this.setState({
-							...this.state,
-							delay: parseInt(e.target.value, 10)
-						})
-					}}></input>
+				<div id={`menu-options-${tab === "limit" ? "active" : "inactive"}`}>
+					<div id="menu-limit">
+						<span>Maximum Amount of Rounds:</span>
+						<input id="input-limit" type="text" defaultValue={limit} onChange={(e) => {
+							this.setState({
+								...this.state,
+								limit: parseInt(e.target.value, 10)
+							})
+						}}></input>
+					</div>
+				</div>
+				<div id="menu-options">
+					<div id="menu-winLength">
+						<span>Length to Win or (Limit Mode) Gain Score:</span>
+						<input id="input-winLength" type="text" defaultValue={winLength} onChange={(e) => {
+							this.setState({
+								...this.state,
+								winLength: parseInt(e.target.value, 10)
+							})
+						}}></input>
+					</div>
+					<div id="menu-delay">
+						<span>Millisecond Delay Between Moves:</span>
+						<input id="input-delay" type="text" defaultValue={delay} onChange={(e) => {
+							this.setState({
+								...this.state,
+								delay: parseInt(e.target.value, 10)
+							})
+						}}></input>
+					</div>
 				</div>
 				<div id="menu-players">
 					{AINames.map((AIName, index) => PlayerItem({

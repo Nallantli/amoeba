@@ -76,12 +76,20 @@ body {
 }
 
 #menu {
+	position: relative;
 	padding: 15px;
 	background-color: white;
 	width: 300px;
 	height: 100vh;
 	color: black;
-	font-size: 12px;
+	font-size: 14px;
+	font-family: 'Iosevka';
+}
+
+#menu input {
+	width: calc(100% - 15px);
+	border: 2px black solid;
+	padding: 5px;
 }
 
 #menu-players {
@@ -118,4 +126,37 @@ body {
 	position: absolute;
 	top: 0;
 	right: 0;
+}
+
+#menu-addPlayer {
+	height: 70px;
+	width: 100%;
+}
+
+#menu-options {
+	padding-bottom: 15px;
+}
+
+#menu-options-inactive {
+	display: none;
+}
+
+#play-game {
+	position: absolute;
+	bottom: 30px;
+	left: 0;
+	width: 330px;
+	height: 30px;
+}
+
+.tablinks-active {
+	border: none;
+	background-color:#1f1f1f;
+	color: white;
+}
+
+.tablinks-inactive {
+	border: none;
+	background-color:#c0c0c0;
+	color: black;
 }

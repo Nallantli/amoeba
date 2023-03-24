@@ -17,7 +17,7 @@ const openGame = params.get('game');
 let winLength = params.get('win') ? parseInt(params.get('win') as string, 10) : 5;
 let playerCount = params.get('count') ? parseInt(params.get('count') as string, 10) : 2;
 let limit = params.get('limit') ? parseInt(params.get('limit') as string, 10) : 0;
-let delay = params.get('delay') ? parseInt(params.get('delay') as string, 10) : 0;
+let delay = params.get('delay') ? parseInt(params.get('delay') as string, 10) : 200;
 let AINames = []
 for (let i = 0; i < playerCount; i++) {
 	AINames.push(params.get(`p${i + 1}`) || 'player');
