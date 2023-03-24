@@ -1,0 +1,2 @@
+(this.webpackJsonpamoeba=this.webpackJsonpamoeba||[]).push([[4],{20:function(n,t,a){},23:function(n,t,a){"use strict";a.r(t);var e=a(4),s=a.n(e),c=(a(20),a(0));t.default=function(){return Object(c.jsx)(s.a.Fragment,{})}}}]);
+//# sourceMappingURL=4.5b0be84c.chunk.js.map

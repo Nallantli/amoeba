@@ -1,0 +1,1 @@
+{"version":3,"sources":["styles/App.tsx"],"names":["DefaultTheme","Fragment"],"mappings":"sHAAA,0CAKeA,UAFM,kBAAO,cAAC,IAAMC,SAAP","file":"static/js/3.bbf22261.chunk.js","sourcesContent":["import React from 'react';\r\nimport './App.css';\r\n\r\nconst DefaultTheme = () => (<React.Fragment></React.Fragment>);\r\n\r\nexport default DefaultTheme;"],"sourceRoot":""}
