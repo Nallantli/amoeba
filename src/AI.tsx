@@ -13,7 +13,7 @@ export class AI {
 		this.icon = icon;
 		this.pCount = pCount;
 	}
-	doTurn(_gameState: GameState): { x: number, y: number } {
+	doTurn(_gameState: GameState, _playerScores: number[]): { x: number, y: number } {
 		throw new Error("Method not implemented.");
 	}
 }

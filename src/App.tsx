@@ -7,12 +7,14 @@ import { ElkDef } from './ais/ElkDef';
 import { Fuzzy } from './ais/Fuzzy';
 import React from 'react';
 import { GameProps } from './GameProps';
+import { ElkSurf } from './ais/ElkSurf';
+import { ElkTimid } from './ais/ElkTimid';
 
 // const params = new URLSearchParams(window.location.search);
 
-function doLocalTurn(gameState: GameState, boardRef: any, turnDelay: number) {
+function doLocalTurn(gameState: GameState, boardRef: any, turnDelay: number, playerScores: number[]) {
 	if (gameState.AIs[gameState.turn] !== undefined) {
-		const { x, y } = (gameState.AIs[gameState.turn] as AI).doTurn(gameState);
+		const { x, y } = (gameState.AIs[gameState.turn] as AI).doTurn(gameState, playerScores);
 		setTimeout(
 			() => boardRef.current?.dispatchEvent(
 				new CustomEvent('selectSquare',
@@ -41,6 +43,12 @@ class App extends React.Component<GameProps, GameState> {
 					break;
 				case "elkdef":
 					AIs.push(new ElkDef(winLength, i + 1, AINames.length));
+					break;
+				case "elksurf":
+					AIs.push(new ElkSurf(winLength, i + 1, AINames.length));
+					break;
+				case "elktimid":
+					AIs.push(new ElkTimid(winLength, i + 1, AINames.length));
 					break;
 				default:
 					AIs.push(undefined);

@@ -27,6 +27,8 @@ function PlayerItem(props: PlayerItemProps) {
 						<option selected={AIName === 'elk' ? true : false} value="elk">elk</option>
 						<option selected={AIName === 'elkatt' ? true : false} value="elkatt">elkatt</option>
 						<option selected={AIName === 'elkdef' ? true : false} value="elkdef">elkdef</option>
+						<option selected={AIName === 'elksurf' ? true : false} value="elksurf">elksurf</option>
+						<option selected={AIName === 'elktimid' ? true : false} value="elktimid">elktimid</option>
 					</select>
 				</div>
 			</div>
@@ -80,8 +82,8 @@ export class Menu extends React.Component<GameProps, MenuState> {
 		return (
 			<div id="menu">
 				<div id="tabs">
-					<button className={`tablinks-${tab === "regular" ? "active" : "inactive"}`} onClick={() => this.setState({ ...this.state, tab: "regular"})}>Regular Mode</button>
-					<button className={`tablinks-${tab === "limit" ? "active" : "inactive"}`} onClick={() => this.setState({ ...this.state, tab: "limit"})}>Limit Mode</button>
+					<button className={`tablinks-${tab === "regular" ? "active" : "inactive"}`} onClick={() => this.setState({ ...this.state, tab: "regular" })}>Regular Mode</button>
+					<button className={`tablinks-${tab === "limit" ? "active" : "inactive"}`} onClick={() => this.setState({ ...this.state, tab: "limit" })}>Limit Mode</button>
 				</div>
 				<div id={`menu-options-${tab === "regular" ? "active" : "inactive"}`}>
 				</div>

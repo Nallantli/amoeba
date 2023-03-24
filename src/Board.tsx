@@ -25,7 +25,7 @@ type BoardProps = {
 	gameState: GameState;
 	iconConfig: IconConfig;
 	broadcast: (gameState: GameState, callback: (gameState: GameState) => void) => void;
-	doLocalTurn: (gameState: GameState, boardRef: any, turnDelay: number) => void;
+	doLocalTurn: (gameState: GameState, boardRef: any, turnDelay: number, playerScores: number[]) => void;
 	canMove: boolean;
 };
 
@@ -60,6 +60,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		this.handleZoom = this.handleZoom.bind(this);
 		this.handleKeyDown = this.handleKeyDown.bind(this);
 		this.handleKeyUp = this.handleKeyUp.bind(this);
+		this.getPlayerScores = this.getPlayerScores.bind(this);
 
 		this.boardRef = React.createRef();
 
@@ -176,6 +177,10 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				break;
 		}
 	}
+	getPlayerScores() {
+		const { gameState, gameState: { isLimited } } = this.props;
+		return isLimited ? calculateLimitScore(gameState) : [];
+	}
 	componentDidMount() {
 		window.addEventListener('wheel', this.handleScroll, { passive: false });
 		window.addEventListener('touchstart', this.handleTouchStart, { passive: false });
@@ -185,7 +190,11 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		window.addEventListener('keydown', this.handleKeyDown, { passive: false });
 		window.addEventListener('keyup', this.handleKeyUp, { passive: false });
 		this.boardRef.current?.addEventListener('selectSquare', this.selectSquare);
-		this.props.doLocalTurn(this.props.gameState, this.boardRef, this.props.gameState.delay);
+		this.props.doLocalTurn(
+			this.props.gameState,
+			this.boardRef,
+			this.props.gameState.delay,
+			this.getPlayerScores());
 	}
 	postMove(gameState: GameState) {
 		const { iconConfig } = this.props;
@@ -240,7 +249,11 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				element.style.boxShadow = shadow.join(", ");
 			});
 		} else {
-			this.props.doLocalTurn(gameState, this.boardRef, gameState.delay);
+			this.props.doLocalTurn(
+				gameState,
+				this.boardRef,
+				gameState.delay,
+				this.getPlayerScores());
 		}
 	}
 	selectSquare(e: any) {
@@ -259,7 +272,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		} = this.state;
 		const width = spaceSize * chunkSize * (xHigh - xLow + 1);
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
-		const playerScores = isLimited ? calculateLimitScore(gameState) : [];
+		const playerScores = this.getPlayerScores();
 		const win = checkWin(gameState);
 		return (
 			<div id="screen">
