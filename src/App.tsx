@@ -1,14 +1,8 @@
 import { Board } from './Board';
 import { addChunk, GameState } from './GameState';
 import { AI } from './AI';
-import { Elk } from './ais/Elk';
-import { ElkAtt } from './ais/ElkAtt';
-import { ElkDef } from './ais/ElkDef';
-import { Fuzzy } from './ais/Fuzzy';
 import React from 'react';
 import { GameProps } from './GameProps';
-import { ElkSurf } from './ais/ElkSurf';
-import { ElkTimid } from './ais/ElkTimid';
 
 // const params = new URLSearchParams(window.location.search);
 
@@ -27,34 +21,12 @@ class App extends React.Component<GameProps, GameState> {
 	constructor(props: GameProps) {
 		super(props);
 
-		const { winLength, limit, AINames, delay } = props;
+		const { winLength, limit, AINames, delay, AISelectOptions } = props;
 
-		let AIs: (AI | undefined)[] = [];
-		for (let i = 0; i < AINames.length; i++) {
-			switch (AINames[i]) {
-				case "fuzzy":
-					AIs.push(new Fuzzy(winLength, i + 1, AINames.length));
-					break;
-				case "elk":
-					AIs.push(new Elk(winLength, i + 1, AINames.length));
-					break;
-				case "elkatt":
-					AIs.push(new ElkAtt(winLength, i + 1, AINames.length));
-					break;
-				case "elkdef":
-					AIs.push(new ElkDef(winLength, i + 1, AINames.length));
-					break;
-				case "elksurf":
-					AIs.push(new ElkSurf(winLength, i + 1, AINames.length));
-					break;
-				case "elktimid":
-					AIs.push(new ElkTimid(winLength, i + 1, AINames.length));
-					break;
-				default:
-					AIs.push(undefined);
-					break;
-			}
-		}
+		const AIs: (AI | undefined)[] = AINames
+			.map((AIName, i) => AIName === "player"
+				? undefined
+				: new AISelectOptions[AIName](winLength, i + 1, AINames.length));
 
 		this.state = {
 			turn: 0,

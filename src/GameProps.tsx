@@ -5,5 +5,6 @@ export type GameProps = {
 	limit: number,
 	delay: number,
 	AINames: string[],
-	iconConfig: IconConfig
+	iconConfig: IconConfig,
+	AISelectOptions: { [key: string]: any }
 };

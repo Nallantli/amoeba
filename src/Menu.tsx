@@ -8,11 +8,12 @@ type PlayerItemProps = {
 	iconConfig: IconConfig,
 	removeItem: Function,
 	changeAI: Function,
-	canDelete: boolean
+	canDelete: boolean,
+	AIMenuOptions: string[]
 };
 
 function PlayerItem(props: PlayerItemProps) {
-	const { AIName, index, iconConfig, removeItem, changeAI, canDelete } = props;
+	const { AIName, index, iconConfig, removeItem, changeAI, canDelete, AIMenuOptions } = props;
 	return (
 		<div className="menu-playerItem">
 			<div className="menu-playerItem-icon">
@@ -22,13 +23,8 @@ function PlayerItem(props: PlayerItemProps) {
 				<div className="menu-playerItem-AISelect">
 					<span>Type:</span>
 					<select id={`p${index + 1}`} onChange={(e) => changeAI(index, e.target.value)}>
-						<option selected={AIName === 'player' ? true : false} value="player">No AI</option>
-						<option selected={AIName === 'fuzzy' ? true : false} value="fuzzy">fuzzy</option>
-						<option selected={AIName === 'elk' ? true : false} value="elk">elk</option>
-						<option selected={AIName === 'elkatt' ? true : false} value="elkatt">elkatt</option>
-						<option selected={AIName === 'elkdef' ? true : false} value="elkdef">elkdef</option>
-						<option selected={AIName === 'elksurf' ? true : false} value="elksurf">elksurf</option>
-						<option selected={AIName === 'elktimid' ? true : false} value="elktimid">elktimid</option>
+						<option selected={AIName === "player" ? true : false} value="player">No AI</option>
+						{AIMenuOptions.map(selectOption => <option selected={AIName === selectOption ? true : false} value={selectOption}>{selectOption}</option>)}
 					</select>
 				</div>
 			</div>
@@ -40,8 +36,11 @@ interface MenuState extends GameProps {
 	tab: string;
 };
 
-export class Menu extends React.Component<GameProps, MenuState> {
-	constructor(props: GameProps) {
+interface MenuProps extends GameProps {
+};
+
+export class Menu extends React.Component<MenuProps, MenuState> {
+	constructor(props: MenuProps) {
 		super(props);
 		this.state = {
 			...props,
@@ -49,7 +48,8 @@ export class Menu extends React.Component<GameProps, MenuState> {
 		};
 	}
 	render() {
-		const { winLength, limit, delay, AINames, iconConfig, tab } = this.state
+		const { AISelectOptions } = this.props;
+		const { winLength, limit, delay, AINames, iconConfig, tab } = this.state;
 		const removeItem = (index: number) => {
 			let newAINames = [...this.state.AINames];
 			newAINames.splice(index, 1);
@@ -68,7 +68,8 @@ export class Menu extends React.Component<GameProps, MenuState> {
 					url += `&p${i + 1}=${AINames[i]}`;
 				}
 			}
-			window.location.assign(`https://nallantli.github.io/amoeba/?game=1&${url}`);
+			const baseURL = window.location.href.split('?')[0];
+			window.location.assign(`${baseURL}?game=1&${url}`);
 		};
 		const changeAI = (index: number, value: string) => {
 			let newAINames = [...this.state.AINames];
@@ -79,6 +80,7 @@ export class Menu extends React.Component<GameProps, MenuState> {
 			})
 		}
 		const canDelete = (AINames.length > 1);
+		const AIMenuOptions = Object.keys(AISelectOptions);
 		return (
 			<div id="menu">
 				<div id="tabs">
@@ -125,7 +127,8 @@ export class Menu extends React.Component<GameProps, MenuState> {
 						iconConfig,
 						removeItem,
 						changeAI,
-						canDelete
+						canDelete,
+						AIMenuOptions
 					}))}
 				</div>
 				{AINames.length < 4 && <button id="menu-addPlayer" onClick={() => {

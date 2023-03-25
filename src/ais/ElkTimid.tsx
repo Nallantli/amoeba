@@ -91,7 +91,6 @@ export class ElkTimid extends AI {
 				}
 			});
 			const modif = (opponentScores / (this.pCount - 1)) < AIScore ? 1 : -1;
-			console.log(opponentScores / (this.pCount - 1), AIScore, modif);
 			return (highAtt - highDef) > modif ? attMap[Math.floor(Math.random() * attMap.length)] : defMap[Math.floor(Math.random() * defMap.length)];
 		}
 	}
