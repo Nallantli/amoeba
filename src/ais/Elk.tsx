@@ -1,10 +1,10 @@
 import { AI } from "../AI";
 import { GameState, getValue } from "../GameState";
-import { countLine } from "./utils";
+import { countLine, getRandomElement } from "./utils";
 
 export class Elk extends AI {
 	doTurn(gameState: GameState) {
-		const { placements } = gameState;
+		const { placements, winLength } = gameState;
 		let highAtt = 0;
 		let highDef = 0;
 		let heatMap: { x: number; y: number; att: number; def: number; }[] = [];
@@ -17,28 +17,19 @@ export class Elk extends AI {
 					if (getValue(gameState, e.x + x, e.y + y) !== 0) {
 						continue;
 					}
-					let flag = false;
-					heatMap.forEach(h => {
-						if (h.x === e.x + x && h.y === e.y + y) {
-							flag = true;
-						}
-					});
-					if (flag) {
+					if (heatMap.find(h => h.x === e.x + x && h.y === e.y + y)) {
 						continue;
 					}
-					let o = {
+					const mappings = Array(this.pCount).fill(0).map((_, i) =>
+						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, winLength));
+					const o = {
 						x: e.x + x,
 						y: e.y + y,
-						att: countLine(gameState, e.x + x, e.y + y, this.icon, 1, 0, getValue) +
-							countLine(gameState, e.x + x, e.y + y, this.icon, 1, 1, getValue) +
-							countLine(gameState, e.x + x, e.y + y, this.icon, 0, 1, getValue) +
-							countLine(gameState, e.x + x, e.y + y, this.icon, -1, 1, getValue),
-						def: Math.max(...Array(this.pCount).fill(0).map((_, i) =>
-							countLine(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue) +
-							countLine(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue) +
-							countLine(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue) +
-							countLine(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue)
-						).filter((_, i) => i !== this.icon - 1))
+						att: mappings[this.icon - 1],
+						def: Math.max(...mappings.filter((_, i) => i !== this.icon - 1))
 					};
 					if (o.att > highAtt) {
 						highAtt = o.att;
@@ -69,7 +60,7 @@ export class Elk extends AI {
 				}
 			});
 			defMap = defMap.filter(e => e.att === maxAtt);
-			return (highAtt - highDef) > 0 ? attMap[Math.floor(Math.random() * attMap.length)] : defMap[Math.floor(Math.random() * defMap.length)];
+			return (highAtt - highDef) > 0 ? getRandomElement(attMap) : getRandomElement(defMap);
 		}
 	}
 }

@@ -1,12 +1,10 @@
 import { AI } from "../AI";
 import { GameState, getValue } from "../GameState";
-import { countLineOld } from "./utils";
+import { countLineOld, getRandomElement } from "./utils";
 
 export class Fuzzy extends AI {
 	doTurn(gameState: GameState) {
 		const { placements } = gameState;
-		let highAtt = 0;
-		let highDef = 0;
 		let heatMap: { x: number; y: number; att: number; def: number; }[] = [];
 		placements.forEach(e => {
 			for (let x = -1; x <= 1; x++) {
@@ -17,75 +15,41 @@ export class Fuzzy extends AI {
 					if (getValue(gameState, e.x + x, e.y + y) !== 0) {
 						continue;
 					}
-					let flag = false;
-					heatMap.forEach(h => {
-						if (h.x === e.x + x && h.y === e.y + y) {
-							flag = true;
-						}
-					});
-					if (flag) {
+					if (heatMap.find(h => h.x === e.x + x && h.y === e.y + y)) {
 						continue;
 					}
-					let o = {
+					const mappings = Array(this.pCount).fill(0).map((_, i) => Math.max(
+						countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength),
+						countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength),
+						countLineOld(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength),
+						countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength),
+						countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, 0, getValue, this.winLength),
+						countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, -1, getValue, this.winLength),
+						countLineOld(gameState, e.x + x, e.y + y, i + 1, 0, -1, getValue, this.winLength),
+						countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, -1, getValue, this.winLength)));
+					heatMap.push({
 						x: e.x + x,
 						y: e.y + y,
-						att: Math.max(
-							countLineOld(gameState, e.x + x, e.y + y, this.icon, 1, 0, getValue, this.winLength),
-							countLineOld(gameState, e.x + x, e.y + y, this.icon, 1, 1, getValue, this.winLength),
-							countLineOld(gameState, e.x + x, e.y + y, this.icon, 0, 1, getValue, this.winLength),
-							countLineOld(gameState, e.x + x, e.y + y, this.icon, -1, 1, getValue, this.winLength),
-							countLineOld(gameState, e.x + x, e.y + y, this.icon, -1, 0, getValue, this.winLength),
-							countLineOld(gameState, e.x + x, e.y + y, this.icon, -1, -1, getValue, this.winLength),
-							countLineOld(gameState, e.x + x, e.y + y, this.icon, 0, -1, getValue, this.winLength),
-							countLineOld(gameState, e.x + x, e.y + y, this.icon, 1, -1, getValue, this.winLength)),
-						def: Math.max(...Array(this.pCount).fill(0).map((_, i) => {
-							return Math.max(
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, 0, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, -1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 0, -1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, -1, getValue, this.winLength))
-						}).filter((_, i) => i !== this.icon - 1))
-					};
-					if (o.att > highAtt) {
-						highAtt = o.att;
-					}
-					if (o.def > highDef) {
-						highDef = o.def;
-					}
-					heatMap.push(o);
+						att: mappings[this.icon - 1],
+						def: Math.max(...mappings.filter((_, i) => i !== this.icon - 1))
+					});
 				}
 			}
 		});
 		if (heatMap.length === 0) {
 			return { x: 0, y: 0 };
 		} else {
-			let maxDef = 0;
-			let maxAtt = 0;
-			let attMap = heatMap.filter(e => e.att === highAtt);
-			attMap.forEach(e => {
-				if (e.def > maxDef) {
-					maxDef = e.def;
-				}
-			});
-			attMap = attMap.filter(e => e.def === maxDef);
-			let defMap = heatMap.filter(e => e.def === highDef);
-			defMap.forEach(e => {
-				if (e.att > maxAtt) {
-					maxAtt = e.att;
-				}
-			});
-			defMap = defMap.filter(e => e.att === maxAtt);
-			if (highAtt >= this.winLength) {
-				return attMap[Math.floor(Math.random() * attMap.length)];
+			let attMap = [...heatMap].sort((a, b) => a.att === b.att ? b.def - a.def : b.att - a.att);
+			let defMap = [...heatMap].sort((a, b) => a.def === b.def ? b.att - a.att : b.def - a.def);
+			attMap = attMap.filter(({ att, def }) => att === attMap[0].att && def === attMap[0].def);
+			defMap = defMap.filter(({ att, def }) => att === defMap[0].att && def === defMap[0].def);
+			if (attMap[0].att > this.winLength - 2) {
+				return getRandomElement(attMap);
 			}
-			if (highDef >= this.winLength) {
-				return defMap[Math.floor(Math.random() * defMap.length)];
+			if (defMap[0].def > this.winLength - 2) {
+				return getRandomElement(defMap);
 			}
-			return highAtt >= highDef ? attMap[Math.floor(Math.random() * attMap.length)] : defMap[Math.floor(Math.random() * defMap.length)];
+			return attMap[0].att >= defMap[0].def ? getRandomElement(attMap) : getRandomElement(defMap);
 		}
 	}
 }

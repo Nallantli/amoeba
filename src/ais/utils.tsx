@@ -5,19 +5,32 @@ export function countLine(
 	x: number, y: number,
 	v: number,
 	dx: number, dy: number,
-	getValue: (gameState: GameState, x: number, y: number) => number): number {
+	getValue: (gameState: GameState, x: number, y: number) => number,
+	winLength: number): number {
 	let i = 1;
-	let l = 0;
+	let contiguous = 0;
+	let space = 0;
 	while (getValue(gameState, x + i * dx, y + i * dy) === v) {
-		l++;
+		contiguous++;
+		i++;
+	}
+	while (getValue(gameState, x + i * dx, y + i * dy) === 0 && i < winLength) {
+		space++;
 		i++;
 	}
 	i = -1;
 	while (getValue(gameState, x + i * dx, y + i * dy) === v) {
-		l++;
+		contiguous++;
 		i--;
 	}
-	return l;
+	while (getValue(gameState, x + i * dx, y + i * dy) === v && -i < winLength) {
+		space++;
+		i--;
+	}
+	if (space + contiguous + 1 < winLength) {
+		return 0;
+	}
+	return contiguous;
 }
 
 // I don't remember how this works
@@ -49,4 +62,8 @@ export function countLineOld(gameState: GameState, x: number, y: number, v: numb
 		i--;
 	}
 	return l;
+}
+
+export function getRandomElement(array: any[]) {
+	return array[Math.floor(Math.random() * array.length)];
 }
