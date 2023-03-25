@@ -1,6 +1,6 @@
 import { AI } from "../AI";
 import { GameState, getValue } from "../GameState";
-import { countLine } from "./utils";
+import { countLineOld } from "./utils";
 
 export class Fuzzy extends AI {
 	doTurn(gameState: GameState) {
@@ -30,24 +30,24 @@ export class Fuzzy extends AI {
 						x: e.x + x,
 						y: e.y + y,
 						att: Math.max(
-							countLine(gameState, e.x + x, e.y + y, this.icon, 1, 0, getValue, this.winLength),
-							countLine(gameState, e.x + x, e.y + y, this.icon, 1, 1, getValue, this.winLength),
-							countLine(gameState, e.x + x, e.y + y, this.icon, 0, 1, getValue, this.winLength),
-							countLine(gameState, e.x + x, e.y + y, this.icon, -1, 1, getValue, this.winLength),
-							countLine(gameState, e.x + x, e.y + y, this.icon, -1, 0, getValue, this.winLength),
-							countLine(gameState, e.x + x, e.y + y, this.icon, -1, -1, getValue, this.winLength),
-							countLine(gameState, e.x + x, e.y + y, this.icon, 0, -1, getValue, this.winLength),
-							countLine(gameState, e.x + x, e.y + y, this.icon, 1, -1, getValue, this.winLength)),
+							countLineOld(gameState, e.x + x, e.y + y, this.icon, 1, 0, getValue, this.winLength),
+							countLineOld(gameState, e.x + x, e.y + y, this.icon, 1, 1, getValue, this.winLength),
+							countLineOld(gameState, e.x + x, e.y + y, this.icon, 0, 1, getValue, this.winLength),
+							countLineOld(gameState, e.x + x, e.y + y, this.icon, -1, 1, getValue, this.winLength),
+							countLineOld(gameState, e.x + x, e.y + y, this.icon, -1, 0, getValue, this.winLength),
+							countLineOld(gameState, e.x + x, e.y + y, this.icon, -1, -1, getValue, this.winLength),
+							countLineOld(gameState, e.x + x, e.y + y, this.icon, 0, -1, getValue, this.winLength),
+							countLineOld(gameState, e.x + x, e.y + y, this.icon, 1, -1, getValue, this.winLength)),
 						def: Math.max(...Array(this.pCount).fill(0).map((_, i) => {
 							return Math.max(
-								countLine(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength),
-								countLine(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength),
-								countLine(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength),
-								countLine(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength),
-								countLine(gameState, e.x + x, e.y + y, i + 1, -1, 0, getValue, this.winLength),
-								countLine(gameState, e.x + x, e.y + y, i + 1, -1, -1, getValue, this.winLength),
-								countLine(gameState, e.x + x, e.y + y, i + 1, 0, -1, getValue, this.winLength),
-								countLine(gameState, e.x + x, e.y + y, i + 1, 1, -1, getValue, this.winLength))
+								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength),
+								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength),
+								countLineOld(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength),
+								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength),
+								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, 0, getValue, this.winLength),
+								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, -1, getValue, this.winLength),
+								countLineOld(gameState, e.x + x, e.y + y, i + 1, 0, -1, getValue, this.winLength),
+								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, -1, getValue, this.winLength))
 						}).filter((_, i) => i !== this.icon - 1))
 					};
 					if (o.att > highAtt) {

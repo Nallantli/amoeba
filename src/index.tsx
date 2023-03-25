@@ -15,6 +15,7 @@ import { ElkAtt } from './ais/ElkAtt';
 import { ElkDef } from './ais/ElkDef';
 import { ElkSurf } from './ais/ElkSurf';
 import { ElkTimid } from './ais/ElkTimid';
+import { AttAndDef } from './ais/AttAndDef';
 
 const AISelectOptions: { [key: string]: any } = {
 	"fuzzy": Fuzzy,
@@ -22,7 +23,8 @@ const AISelectOptions: { [key: string]: any } = {
 	"elkatt": ElkAtt,
 	"elkdef": ElkDef,
 	"elksurf": ElkSurf,
-	"elktimid": ElkTimid
+	"elktimid": ElkTimid,
+	"attanddef": AttAndDef
 };
 
 const params = new URLSearchParams(window.location.search);
