@@ -43,10 +43,10 @@ export class Fuzzy extends AI {
 			let defMap = [...heatMap].sort((a, b) => a.def === b.def ? b.att - a.att : b.def - a.def);
 			attMap = attMap.filter(({ att, def }) => att === attMap[0].att && def === attMap[0].def);
 			defMap = defMap.filter(({ att, def }) => att === defMap[0].att && def === defMap[0].def);
-			if (attMap[0].att > this.winLength - 2) {
+			if (attMap[0].att > this.winLength - 1) {
 				return getRandomElement(attMap);
 			}
-			if (defMap[0].def > this.winLength - 2) {
+			if (defMap[0].def > this.winLength - 1) {
 				return getRandomElement(defMap);
 			}
 			return attMap[0].att >= defMap[0].def ? getRandomElement(attMap) : getRandomElement(defMap);
