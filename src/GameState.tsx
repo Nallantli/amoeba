@@ -5,13 +5,10 @@ import { fib, flatten } from "./utils";
 export type GameState = {
 	map: { [key: string]: { x: number, y: number, chunkData: number[][] } };
 	placements: { x: number, y: number, v: number }[];
-	playerCount: number;
-	winLength: number;
 	moveLimit: number;
 	isLimited: boolean;
 	turn: number;
-	delay: number;
-	AIs: (AI | undefined)[];
+	players: (AI | null)[];
 };
 
 function horizontalCount(gameState: GameState, x: number, y: number, v: number) {
@@ -71,10 +68,15 @@ function sharePoint(a: { x: number, y: number }[], b: { x: number, y: number }[]
 	return false;
 }
 
-export function calculateLimitScore(gameState: GameState) {
-	const { playerCount, winLength, placements } = gameState;
+export function getPlayerScores(gameState: GameState, winLength: number) {
+	const { isLimited } = gameState;
+	return isLimited ? calculateLimitScore(gameState, winLength) : [];
+}
+
+export function calculateLimitScore(gameState: GameState, winLength: number) {
+	const { players, placements } = gameState;
 	let matches: { type: number, ps: { x: number, y: number }[], old?: boolean }[][] = [];
-	for (let i = 0; i < playerCount; i++) {
+	for (let i = 0; i < players.length; i++) {
 		matches.push([]);
 	}
 	placements.forEach((placement: { x: number, y: number, v: number }) => {
@@ -116,12 +118,12 @@ export function calculateLimitScore(gameState: GameState) {
 	return playerScores;
 }
 
-export function checkWin(gameState: GameState): boolean {
+export function checkWin(gameState: GameState, winLength: number): boolean {
 	if (gameState.placements.length === 0) {
 		return false;
 	}
 	const { x, y } = gameState.placements[gameState.placements.length - 1];
-	const { winLength, isLimited, moveLimit } = gameState;
+	const { isLimited, moveLimit } = gameState;
 	if (isLimited) {
 		if (moveLimit === 0) {
 			return true;
@@ -230,7 +232,7 @@ function generateBorderChunks(gameState: GameState, chunkX: number, chunkY: numb
 }
 
 export function selectSquare(gameState: GameState, x: number, y: number): GameState {
-	const { turn, moveLimit, placements, playerCount } = gameState;
+	const { turn, moveLimit, placements, players } = gameState;
 	const chunkX = Math.floor(x / chunkSize);
 	const chunkY = Math.floor(y / chunkSize);
 	const v = turn + 1;
@@ -253,7 +255,7 @@ export function selectSquare(gameState: GameState, x: number, y: number): GameSt
 			[chunkX + '_' + chunkY]: chunk
 		},
 		placements: [...placements, { x, y, v }],
-		turn: (turn + 1) % playerCount,
-		moveLimit: moveLimit - (turn === playerCount - 1 ? 1 : 0)
+		turn: (turn + 1) % players.length,
+		moveLimit: moveLimit - (turn === players.length - 1 ? 1 : 0)
 	};
 }

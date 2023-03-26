@@ -32,15 +32,8 @@ function PlayerItem(props: PlayerItemProps) {
 		</div>)
 }
 
-interface MenuState extends GameProps {
-	tab: string;
-};
-
-interface MenuProps extends GameProps {
-};
-
-export class Menu extends React.Component<MenuProps, MenuState> {
-	constructor(props: MenuProps) {
+export class Menu extends React.Component<GameProps, GameProps & { tab: string }> {
+	constructor(props: GameProps) {
 		super(props);
 		this.state = {
 			...props,

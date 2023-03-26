@@ -1,12 +1,12 @@
 import { AI } from "../AI";
-import { GameState, getValue } from "../GameState";
+import { GameState, getPlayerScores, getValue } from "../GameState";
 import { countLine, getRandomElement } from "./utils";
 
 // Becomes ElkAtt when winning, ElkDef when losing
 
 export class ElkSurf extends AI {
-	doTurn(gameState: GameState, playerScores: number[]) {
-		const { placements, AIs, winLength } = gameState;
+	doTurn(gameState: GameState) {
+		const { placements, players } = gameState;
 		let highAtt = 0;
 		let highDef = 0;
 		let heatMap: { x: number; y: number; att: number; def: number; }[] = [];
@@ -23,10 +23,10 @@ export class ElkSurf extends AI {
 						continue;
 					}
 					const mappings = Array(this.pCount).fill(0).map((_, i) =>
-						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, winLength) +
-						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, winLength) +
-						countLine(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, winLength) +
-						countLine(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, winLength));
+						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength));
 					const o = {
 						x: e.x + x,
 						y: e.y + y,
@@ -64,8 +64,9 @@ export class ElkSurf extends AI {
 			defMap = defMap.filter(e => e.att === maxAtt);
 			let opponentScores = 0;
 			let AIScore = 0;
+			const playerScores = getPlayerScores(gameState, this.winLength);
 			playerScores.forEach((score, index) => {
-				if (AIs[index] === this) {
+				if (players[index] === this) {
 					AIScore = score;
 				} else {
 					opponentScores += score;

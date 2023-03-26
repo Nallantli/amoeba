@@ -8,7 +8,6 @@ import { CrossIcon } from './assets/CrossIcon';
 import { DiamondIcon } from './assets/DiamondIcon';
 import { SquareIcon } from './assets/SquareIcon';
 import { Menu } from './Menu';
-import App from './App';
 import { Fuzzy } from './ais/Fuzzy';
 import { Elk } from './ais/Elk';
 import { ElkAtt } from './ais/ElkAtt';
@@ -16,6 +15,7 @@ import { ElkDef } from './ais/ElkDef';
 import { ElkSurf } from './ais/ElkSurf';
 import { ElkTimid } from './ais/ElkTimid';
 import { AttAndDef } from './ais/AttAndDef';
+import { Game } from './Game';
 
 const AISelectOptions: { [key: string]: any } = {
 	"fuzzy": Fuzzy,
@@ -58,7 +58,7 @@ const iconConfig = {
 ReactDOM.render(
 	<React.StrictMode>
 		<ThemeSelector theme={params.get('theme') || 'default'}>
-			{openGame ? <App
+			{openGame ? <Game
 				winLength={winLength}
 				limit={limit}
 				delay={delay}

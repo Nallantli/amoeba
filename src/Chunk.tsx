@@ -3,7 +3,7 @@ import { Space } from "./Space";
 
 export const chunkSize = 3;
 
-export const Chunk = (props: {
+export function Chunk(props: {
 	chunkX: number;
 	chunkY: number;
 	selectSquare: (e: any) => void;
@@ -14,9 +14,19 @@ export const Chunk = (props: {
 	canPlayerMove: boolean;
 	view: { spaceSize: number; };
 	iconConfig: IconConfig;
-}) => {
-	const { chunkData, posX, posY, chunkX, chunkY, win, canPlayerMove, view, selectSquare, iconConfig } = props;
-	const { spaceSize } = view;
+}) {
+	const {
+		chunkData,
+		posX,
+		posY,
+		chunkX,
+		chunkY,
+		win,
+		canPlayerMove,
+		view,
+		view: { spaceSize },
+		selectSquare,
+		iconConfig } = props;
 	return (
 		<div
 			className="chunk"

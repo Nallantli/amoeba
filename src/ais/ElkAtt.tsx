@@ -4,7 +4,7 @@ import { countLine, getRandomElement } from "./utils";
 
 export class ElkAtt extends AI {
 	doTurn(gameState: GameState) {
-		const { placements, winLength } = gameState;
+		const { placements } = gameState;
 		let highAtt = 0;
 		let highDef = 0;
 		let heatMap: { x: number; y: number; att: number; def: number; }[] = [];
@@ -21,10 +21,10 @@ export class ElkAtt extends AI {
 						continue;
 					}
 					const mappings = Array(this.pCount).fill(0).map((_, i) =>
-						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, winLength) +
-						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, winLength) +
-						countLine(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, winLength) +
-						countLine(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, winLength));
+						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength) +
+						countLine(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength));
 					const o = {
 						x: e.x + x,
 						y: e.y + y,

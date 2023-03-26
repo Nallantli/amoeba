@@ -1,7 +1,7 @@
 import React from "react";
 import { IconConfig } from "./IconConfig";
 
-type SpaceProps = {
+export function Space(props: {
 	x: number;
 	y: number;
 	id: string;
@@ -11,9 +11,7 @@ type SpaceProps = {
 	onClick: (e: any) => void;
 	view: { spaceSize: number };
 	iconConfig: IconConfig;
-};
-
-export const Space = (props: SpaceProps) => {
+}) {
 	const { x, y, id, value, win, canPlayerMove, onClick, view, iconConfig } = props;
 	const { spaceSize } = view;
 	return (<button
