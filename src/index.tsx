@@ -20,6 +20,7 @@ import { DiamondIcon } from "./assets/DiamondIcon";
 import { SquareIcon } from "./assets/SquareIcon";
 import reportWebVitals from "./reportWebVitals";
 import { generateInitialGameState } from "./utils";
+import { AppState } from "./AppState";
 
 const darkTheme = createTheme({
 	palette: {
@@ -55,20 +56,49 @@ function App() {
 		AISelectOptions: AISelectOptions,
 	});
 
-	const [gameState, setGameState] = useState<GameState | undefined>(undefined);
+	const [appState, setAppState] = useState<AppState>({});
 
 	const startGame = () => {
-		setGameState(generateInitialGameState(gameProps))
+		const gameState = generateInitialGameState(gameProps, appState);
+		if (appState.multiplayerState?.players[appState.multiplayerState?.playerIndex]?.isHost) {
+			gameProps.socket?.send(
+				JSON.stringify([
+					{
+						action: "BROADCAST",
+						id: appState.multiplayerState.id,
+						gameState,
+					},
+				])
+			);
+		} else {
+			setAppState({
+				...appState,
+				gameState: gameState,
+			});
+		}
 	};
 
 	return (
 		<ThemeProvider theme={darkTheme}>
-			{gameState?.isStarted ? (
+			{appState.gameState?.isStarted ? (
 				<ThemeSelector theme={params.get("theme") || "default"}>
-					<GameController gameProps={gameProps} gameState={gameState} setGameState={setGameState} iconConfig={iconConfig} />
+					<GameController
+						gameProps={gameProps}
+						gameState={appState.gameState}
+						appState={appState}
+						setGameState={(gameState: GameState) => setAppState({ ...appState, gameState })}
+						iconConfig={iconConfig}
+					/>
 				</ThemeSelector>
 			) : (
-				<Menu gameProps={gameProps} updateGameProps={setGameProps} iconConfig={iconConfig} startGame={startGame} />
+				<Menu
+					gameProps={gameProps}
+					multiplayerState={appState.multiplayerState}
+					updateGameProps={setGameProps}
+					iconConfig={iconConfig}
+					startGame={startGame}
+					setAppState={setAppState}
+				/>
 			)}
 		</ThemeProvider>
 	);

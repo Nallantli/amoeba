@@ -1,3 +1,4 @@
+import { AppState } from "./AppState";
 import { Board } from "./Board";
 import { GameProps } from "./GameProps";
 import { GameState } from "./GameState";
@@ -6,11 +7,12 @@ import { IconConfig } from "./IconConfig";
 interface GameControllerProps {
 	gameProps: GameProps;
 	gameState: GameState;
+	appState: AppState;
 	setGameState: (gameState: GameState) => void;
 	iconConfig: IconConfig;
 }
 
-export function GameController({ gameState, setGameState, gameProps: { delay, winLength }, iconConfig }: GameControllerProps) {
+export function GameController({ gameState, setGameState, appState, gameProps: { delay, winLength, socket }, iconConfig }: GameControllerProps) {
 	const { players, turn } = gameState;
 
 	return (
@@ -18,10 +20,22 @@ export function GameController({ gameState, setGameState, gameProps: { delay, wi
 			iconConfig={iconConfig}
 			gameState={gameState}
 			broadcast={(gs: GameState, callback: (gs: GameState) => void) => {
-				setGameState(gs);
+				if (socket) {
+					socket?.send(
+						JSON.stringify([
+							{
+								action: "BROADCAST",
+								id: appState?.multiplayerState?.id,
+								gameState: gs,
+							},
+						])
+					);
+				} else {
+					setGameState(gs);
+				}
 				callback(gs);
 			}}
-			canMove={players[turn] === null}
+			canMove={!socket ? players[turn] === null : turn === appState.multiplayerState?.playerIndex}
 			delay={delay}
 			winLength={winLength}
 		/>

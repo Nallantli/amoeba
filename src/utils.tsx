@@ -1,6 +1,7 @@
 import { AI } from "./AI";
+import { AppState } from "./AppState";
 import { GameProps } from "./GameProps";
-import { GameMap, addChunk } from "./GameState";
+import { GameMap, GameState, addChunk } from "./GameState";
 
 export const serverUrl = "wss://wmgs.nallant.li:8081";
 
@@ -25,9 +26,17 @@ function generateInitialChunks() {
 	return map;
 }
 
-export function generateInitialGameState(gameProps: GameProps) {
-	const { AINames, AISelectOptions, limit, winLength } = gameProps;
-	const players: (AI | null)[] = AINames.map((AIName, i) => (AIName === "player" ? null : new AISelectOptions[AIName](winLength, i + 1, AINames.length)));
+function getPlayers(gameProps: GameProps, appState: AppState) {
+	if (appState.multiplayerState) {
+		return appState.multiplayerState.players.map(() => null);
+	}
+	const { AINames, AISelectOptions, winLength } = gameProps;
+	return AINames.map((AIName, i) => (AIName === "player" ? null : new AISelectOptions[AIName](winLength, i + 1, AINames.length)));
+}
+
+export function generateInitialGameState(gameProps: GameProps, appState: AppState): GameState {
+	const { limit } = gameProps;
+	const players: (AI | null)[] = getPlayers(gameProps, appState);
 	return {
 		turn: 0,
 		placements: [],
@@ -35,6 +44,6 @@ export function generateInitialGameState(gameProps: GameProps) {
 		moveLimit: limit > 0 ? limit : 0,
 		isLimited: limit > 0,
 		players,
-		isStarted: true
+		isStarted: true,
 	};
 }

@@ -1,17 +1,18 @@
-import { Box, Button, MenuItem, Select, SvgIcon, Tab, Tabs, TextField } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, MenuItem, Select, SvgIcon, Tab, Tabs, TextField } from "@mui/material";
 import React, { useState } from "react";
+import { AppState, MultiplayerState } from "./AppState";
 import "./Base.css";
 import { GameProps } from "./GameProps";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
 
-/*
-function setUpSocket(socket: WebSocket, updateState: (gameState: GameState) => void) {
+function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
+		console.log(data);
 		switch (data.action) {
 			case "JOIN_FAILURE": {
-				const { message } = data;
+				// const { message } = data;
 				// TODO
 				socket.close();
 				break;
@@ -26,13 +27,20 @@ function setUpSocket(socket: WebSocket, updateState: (gameState: GameState) => v
 				break;
 			}
 			case "STATE_UPDATE": {
-				const { gameState } = data;
-				updateState(gameState);
+				const { gameState, id, playerIndex, players } = data;
+				setAppState({
+					gameState,
+					multiplayerState: {
+						id,
+						playerIndex,
+						players,
+					},
+				});
 				break;
 			}
 		}
 	});
-} */
+}
 
 type PlayerItemProps = {
 	AIName: string;
@@ -66,19 +74,24 @@ function PlayerItem(props: PlayerItemProps) {
 
 interface MenuProps {
 	gameProps: GameProps;
+	multiplayerState?: MultiplayerState;
 	iconConfig: IconConfig;
 	updateGameProps: (gameProps: GameProps) => void;
 	startGame: () => void;
+	setAppState: (appState: AppState) => void;
 }
 
 export function Menu({
 	gameProps,
+	multiplayerState,
 	iconConfig,
 	gameProps: { AISelectOptions, AINames, winLength, delay, limit, socket },
 	updateGameProps,
 	startGame,
+	setAppState,
 }: MenuProps) {
 	const [tabValue, setTabValue] = useState(0);
+	const [roomCode, setRoomCode] = useState("");
 	const removeItem = (index: number) => {
 		let newAINames = [...AINames];
 		newAINames.splice(index, 1);
@@ -99,107 +112,228 @@ export function Menu({
 	const AIMenuOptions = Object.keys(AISelectOptions);
 	return (
 		<div style={{ background: "#222", padding: "15px", borderRadius: "10px", maxWidth: "600px", margin: "auto", marginTop: "30px" }}>
-			<Tabs value={tabValue} onChange={(_, value) => setTabValue(value)}>
-				<Tab label="Regular Mode" />
-				<Tab label="Limit Mode" />
-			</Tabs>
-			{tabValue === 1 && (
-				<Box>
-					<TextField
-						label="Maximum Amount of Rounds"
-						variant="filled"
-						value={limit}
-						onChange={(e) => updateGameProps({ ...gameProps, limit: parseInt(e.target.value, 10) || 0 })}
-					/>
-				</Box>
-			)}
-			<Box>
-				<TextField
-					label="Length to Win or (Limit Mode) Gain Score:"
-					variant="filled"
-					value={winLength}
-					onChange={(e) =>
-						updateGameProps({
-							...gameProps,
-							winLength: parseInt(e.target.value, 10) || 0,
-						})
-					}
-				/>
-				<TextField
-					label="Millisecond Delay Between Moves:"
-					variant="filled"
-					value={delay}
-					onChange={(e) =>
-						updateGameProps({
-							...gameProps,
-							delay: parseInt(e.target.value, 10) || 0,
-						})
-					}
-				/>
-			</Box>
 			<Tabs
-				value={socket === undefined ? 0 : 1}
+				value={tabValue}
 				onChange={(_, value) => {
-					if (value === 1) {
-						const socket = new WebSocket(serverUrl);
-						socket.addEventListener("open", () => {
-							socket.send(
-								JSON.stringify([
-									{
-										action: "CREATE_GAME",
-										options: { limit },
-									},
-								])
-							);
-						});
-						updateGameProps({
-							...gameProps,
-							socket,
-						});
-					} else {
+					if (socket && (value === 2 || tabValue === 2)) {
 						socket?.close();
 						updateGameProps({
 							...gameProps,
 							socket: undefined,
 						});
 					}
+					setTabValue(value);
 				}}
 			>
-				<Tab label="Singleplayer" />
-				<Tab label="Multiplayer (Beta)" />
+				<Tab label="Regular Mode" />
+				<Tab label="Limit Mode" />
+				<Tab label="Join Multiplayer Game (Beta)" />
 			</Tabs>
-			{socket === undefined && (
-				<Box>
-					<div style={{ border: "3px solid white" }}>
-						{AINames.map((AIName, index) =>
-							PlayerItem({
-								AIName,
-								index,
-								iconConfig,
-								removeItem,
-								changeAI,
-								canDelete,
-								AIMenuOptions,
-							})
-						)}
-					</div>
-					{AINames.length < 4 && (
-						<Button
-							onClick={() => {
+			{tabValue !== 2 ? (
+				<>
+					{tabValue === 1 && (
+						<Box>
+							<TextField
+								label="Maximum Amount of Rounds"
+								variant="filled"
+								value={limit}
+								onChange={(e) => updateGameProps({ ...gameProps, limit: parseInt(e.target.value, 10) || 0 })}
+							/>
+						</Box>
+					)}
+					<Box>
+						<TextField
+							label="Length to Win or (Limit Mode) Gain Score:"
+							variant="filled"
+							value={winLength}
+							onChange={(e) =>
 								updateGameProps({
 									...gameProps,
-									AINames: [...AINames, "player"],
+									winLength: parseInt(e.target.value, 10) || 0,
+								})
+							}
+						/>
+						<TextField
+							label="Millisecond Delay Between Moves:"
+							variant="filled"
+							value={delay}
+							onChange={(e) =>
+								updateGameProps({
+									...gameProps,
+									delay: parseInt(e.target.value, 10) || 0,
+								})
+							}
+						/>
+					</Box>
+					<Tabs
+						value={socket === undefined ? 0 : 1}
+						onChange={(_, value) => {
+							if (value === 1) {
+								const socket = new WebSocket(serverUrl);
+								socket.addEventListener("open", () => {
+									socket.send(
+										JSON.stringify([
+											{
+												action: "CREATE_GAME",
+												options: { limit },
+											},
+										])
+									);
 								});
-							}}
-						>
-							Add Player
-						</Button>
+								setUpSocket(socket, setAppState);
+								updateGameProps({
+									...gameProps,
+									socket,
+								});
+							} else {
+								socket?.close();
+								updateGameProps({
+									...gameProps,
+									socket: undefined,
+								});
+							}
+						}}
+					>
+						<Tab label="Singleplayer" />
+						<Tab label="Multiplayer (Beta)" />
+					</Tabs>
+					{socket === undefined ? (
+						<>
+							<Box>
+								<div style={{ border: "3px solid white" }}>
+									{AINames.map((AIName, index) =>
+										PlayerItem({
+											AIName,
+											index,
+											iconConfig,
+											removeItem,
+											changeAI,
+											canDelete,
+											AIMenuOptions,
+										})
+									)}
+								</div>
+								{AINames.length < 4 && (
+									<Button
+										onClick={() => {
+											updateGameProps({
+												...gameProps,
+												AINames: [...AINames, "player"],
+											});
+										}}
+									>
+										Add Player
+									</Button>
+								)}
+							</Box>
+						</>
+					) : (
+						<Box style={{ color: "white" }}>
+							<div>
+								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
+							</div>
+							<FormControlLabel
+								control={
+									<Checkbox
+										checked={multiplayerState?.players[multiplayerState.playerIndex].isReady}
+										onChange={() => {
+											if (multiplayerState?.players[multiplayerState.playerIndex].isReady) {
+												socket.send(
+													JSON.stringify([
+														{
+															action: "READY_DOWN",
+															id: multiplayerState?.id,
+														},
+													])
+												);
+											} else {
+												socket.send(
+													JSON.stringify([
+														{
+															action: "READY_UP",
+															id: multiplayerState?.id,
+														},
+													])
+												);
+											}
+										}}
+									/>
+								}
+								label="Ready"
+							/>
+						</Box>
 					)}
-				</Box>
+					<Button variant="contained" onClick={startGame}>
+						Play!
+					</Button>
+				</>
+			) : (
+				<>
+					{!socket ? (
+						<Box>
+							<TextField label="Room Code" variant="filled" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} />
+							<Button
+								variant="contained"
+								onClick={() => {
+									const socket = new WebSocket(serverUrl);
+									socket.addEventListener("open", () => {
+										socket.send(
+											JSON.stringify([
+												{
+													action: "JOIN_GAME",
+													id: roomCode,
+												},
+											])
+										);
+									});
+									setUpSocket(socket, setAppState);
+									updateGameProps({
+										...gameProps,
+										socket,
+									});
+								}}
+							>
+								Join Room
+							</Button>
+						</Box>
+					) : (
+						<Box style={{ color: "white" }}>
+							<div style={{ color: "white" }}>
+								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
+							</div>
+							<FormControlLabel
+								control={
+									<Checkbox
+										checked={multiplayerState?.players[multiplayerState.playerIndex]?.isReady}
+										onChange={() => {
+											if (multiplayerState?.players[multiplayerState.playerIndex]?.isReady) {
+												socket.send(
+													JSON.stringify([
+														{
+															action: "READY_DOWN",
+															id: multiplayerState?.id,
+														},
+													])
+												);
+											} else {
+												socket.send(
+													JSON.stringify([
+														{
+															action: "READY_UP",
+															id: multiplayerState?.id,
+														},
+													])
+												);
+											}
+										}}
+									/>
+								}
+								label="Ready"
+							/>
+						</Box>
+					)}
+				</>
 			)}
-			<Button variant="contained" onClick={startGame}>
-				Play!
-			</Button>
 		</div>
 	);
 }
