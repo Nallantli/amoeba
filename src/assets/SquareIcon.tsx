@@ -4,4 +4,4 @@ export const SquareIcon = (props: { color: string }) => {
 			<path fill={props.color} d="M0,0V1000H1000V0ZM800,800H200V200H800Z" />
 		</svg>
 	);
-}
+};

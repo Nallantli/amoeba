@@ -2,11 +2,14 @@ import { GameState } from "../GameState";
 
 export function countLine(
 	gameState: GameState,
-	x: number, y: number,
+	x: number,
+	y: number,
 	v: number,
-	dx: number, dy: number,
+	dx: number,
+	dy: number,
 	getValue: (gameState: GameState, x: number, y: number) => number,
-	winLength: number): number {
+	winLength: number
+): number {
 	let i = 1;
 	let contiguous = 0;
 	let space = 0;
@@ -34,7 +37,16 @@ export function countLine(
 }
 
 // I don't remember how this works
-export function countLineOld(gameState: GameState, x: number, y: number, v: number, dx: number, dy: number, getValue: (gameState: GameState, x: number, y: number) => number, winLength: number): number {
+export function countLineOld(
+	gameState: GameState,
+	x: number,
+	y: number,
+	v: number,
+	dx: number,
+	dy: number,
+	getValue: (gameState: GameState, x: number, y: number) => number,
+	winLength: number
+): number {
 	let l = 0;
 	let i = -1;
 	while (getValue(gameState, x + i * dx, y + i * dy) === v) {

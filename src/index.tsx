@@ -1,83 +1,84 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css'
-import reportWebVitals from './reportWebVitals';
-import ThemeSelector from './ThemeSelector';
-import { CircleIcon } from './assets/CircleIcon';
-import { CrossIcon } from './assets/CrossIcon';
-import { DiamondIcon } from './assets/DiamondIcon';
-import { SquareIcon } from './assets/SquareIcon';
-import { Menu } from './Menu';
-import { Fuzzy } from './ais/Fuzzy';
-import { Elk } from './ais/Elk';
-import { ElkAtt } from './ais/ElkAtt';
-import { ElkDef } from './ais/ElkDef';
-import { ElkSurf } from './ais/ElkSurf';
-import { ElkTimid } from './ais/ElkTimid';
-import { AttAndDef } from './ais/AttAndDef';
-import { Game } from './Game';
-import { TicTacToeGPT } from './ais/TicTacToeGPT';
+import { ThemeProvider, createTheme } from "@mui/material";
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import { Game } from "./Game";
+import { GameProps } from "./GameProps";
+import { Menu } from "./Menu";
+import ThemeSelector from "./ThemeSelector";
+import { AttAndDef } from "./ais/AttAndDef";
+import { Elk } from "./ais/Elk";
+import { ElkAtt } from "./ais/ElkAtt";
+import { ElkDef } from "./ais/ElkDef";
+import { ElkSurf } from "./ais/ElkSurf";
+import { ElkTimid } from "./ais/ElkTimid";
+import { Fuzzy } from "./ais/Fuzzy";
+import { TicTacToeGPT } from "./ais/TicTacToeGPT";
+import { CircleIcon } from "./assets/CircleIcon";
+import { CrossIcon } from "./assets/CrossIcon";
+import { DiamondIcon } from "./assets/DiamondIcon";
+import { SquareIcon } from "./assets/SquareIcon";
+import reportWebVitals from "./reportWebVitals";
+import { GameState } from "./GameState";
+import { generateInitialGameState } from "./utils";
+
+const darkTheme = createTheme({
+	palette: {
+		mode: "dark",
+	},
+	spacing: 8,
+});
 
 const AISelectOptions: { [key: string]: any } = {
-	"fuzzy": Fuzzy,
-	"elk": Elk,
-	"elkatt": ElkAtt,
-	"elkdef": ElkDef,
-	"elksurf": ElkSurf,
-	"elktimid": ElkTimid,
-	"attanddef": AttAndDef,
-	"tictactoe-gpt": TicTacToeGPT
+	fuzzy: Fuzzy,
+	elk: Elk,
+	elkatt: ElkAtt,
+	elkdef: ElkDef,
+	elksurf: ElkSurf,
+	elktimid: ElkTimid,
+	attanddef: AttAndDef,
+	"tictactoe-gpt": TicTacToeGPT,
 };
 
 const params = new URLSearchParams(window.location.search);
 
-const openGame = params.get('game');
-
-const winLength = params.get('win') ? parseInt(params.get('win') as string, 10) : 5;
-const playerCount = params.get('count') ? parseInt(params.get('count') as string, 10) : 2;
-const limit = params.get('limit') ? parseInt(params.get('limit') as string, 10) : 0;
-const delay = params.get('delay') ? parseInt(params.get('delay') as string, 10) : 0;
-let AINames = []
-for (let i = 0; i < playerCount; i++) {
-	AINames.push(params.get(`p${i + 1}`) || 'player');
-}
-
 const iconConfig = {
-	playerColors: [
-		'#5588ff',
-		'#ff3344',
-		"#33ff44",
-		'#ffcc33'
-	],
-	playerIcons: [
-		CircleIcon,
-		CrossIcon,
-		DiamondIcon,
-		SquareIcon
-	]
+	playerColors: ["#5588ff", "#ff3344", "#33ff44", "#ffcc33"],
+	playerIcons: [CircleIcon, CrossIcon, DiamondIcon, SquareIcon],
 };
+
+function App() {
+	const [gameOpen, setGameOpen] = useState(false);
+
+	const [gameProps, setGameProps] = useState<GameProps>({
+		winLength: 5,
+		limit: 0,
+		delay: 0,
+		AINames: ["player", "player"],
+		AISelectOptions: AISelectOptions,
+	});
+
+	const startGame = () => {
+		setGameOpen(true);
+	};
+
+	return (
+		<ThemeProvider theme={darkTheme}>
+			{gameOpen ? (
+				<ThemeSelector theme={params.get("theme") || "default"}>
+					<Game gameProps={gameProps} iconConfig={iconConfig}/>
+				</ThemeSelector>
+			) : (
+				<Menu gameProps={gameProps} updateGameProps={setGameProps} iconConfig={iconConfig} startGame={startGame} />
+			)}
+		</ThemeProvider>
+	);
+}
 
 ReactDOM.render(
 	<React.StrictMode>
-		<ThemeSelector theme={params.get('theme') || 'default'}>
-			{openGame ? <Game
-				winLength={winLength}
-				limit={limit}
-				delay={delay}
-				AINames={AINames}
-				iconConfig={iconConfig}
-				AISelectOptions={AISelectOptions}
-			/> : <Menu
-				winLength={winLength}
-				limit={limit}
-				delay={delay}
-				AINames={AINames}
-				iconConfig={iconConfig}
-				AISelectOptions={AISelectOptions}
-			/>}
-		</ThemeSelector>
+		<App />
 	</React.StrictMode>,
-	document.getElementById('root')
+	document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

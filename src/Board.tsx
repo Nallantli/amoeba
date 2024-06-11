@@ -1,9 +1,9 @@
-import React from 'react';
-import { AI } from './AI';
-import { Chunk, chunkSize } from './Chunk';
-import { calculateLimitScore, checkWin, GameState, getPlayerScores, getValue, selectSquare } from './GameState';
-import { IconConfig } from './IconConfig';
-import { flatten } from './utils';
+import React from "react";
+import { AI } from "./AI";
+import { Chunk, chunkSize } from "./Chunk";
+import { calculateLimitScore, checkWin, GameState, getPlayerScores, getValue, selectSquare } from "./GameState";
+import { IconConfig } from "./IconConfig";
+import { flatten } from "./utils";
 
 type BoardProps = {
 	gameState: GameState;
@@ -25,28 +25,33 @@ type BoardState = {
 	yLow: number;
 	yHigh: number;
 	isTouching: boolean;
-	touchStart: { x: number, y: number };
-	touchOffset: { x: number, y: number };
+	touchStart: { x: number; y: number };
+	touchOffset: { x: number; y: number };
 	shiftScroll: boolean;
 	ctrlScroll: boolean;
 };
 
 const Limit = (props: { moveLimit: number }) => {
-	return (<div id="limit-dialog">Turns Left: {props.moveLimit}</div>);
-}
+	return <div id="limit-dialog">Turns Left: {props.moveLimit}</div>;
+};
 
-const ScoreScreen = (props: { playerScores: number[], iconConfig: IconConfig }) => {
+const ScoreScreen = (props: { playerScores: number[]; iconConfig: IconConfig }) => {
 	const { playerScores, iconConfig } = props;
 	return (
 		<div id="score-dialog">
 			<table>
 				<tbody>
-					{playerScores.map((score, i) => <tr key={i}><td style={{ width: "40px" }}>{React.createElement(iconConfig.playerIcons[i], { color: iconConfig.playerColors[i] })}</td><td>{score}</td></tr>)}
+					{playerScores.map((score, i) => (
+						<tr key={i}>
+							<td style={{ width: "40px" }}>{React.createElement(iconConfig.playerIcons[i], { color: iconConfig.playerColors[i] })}</td>
+							<td>{score}</td>
+						</tr>
+					))}
 				</tbody>
 			</table>
 		</div>
 	);
-}
+};
 
 function doLocalTurn(gameState: GameState, callback: (x: number, y: number) => void) {
 	if (gameState.players[gameState.turn] !== null) {
@@ -54,21 +59,18 @@ function doLocalTurn(gameState: GameState, callback: (x: number, y: number) => v
 	}
 }
 
-function postMove(
-	gameState: GameState,
-	iconConfig: IconConfig,
-	winLength: number,
-	setSquare: (x: number, y: number) => void) {
+function postMove(gameState: GameState, iconConfig: IconConfig, winLength: number, setSquare: (x: number, y: number) => void) {
 	const { isLimited, players, placements, turn } = gameState;
 	if (checkWin(gameState, winLength)) {
-		const winner =
-			flatten(
-				(isLimited ?
-					calculateLimitScore(gameState, winLength).map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i
-					: turn - 1),
-				players.length
-			);
-		placements.forEach(placement => {
+		const winner = flatten(
+			isLimited
+				? calculateLimitScore(gameState, winLength)
+						.map((e, i) => ({ e, i }))
+						.sort((a, b) => b.e - a.e)[0].i
+				: turn - 1,
+			players.length
+		);
+		placements.forEach((placement) => {
 			let element = document.getElementById(placement.x + "_" + placement.y) as HTMLElement;
 			element.classList.add("amoeba-square");
 			let shadow = [];
@@ -78,33 +80,41 @@ function postMove(
 			if (getValue(gameState, placement.x, placement.y + 1) === 0) {
 				shadow.push(`${iconConfig.playerColors[winner]} 0rem 5rem`);
 			}
-			if (getValue(gameState, placement.x + 1, placement.y) === 0
-				&& getValue(gameState, placement.x, placement.y + 1) === 0
-				&& getValue(gameState, placement.x + 1, placement.y + 1) === 0) {
+			if (
+				getValue(gameState, placement.x + 1, placement.y) === 0 &&
+				getValue(gameState, placement.x, placement.y + 1) === 0 &&
+				getValue(gameState, placement.x + 1, placement.y + 1) === 0
+			) {
 				shadow.push(`${iconConfig.playerColors[winner]} 5rem 5rem`);
 			}
 			if (getValue(gameState, placement.x + 1, placement.y) === 0) {
 				shadow.push(`${iconConfig.playerColors[winner]} 5rem 0rem`);
 			}
-			if (getValue(gameState, placement.x + 1, placement.y) === 0
-				&& getValue(gameState, placement.x, placement.y - 1) === 0
-				&& getValue(gameState, placement.x + 1, placement.y - 1) === 0) {
+			if (
+				getValue(gameState, placement.x + 1, placement.y) === 0 &&
+				getValue(gameState, placement.x, placement.y - 1) === 0 &&
+				getValue(gameState, placement.x + 1, placement.y - 1) === 0
+			) {
 				shadow.push(`${iconConfig.playerColors[winner]} 5rem -5rem`);
 			}
 			if (getValue(gameState, placement.x, placement.y - 1) === 0) {
 				shadow.push(`${iconConfig.playerColors[winner]} 0rem -5rem`);
 			}
-			if (getValue(gameState, placement.x - 1, placement.y) === 0
-				&& getValue(gameState, placement.x, placement.y + 1) === 0
-				&& getValue(gameState, placement.x - 1, placement.y + 1) === 0) {
+			if (
+				getValue(gameState, placement.x - 1, placement.y) === 0 &&
+				getValue(gameState, placement.x, placement.y + 1) === 0 &&
+				getValue(gameState, placement.x - 1, placement.y + 1) === 0
+			) {
 				shadow.push(`${iconConfig.playerColors[winner]} -5rem 5rem`);
 			}
 			if (getValue(gameState, placement.x - 1, placement.y) === 0) {
 				shadow.push(`${iconConfig.playerColors[winner]} -5rem 0rem`);
 			}
-			if (getValue(gameState, placement.x - 1, placement.y) === 0
-				&& getValue(gameState, placement.x, placement.y - 1) === 0
-				&& getValue(gameState, placement.x - 1, placement.y - 1) === 0) {
+			if (
+				getValue(gameState, placement.x - 1, placement.y) === 0 &&
+				getValue(gameState, placement.x, placement.y - 1) === 0 &&
+				getValue(gameState, placement.x - 1, placement.y - 1) === 0
+			) {
 				shadow.push(`${iconConfig.playerColors[winner]} -5rem -5rem`);
 			}
 			element.style.boxShadow = shadow.join(", ");
@@ -135,7 +145,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			view: {
 				offsetX: 0,
 				offsetY: 0,
-				spaceSize: 50
+				spaceSize: 50,
 			},
 			xLow: 0,
 			xHigh: 0,
@@ -145,8 +155,8 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			touchStart: { x: 0, y: 0 },
 			touchOffset: { x: 0, y: 0 },
 			shiftScroll: false,
-			ctrlScroll: false
-		}
+			ctrlScroll: false,
+		};
 	}
 	handleZoom(v: number) {
 		const { offsetX, offsetY, spaceSize } = this.state.view;
@@ -155,8 +165,8 @@ export class Board extends React.Component<BoardProps, BoardState> {
 			view: {
 				offsetX: offsetX * (newSpaceSize / spaceSize),
 				offsetY: offsetY * (newSpaceSize / spaceSize),
-				spaceSize: newSpaceSize
-			}
+				spaceSize: newSpaceSize,
+			},
 		});
 	}
 	handleScroll(e: any) {
@@ -172,114 +182,121 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				view: {
 					offsetX: offsetX - (shiftScroll ? deltaY : deltaX),
 					offsetY: offsetY - (shiftScroll ? deltaX : deltaY),
-					spaceSize: spaceSize
-				}
+					spaceSize: spaceSize,
+				},
 			});
 		}
 	}
 	handleTouchMove(e: any) {
 		e.preventDefault();
-		const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		const evt = typeof e.originalEvent === "undefined" ? e : e.originalEvent;
 		const touch = evt.touches[0] || evt.changedTouches[0];
 		this.setState({
-			touchOffset: { x: touch.pageX, y: touch.pageY }
+			touchOffset: { x: touch.pageX, y: touch.pageY },
 		});
 	}
 	handleTouchStart(e: any) {
 		e.preventDefault();
-		const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		const evt = typeof e.originalEvent === "undefined" ? e : e.originalEvent;
 		const touch = evt.touches[0] || evt.changedTouches[0];
 		this.setState({
 			isTouching: true,
 			touchStart: { x: touch.pageX, y: touch.pageY },
-			touchOffset: { x: touch.pageX, y: touch.pageY }
+			touchOffset: { x: touch.pageX, y: touch.pageY },
 		});
 	}
 	handleTouchEnd(e: any) {
 		e.preventDefault();
-		const evt = (typeof e.originalEvent === 'undefined') ? e : e.originalEvent;
+		const evt = typeof e.originalEvent === "undefined" ? e : e.originalEvent;
 		const touch = evt.touches[0] || evt.changedTouches[0];
 		const { view, touchStart, touchOffset } = this.state;
 		const { offsetX, offsetY, spaceSize } = view;
-		this.setState({
-			isTouching: false,
-			view: {
-				offsetX: offsetX + (touchOffset.x - touchStart.x),
-				offsetY: offsetY + (touchOffset.y - touchStart.y),
-				spaceSize: spaceSize
-			}
-		}, () => {
-			if (Math.pow(touchStart.x - touch.pageX, 2) + Math.pow(touchStart.y - touch.pageY, 2) < 10) {
-				if (touch.target.click !== undefined) {
-					touch.target.click();
+		this.setState(
+			{
+				isTouching: false,
+				view: {
+					offsetX: offsetX + (touchOffset.x - touchStart.x),
+					offsetY: offsetY + (touchOffset.y - touchStart.y),
+					spaceSize: spaceSize,
+				},
+			},
+			() => {
+				if (Math.pow(touchStart.x - touch.pageX, 2) + Math.pow(touchStart.y - touch.pageY, 2) < 10) {
+					if (touch.target.click !== undefined) {
+						touch.target.click();
+					}
 				}
 			}
-		});
+		);
 	}
 	handleKeyDown(e: any) {
 		switch (e.key) {
-			case 'Shift':
+			case "Shift":
 				this.setState({
-					shiftScroll: true
+					shiftScroll: true,
 				});
 				break;
-			case 'Control':
+			case "Control":
 				this.setState({
-					ctrlScroll: true
+					ctrlScroll: true,
 				});
 				break;
 		}
 	}
 	handleKeyUp(e: any) {
 		switch (e.key) {
-			case 'Shift':
+			case "Shift":
 				this.setState({
-					shiftScroll: false
+					shiftScroll: false,
 				});
 				break;
-			case 'Control':
+			case "Control":
 				this.setState({
-					ctrlScroll: false
+					ctrlScroll: false,
 				});
 				break;
 		}
 	}
 	componentDidMount() {
 		const { gameState } = this.props;
-		window.addEventListener('wheel', this.handleScroll, { passive: false });
-		window.addEventListener('touchstart', this.handleTouchStart, { passive: false });
-		window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
-		window.addEventListener('touchend', this.handleTouchEnd, { passive: false });
-		window.addEventListener('touchcancel', this.handleTouchEnd, { passive: false });
-		window.addEventListener('keydown', this.handleKeyDown, { passive: false });
-		window.addEventListener('keyup', this.handleKeyUp, { passive: false });
-		this.boardRef.current?.addEventListener('selectSquare', this.selectSquare);
+		window.addEventListener("wheel", this.handleScroll, { passive: false });
+		window.addEventListener("touchstart", this.handleTouchStart, { passive: false });
+		window.addEventListener("touchmove", this.handleTouchMove, { passive: false });
+		window.addEventListener("touchend", this.handleTouchEnd, { passive: false });
+		window.addEventListener("touchcancel", this.handleTouchEnd, { passive: false });
+		window.addEventListener("keydown", this.handleKeyDown, { passive: false });
+		window.addEventListener("keyup", this.handleKeyUp, { passive: false });
+		this.boardRef.current?.addEventListener("selectSquare", this.selectSquare);
 		doLocalTurn(gameState, this.setSquare);
 	}
 	setSquare(x: number, y: number) {
 		const { delay } = this.props;
-		setTimeout(
-			() => this.boardRef.current?.dispatchEvent(
-				new CustomEvent('selectSquare',
-					{ detail: { x: x, y: y } })),
-			delay);
+		setTimeout(() => this.boardRef.current?.dispatchEvent(new CustomEvent("selectSquare", { detail: { x: x, y: y } })), delay);
 	}
 	selectSquare(e: any) {
 		const { broadcast, gameState, iconConfig, winLength } = this.props;
 		const { x, y } = e.detail;
 		document.getElementById(x + "_" + y)?.classList.add("space-pressed");
-		broadcast(
-			selectSquare(gameState, x, y),
-			(gameState2: GameState) =>
-				postMove(gameState2, iconConfig, winLength, this.setSquare));
+		broadcast(selectSquare(gameState, x, y), (gameState2: GameState) => postMove(gameState2, iconConfig, winLength, this.setSquare));
 	}
 	render() {
-		const { iconConfig, canMove, winLength, gameState,
-			gameState: { moveLimit, turn, map, isLimited, players } } = this.props;
-		const { view,
+		const {
+			iconConfig,
+			canMove,
+			winLength,
+			gameState,
+			gameState: { moveLimit, turn, map, isLimited, players },
+		} = this.props;
+		const {
+			view,
 			view: { offsetX, offsetY, spaceSize },
-			isTouching, touchOffset, touchStart,
-			xLow, yLow, xHigh, yHigh
+			isTouching,
+			touchOffset,
+			touchStart,
+			xLow,
+			yLow,
+			xHigh,
+			yHigh,
 		} = this.state;
 		const width = spaceSize * chunkSize * (xHigh - xLow + 1);
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
@@ -287,22 +304,27 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		const win = checkWin(gameState, winLength);
 		return (
 			<div id="screen">
-				<div id="player-bar"
+				<div
+					id="player-bar"
 					style={{
-						background: (win ?
-							iconConfig.playerColors[flatten((isLimited ?
-								playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i
-								: turn - 1), players.length)]
-							: iconConfig.playerColors[turn])
+						background: win
+							? iconConfig.playerColors[flatten(isLimited ? playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i : turn - 1, players.length)]
+							: iconConfig.playerColors[turn],
 					}}
 				/>
 				<div id="zoom-bar">
-					<button id="zoom-in" onClick={() => this.handleZoom(3 / 2)}>+</button>
-					<button id="zoom-out" onClick={() => this.handleZoom(2 / 3)}>-</button>
+					<button id="zoom-in" onClick={() => this.handleZoom(3 / 2)}>
+						+
+					</button>
+					<button id="zoom-out" onClick={() => this.handleZoom(2 / 3)}>
+						-
+					</button>
 				</div>
 				{isLimited && <Limit moveLimit={moveLimit} />}
 				{isLimited && <ScoreScreen playerScores={playerScores} iconConfig={iconConfig} />}
-				<button id="reset-button" onClick={() => window.location.reload()}>Reset Game</button>
+				<button id="reset-button" onClick={() => window.location.reload()}>
+					Reset Game
+				</button>
 				<div className="board" ref={this.boardRef}>
 					<div
 						className="chunk-container"
@@ -310,14 +332,14 @@ export class Board extends React.Component<BoardProps, BoardState> {
 							position: "absolute",
 							width: `${width}px`,
 							height: `${height}px`,
-							marginTop: `${-height / 2 + offsetY + (isTouching ? (touchOffset.y - touchStart.y) : 0)}px`,
-							marginLeft: `${-width / 2 + offsetX + (isTouching ? (touchOffset.x - touchStart.x) : 0)}px`
+							marginTop: `${-height / 2 + offsetY + (isTouching ? touchOffset.y - touchStart.y : 0)}px`,
+							marginLeft: `${-width / 2 + offsetX + (isTouching ? touchOffset.x - touchStart.x : 0)}px`,
 						}}
 					>
-						{Object.values(map).map(value =>
+						{Object.values(map).map((value) => (
 							<Chunk
 								iconConfig={iconConfig}
-								key={value.x + '_' + value.y}
+								key={value.x + "_" + value.y}
 								posX={value.x - xLow}
 								posY={value.y - yLow}
 								chunkX={value.x}
@@ -328,7 +350,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 								canPlayerMove={canMove}
 								view={view}
 							/>
-						)}
+						))}
 					</div>
 				</div>
 			</div>

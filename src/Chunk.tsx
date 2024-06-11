@@ -12,7 +12,7 @@ export function Chunk(props: {
 	posY: number;
 	win: boolean;
 	canPlayerMove: boolean;
-	view: { spaceSize: number; };
+	view: { spaceSize: number };
 	iconConfig: IconConfig;
 }) {
 	const {
@@ -26,20 +26,21 @@ export function Chunk(props: {
 		view,
 		view: { spaceSize },
 		selectSquare,
-		iconConfig } = props;
+		iconConfig,
+	} = props;
 	return (
 		<div
 			className="chunk"
 			style={{
-				position: 'absolute',
+				position: "absolute",
 				width: `${chunkSize * spaceSize}px`,
 				height: `${chunkSize * spaceSize}px`,
 				left: `${posX * chunkSize * spaceSize}px`,
-				top: `${posY * chunkSize * spaceSize}px`
+				top: `${posY * chunkSize * spaceSize}px`,
 			}}
 		>
 			{chunkData.map((col, x) => {
-				return col.map((cell, y) =>
+				return col.map((cell, y) => (
 					<Space
 						key={`${x + chunkX * chunkSize}_${y + chunkY * chunkSize}`}
 						id={`${x + chunkX * chunkSize}_${y + chunkY * chunkSize}`}
@@ -52,8 +53,8 @@ export function Chunk(props: {
 						view={view}
 						iconConfig={iconConfig}
 					/>
-				);
+				));
 			})}
 		</div>
-	)
+	);
 }

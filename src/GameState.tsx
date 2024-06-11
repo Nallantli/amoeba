@@ -3,8 +3,8 @@ import { chunkSize } from "./Chunk";
 import { fib, flatten } from "./utils";
 
 export type GameState = {
-	map: { [key: string]: { x: number, y: number, chunkData: number[][] } };
-	placements: { x: number, y: number, v: number }[];
+	map: { [key: string]: { x: number; y: number; chunkData: number[][] } };
+	placements: { x: number; y: number; v: number }[];
 	moveLimit: number;
 	isLimited: boolean;
 	turn: number;
@@ -51,18 +51,17 @@ function diagonalDown(gameState: GameState, x: number, y: number, v: number) {
 
 export function getValue(gameState: GameState, x: number, y: number) {
 	const { map } = gameState;
-	const chunk = map[Math.floor(x / chunkSize) + '_' + Math.floor(y / chunkSize)];
+	const chunk = map[Math.floor(x / chunkSize) + "_" + Math.floor(y / chunkSize)];
 	if (chunk === undefined) {
 		return 0;
 	}
 	return chunk.chunkData[flatten(x, chunkSize)][flatten(y, chunkSize)];
 }
 
-function sharePoint(a: { x: number, y: number }[], b: { x: number, y: number }[]) {
+function sharePoint(a: { x: number; y: number }[], b: { x: number; y: number }[]) {
 	for (let i = 0; i < a.length; i++) {
 		for (let j = 0; j < b.length; j++) {
-			if (a[i].x === b[j].x && a[i].y === b[j].y)
-				return true;
+			if (a[i].x === b[j].x && a[i].y === b[j].y) return true;
 		}
 	}
 	return false;
@@ -75,23 +74,23 @@ export function getPlayerScores(gameState: GameState, winLength: number) {
 
 export function calculateLimitScore(gameState: GameState, winLength: number) {
 	const { players, placements } = gameState;
-	let matches: { type: number, ps: { x: number, y: number }[], old?: boolean }[][] = [];
+	let matches: { type: number; ps: { x: number; y: number }[]; old?: boolean }[][] = [];
 	for (let i = 0; i < players.length; i++) {
 		matches.push([]);
 	}
-	placements.forEach((placement: { x: number, y: number, v: number }) => {
+	placements.forEach((placement: { x: number; y: number; v: number }) => {
 		[
 			horizontalCount(gameState, placement.x, placement.y, placement.v),
 			verticalCount(gameState, placement.x, placement.y, placement.v),
 			diagonalUp(gameState, placement.x, placement.y, placement.v),
-			diagonalDown(gameState, placement.x, placement.y, placement.v)
-		].forEach(e => {
+			diagonalDown(gameState, placement.x, placement.y, placement.v),
+		].forEach((e) => {
 			if (e.ps.length < winLength) {
 				return;
 			}
 			let flag = false;
 			let removes: number[] = [];
-			matches[placement.v - 1].forEach((p: { type: number, ps: { x: number, y: number }[] }, i: number) => {
+			matches[placement.v - 1].forEach((p: { type: number; ps: { x: number; y: number }[] }, i: number) => {
 				if (p.type === e.type && sharePoint(p.ps, e.ps)) {
 					if (p.ps.length < e.ps.length) {
 						removes.push(i);
@@ -100,17 +99,17 @@ export function calculateLimitScore(gameState: GameState, winLength: number) {
 					}
 				}
 			});
-			removes.forEach(i => matches[placement.v - 1][i].old = true);
+			removes.forEach((i) => (matches[placement.v - 1][i].old = true));
 			if (!flag) {
 				matches[placement.v - 1].push(e);
 			}
 		});
 	});
 	let playerScores: number[] = [];
-	matches.map(m => m.filter(e => e.old === undefined));
-	matches.forEach(e => {
+	matches.map((m) => m.filter((e) => e.old === undefined));
+	matches.forEach((e) => {
 		let score = 0;
-		e.forEach(p => {
+		e.forEach((p) => {
 			score += fib(p.ps.length - winLength + 2);
 		});
 		playerScores.push(score);
@@ -131,17 +130,14 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 		return false;
 	} else {
 		const check = getValue(gameState, x, y);
-		if (check === 0)
-			return false;
+		if (check === 0) return false;
 		for (let i = 0; i < winLength; i++) {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
 				let s = getValue(gameState, x - i + j, y);
-				if (s === undefined)
-					break;
-				if (s !== check)
-					break;
-				squares.push((x - i + j) + "_" + y);
+				if (s === undefined) break;
+				if (s !== check) break;
+				squares.push(x - i + j + "_" + y);
 			}
 			if (squares.length === winLength) {
 				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
@@ -152,10 +148,8 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
 				const s = getValue(gameState, x, y - i + j);
-				if (s === undefined)
-					break;
-				if (s !== check)
-					break;
+				if (s === undefined) break;
+				if (s !== check) break;
 				squares.push(x + "_" + (y - i + j));
 			}
 			if (squares.length === winLength) {
@@ -167,11 +161,9 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
 				let s = getValue(gameState, x - i + j, y - i + j);
-				if (s === undefined)
-					break;
-				if (s !== check)
-					break;
-				squares.push((x - i + j) + "_" + (y - i + j));
+				if (s === undefined) break;
+				if (s !== check) break;
+				squares.push(x - i + j + "_" + (y - i + j));
 			}
 			if (squares.length === winLength) {
 				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
@@ -182,11 +174,9 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
 				let s = getValue(gameState, x - i + j, y + i - j);
-				if (s === undefined)
-					break;
-				if (s !== check)
-					break;
-				squares.push((x - i + j) + "_" + (y + i - j));
+				if (s === undefined) break;
+				if (s !== check) break;
+				squares.push(x - i + j + "_" + (y + i - j));
 			}
 			if (squares.length === winLength) {
 				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
@@ -199,7 +189,7 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 
 export function addChunk(gameState: GameState, x: number, y: number): GameState {
 	const { map } = gameState;
-	if (map[x + '_' + y] !== undefined) {
+	if (map[x + "_" + y] !== undefined) {
 		return gameState;
 	}
 	let chunkData: number[][] = [];
@@ -209,17 +199,17 @@ export function addChunk(gameState: GameState, x: number, y: number): GameState 
 			chunkData[i][j] = 0;
 		}
 	}
-	return gameState = {
+	return (gameState = {
 		...gameState,
 		map: {
 			...map,
 			[`${x}_${y}`]: {
 				x: x,
 				y: y,
-				chunkData
-			}
-		}
-	};
+				chunkData,
+			},
+		},
+	});
 }
 
 function generateBorderChunks(gameState: GameState, chunkX: number, chunkY: number): GameState {
@@ -236,26 +226,20 @@ export function selectSquare(gameState: GameState, x: number, y: number): GameSt
 	const chunkX = Math.floor(x / chunkSize);
 	const chunkY = Math.floor(y / chunkSize);
 	const v = turn + 1;
-	const chunk = gameState.map[chunkX + '_' + chunkY];
+	const chunk = gameState.map[chunkX + "_" + chunkY];
 	if (chunk === undefined) {
-		return selectSquare(
-			addChunk(
-				gameState,
-				chunkX,
-				chunkY),
-			x,
-			y);
+		return selectSquare(addChunk(gameState, chunkX, chunkY), x, y);
 	}
 	chunk.chunkData[flatten(x, chunkSize)][flatten(y, chunkSize)] = v;
 	gameState = generateBorderChunks(gameState, chunkX, chunkY);
-	return gameState = {
+	return (gameState = {
 		...gameState,
 		map: {
 			...gameState.map,
-			[chunkX + '_' + chunkY]: chunk
+			[chunkX + "_" + chunkY]: chunk,
 		},
 		placements: [...placements, { x, y, v }],
 		turn: (turn + 1) % players.length,
-		moveLimit: moveLimit - (turn === players.length - 1 ? 1 : 0)
-	};
+		moveLimit: moveLimit - (turn === players.length - 1 ? 1 : 0),
+	});
 }

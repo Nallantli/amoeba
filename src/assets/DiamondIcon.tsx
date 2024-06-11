@@ -4,4 +4,4 @@ export const DiamondIcon = (props: { color: string }) => {
 			<path fill={props.color} d="M500,0,0,500l500,500,500-500Zm0,717.16L282.84,500,500,282.84,717.16,500Z" transform="translate(0 0)" />
 		</svg>
 	);
-}
+};
