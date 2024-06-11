@@ -3,7 +3,7 @@ import { GameState, getValue } from "../GameState";
 import { countLine, getRandomElement } from "./utils";
 
 export class ElkAtt extends AI {
-	doTurn(gameState: GameState) {
+	async doTurn(gameState: GameState) {
 		const { placements } = gameState;
 		let highAtt = 0;
 		let highDef = 0;

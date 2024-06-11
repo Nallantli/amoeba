@@ -3,7 +3,7 @@ import { GameState, getValue } from "../GameState";
 import { countLine, getRandomElement } from "./utils";
 
 export class AttAndDef extends AI {
-	doTurn(gameState: GameState) {
+	async doTurn(gameState: GameState) {
 		const { placements } = gameState;
 		let heatMap: { x: number; y: number; att: number; def: number; }[] = [];
 		let hottest = 0;

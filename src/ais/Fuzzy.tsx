@@ -3,7 +3,7 @@ import { GameState, getValue } from "../GameState";
 import { countLineOld, getRandomElement } from "./utils";
 
 export class Fuzzy extends AI {
-	doTurn(gameState: GameState) {
+	async doTurn(gameState: GameState) {
 		const { placements } = gameState;
 		let heatMap: { x: number; y: number; att: number; def: number; }[] = [];
 		placements.forEach(e => {

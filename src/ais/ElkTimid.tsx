@@ -5,7 +5,7 @@ import { countLine, getRandomElement } from "./utils";
 // Becomes ElkDef when winning, ElkAtt when losing
 
 export class ElkTimid extends AI {
-	doTurn(gameState: GameState) {
+	async doTurn(gameState: GameState) {
 		const { placements, players } = gameState;
 		let highAtt = 0;
 		let highDef = 0;

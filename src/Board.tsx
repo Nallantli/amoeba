@@ -50,8 +50,7 @@ const ScoreScreen = (props: { playerScores: number[], iconConfig: IconConfig }) 
 
 function doLocalTurn(gameState: GameState, callback: (x: number, y: number) => void) {
 	if (gameState.players[gameState.turn] !== null) {
-		const { x, y } = (gameState.players[gameState.turn] as AI).doTurn(gameState);
-		callback(x, y);
+		(gameState.players[gameState.turn] as AI).doTurn(gameState).then(({ x, y }) => callback(x, y));
 	}
 }
 

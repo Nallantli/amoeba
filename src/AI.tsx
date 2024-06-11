@@ -13,7 +13,7 @@ export class AI {
 		this.icon = icon;
 		this.pCount = pCount;
 	}
-	doTurn(_gameState: GameState): { x: number, y: number } {
+	async doTurn(_gameState: GameState): Promise<{ x: number, y: number }> {
 		throw new Error("Method not implemented.");
 	}
 }

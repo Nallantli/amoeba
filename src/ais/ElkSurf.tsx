@@ -5,7 +5,7 @@ import { countLine, getRandomElement } from "./utils";
 // Becomes ElkAtt when winning, ElkDef when losing
 
 export class ElkSurf extends AI {
-	doTurn(gameState: GameState) {
+	async doTurn(gameState: GameState) {
 		const { placements, players } = gameState;
 		let highAtt = 0;
 		let highDef = 0;

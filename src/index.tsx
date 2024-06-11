@@ -16,6 +16,7 @@ import { ElkSurf } from './ais/ElkSurf';
 import { ElkTimid } from './ais/ElkTimid';
 import { AttAndDef } from './ais/AttAndDef';
 import { Game } from './Game';
+import { TicTacToeGPT } from './ais/TicTacToeGPT';
 
 const AISelectOptions: { [key: string]: any } = {
 	"fuzzy": Fuzzy,
@@ -24,7 +25,8 @@ const AISelectOptions: { [key: string]: any } = {
 	"elkdef": ElkDef,
 	"elksurf": ElkSurf,
 	"elktimid": ElkTimid,
-	"attanddef": AttAndDef
+	"attanddef": AttAndDef,
+	"tictactoe-gpt": TicTacToeGPT
 };
 
 const params = new URLSearchParams(window.location.search);
