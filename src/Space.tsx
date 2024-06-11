@@ -1,7 +1,7 @@
 import React from "react";
 import { IconConfig } from "./IconConfig";
 
-export function Space(props: {
+interface SpaceProps {
 	x: number;
 	y: number;
 	id: string;
@@ -11,28 +11,35 @@ export function Space(props: {
 	onClick: (e: any) => void;
 	view: { spaceSize: number };
 	iconConfig: IconConfig;
-}) {
-	const { x, y, id, value, win, canPlayerMove, onClick, view, iconConfig } = props;
+}
+
+export function Space({ x, y, id, value, win, canPlayerMove, onClick, view, iconConfig }: SpaceProps) {
 	const { spaceSize } = view;
-	return (<button
-		id={id}
-		onClick={value === 0 && !win && canPlayerMove ? onClick : () => { }}
-		className="space"
-		style={{
-			position: "absolute",
-			width: `${spaceSize}px`,
-			height: `${spaceSize}px`,
-			left: `${x * spaceSize}px`,
-			top: `${y * spaceSize}px`
-		}}
-	>
-		<span style={{
-			position: "absolute",
-			left: `0`,
-			top: `0`,
-			color: "#888",
-			fontSize: "10px"
-		}}>{id}</span>
-		{value > 0 && React.createElement(iconConfig.playerIcons[value - 1], { color: iconConfig.playerColors[value - 1] })}
-	</button>);
+	return (
+		<button
+			id={id}
+			onClick={value === 0 && !win && canPlayerMove ? onClick : () => {}}
+			className="space"
+			style={{
+				position: "absolute",
+				width: `${spaceSize}px`,
+				height: `${spaceSize}px`,
+				left: `${x * spaceSize}px`,
+				top: `${y * spaceSize}px`,
+			}}
+		>
+			<span
+				style={{
+					position: "absolute",
+					left: `0`,
+					top: `0`,
+					color: "#888",
+					fontSize: "10px",
+				}}
+			>
+				{id}
+			</span>
+			{value > 0 && React.createElement(iconConfig.playerIcons[value - 1], { color: iconConfig.playerColors[value - 1] })}
+		</button>
+	);
 }

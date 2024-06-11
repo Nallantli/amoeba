@@ -2,8 +2,12 @@ import { AI } from "./AI";
 import { chunkSize } from "./Chunk";
 import { fib, flatten } from "./utils";
 
+export interface GameMap {
+	[key: string]: { x: number; y: number; chunkData: number[][] };
+}
+
 export type GameState = {
-	map: { [key: string]: { x: number; y: number; chunkData: number[][] } };
+	map: GameMap;
 	placements: { x: number; y: number; v: number }[];
 	moveLimit: number;
 	isLimited: boolean;
@@ -187,10 +191,9 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 	return false;
 }
 
-export function addChunk(gameState: GameState, x: number, y: number): GameState {
-	const { map } = gameState;
+export function addChunk(map: GameMap, x: number, y: number): GameMap {
 	if (map[x + "_" + y] !== undefined) {
-		return gameState;
+		return map;
 	}
 	let chunkData: number[][] = [];
 	for (let i = 0; i < chunkSize; i++) {
@@ -199,36 +202,37 @@ export function addChunk(gameState: GameState, x: number, y: number): GameState 
 			chunkData[i][j] = 0;
 		}
 	}
-	return (gameState = {
-		...gameState,
-		map: {
-			...map,
-			[`${x}_${y}`]: {
-				x: x,
-				y: y,
-				chunkData,
-			},
+	return {
+		...map,
+		[`${x}_${y}`]: {
+			x: x,
+			y: y,
+			chunkData,
 		},
-	});
+	};
 }
 
 function generateBorderChunks(gameState: GameState, chunkX: number, chunkY: number): GameState {
 	for (let i = chunkX - 1; i <= chunkX + 1; i++) {
 		for (let j = chunkY - 1; j <= chunkY + 1; j++) {
-			gameState = { ...gameState, ...addChunk(gameState, i, j) };
+			gameState = { ...gameState, map: addChunk(gameState.map, i, j) };
 		}
 	}
 	return gameState;
 }
 
 export function selectSquare(gameState: GameState, x: number, y: number): GameState {
-	const { turn, moveLimit, placements, players } = gameState;
+	const { turn, moveLimit, placements, players, map } = gameState;
 	const chunkX = Math.floor(x / chunkSize);
 	const chunkY = Math.floor(y / chunkSize);
 	const v = turn + 1;
 	const chunk = gameState.map[chunkX + "_" + chunkY];
 	if (chunk === undefined) {
-		return selectSquare(addChunk(gameState, chunkX, chunkY), x, y);
+		const newGameState = {
+			...gameState,
+			map: addChunk(map, chunkX, chunkY)
+		};
+		return selectSquare(newGameState, x, y);
 	}
 	chunk.chunkData[flatten(x, chunkSize)][flatten(y, chunkSize)] = v;
 	gameState = generateBorderChunks(gameState, chunkX, chunkY);
