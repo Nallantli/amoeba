@@ -1,0 +1,1 @@
+{"version":3,"file":"static/js/278.ef4dc09d.chunk.js","mappings":"oJAGA,MAEA,EAFmBA,KAAMC,EAAAA,EAAAA,KAACC,EAAAA,SAAc,G","sources":["styles/Win98.tsx"],"sourcesContent":["import React from \"react\";\nimport \"./Win98.css\";\n\nconst Win98Theme = () => <React.Fragment></React.Fragment>;\n\nexport default Win98Theme;\n"],"names":["Win98Theme","_jsx","React"],"sourceRoot":""}

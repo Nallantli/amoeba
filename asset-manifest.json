@@ -1,30 +1,23 @@
 {
   "files": {
-    "main.css": "/amoeba/static/css/main.d58b555b.chunk.css",
-    "main.js": "/amoeba/static/js/main.89c72079.chunk.js",
-    "main.js.map": "/amoeba/static/js/main.89c72079.chunk.js.map",
-    "runtime-main.js": "/amoeba/static/js/runtime-main.d19a0b38.js",
-    "runtime-main.js.map": "/amoeba/static/js/runtime-main.d19a0b38.js.map",
-    "static/js/2.6de587ef.chunk.js": "/amoeba/static/js/2.6de587ef.chunk.js",
-    "static/js/2.6de587ef.chunk.js.map": "/amoeba/static/js/2.6de587ef.chunk.js.map",
-    "static/css/3.4dde9f3d.chunk.css": "/amoeba/static/css/3.4dde9f3d.chunk.css",
-    "static/js/3.acfca947.chunk.js": "/amoeba/static/js/3.acfca947.chunk.js",
-    "static/js/3.acfca947.chunk.js.map": "/amoeba/static/js/3.acfca947.chunk.js.map",
-    "static/css/4.c831e062.chunk.css": "/amoeba/static/css/4.c831e062.chunk.css",
-    "static/js/4.adb92118.chunk.js": "/amoeba/static/js/4.adb92118.chunk.js",
-    "static/js/4.adb92118.chunk.js.map": "/amoeba/static/js/4.adb92118.chunk.js.map",
-    "static/js/5.4973dc54.chunk.js": "/amoeba/static/js/5.4973dc54.chunk.js",
-    "static/js/5.4973dc54.chunk.js.map": "/amoeba/static/js/5.4973dc54.chunk.js.map",
+    "main.css": "/amoeba/static/css/main.58df4c56.css",
+    "main.js": "/amoeba/static/js/main.e71a7d45.js",
+    "static/css/417.8a631ea2.chunk.css": "/amoeba/static/css/417.8a631ea2.chunk.css",
+    "static/js/417.2e30607e.chunk.js": "/amoeba/static/js/417.2e30607e.chunk.js",
+    "static/css/278.6d463dcc.chunk.css": "/amoeba/static/css/278.6d463dcc.chunk.css",
+    "static/js/278.ef4dc09d.chunk.js": "/amoeba/static/js/278.ef4dc09d.chunk.js",
+    "static/js/453.217f0d34.chunk.js": "/amoeba/static/js/453.217f0d34.chunk.js",
     "index.html": "/amoeba/index.html",
-    "static/css/3.4dde9f3d.chunk.css.map": "/amoeba/static/css/3.4dde9f3d.chunk.css.map",
-    "static/css/4.c831e062.chunk.css.map": "/amoeba/static/css/4.c831e062.chunk.css.map",
-    "static/css/main.d58b555b.chunk.css.map": "/amoeba/static/css/main.d58b555b.chunk.css.map",
-    "static/js/2.6de587ef.chunk.js.LICENSE.txt": "/amoeba/static/js/2.6de587ef.chunk.js.LICENSE.txt"
+    "main.58df4c56.css.map": "/amoeba/static/css/main.58df4c56.css.map",
+    "main.e71a7d45.js.map": "/amoeba/static/js/main.e71a7d45.js.map",
+    "417.8a631ea2.chunk.css.map": "/amoeba/static/css/417.8a631ea2.chunk.css.map",
+    "417.2e30607e.chunk.js.map": "/amoeba/static/js/417.2e30607e.chunk.js.map",
+    "278.6d463dcc.chunk.css.map": "/amoeba/static/css/278.6d463dcc.chunk.css.map",
+    "278.ef4dc09d.chunk.js.map": "/amoeba/static/js/278.ef4dc09d.chunk.js.map",
+    "453.217f0d34.chunk.js.map": "/amoeba/static/js/453.217f0d34.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/runtime-main.d19a0b38.js",
-    "static/js/2.6de587ef.chunk.js",
-    "static/css/main.d58b555b.chunk.css",
-    "static/js/main.89c72079.chunk.js"
+    "static/css/main.58df4c56.css",
+    "static/js/main.e71a7d45.js"
   ]
 }

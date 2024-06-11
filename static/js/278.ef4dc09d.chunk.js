@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkamoeba=self.webpackChunkamoeba||[]).push([[278],{8278:(a,e,s)=>{s.r(e),s.d(e,{default:()=>b});var t=s(5043),u=s(579);const b=()=>(0,u.jsx)(t.Fragment,{})}}]);
+//# sourceMappingURL=278.ef4dc09d.chunk.js.map
