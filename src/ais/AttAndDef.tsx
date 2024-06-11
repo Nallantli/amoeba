@@ -4,7 +4,7 @@ import { countLine, getRandomElement } from "./utils";
 
 export class AttAndDef extends AI {
 	async doTurn(gameState: GameState) {
-		const { placements } = gameState;
+		const { placements, map } = gameState;
 		let heatMap: { x: number; y: number; att: number; def: number }[] = [];
 		let hottest = 0;
 		placements.forEach((e) => {
@@ -13,7 +13,7 @@ export class AttAndDef extends AI {
 					if (x === 0 && y === 0) {
 						continue;
 					}
-					if (getValue(gameState, e.x + x, e.y + y) !== 0) {
+					if (getValue(map, e.x + x, e.y + y) !== 0) {
 						continue;
 					}
 					if (heatMap.find((h) => h.x === e.x + x && h.y === e.y + y)) {
@@ -23,10 +23,10 @@ export class AttAndDef extends AI {
 						.fill(0)
 						.map(
 							(_, i) =>
-								countLine(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength) +
-								countLine(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength) +
-								countLine(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength) +
-								countLine(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength)
+								countLine(map, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength) +
+								countLine(map, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength) +
+								countLine(map, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength) +
+								countLine(map, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength)
 						);
 					const o = {
 						x: e.x + x,

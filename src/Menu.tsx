@@ -1,11 +1,11 @@
-import { Box, Button, IconButton, MenuItem, Select, SvgIcon, Tab, Tabs, TextField } from "@mui/material";
+import { Box, Button, MenuItem, Select, SvgIcon, Tab, Tabs, TextField } from "@mui/material";
 import React, { useState } from "react";
+import "./Base.css";
 import { GameProps } from "./GameProps";
 import { IconConfig } from "./IconConfig";
-import "./Base.css";
 import { serverUrl } from "./utils";
-import { GameState } from "./GameState";
 
+/*
 function setUpSocket(socket: WebSocket, updateState: (gameState: GameState) => void) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
@@ -32,7 +32,7 @@ function setUpSocket(socket: WebSocket, updateState: (gameState: GameState) => v
 			}
 		}
 	});
-}
+} */
 
 type PlayerItemProps = {
 	AIName: string;
@@ -79,7 +79,6 @@ export function Menu({
 	startGame,
 }: MenuProps) {
 	const [tabValue, setTabValue] = useState(0);
-	const [multiplayerTab, setMultiplayerTab] = useState(0);
 	const removeItem = (index: number) => {
 		let newAINames = [...AINames];
 		newAINames.splice(index, 1);

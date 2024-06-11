@@ -60,7 +60,7 @@ function doLocalTurn(gameState: GameState, callback: (x: number, y: number) => v
 }
 
 function postMove(gameState: GameState, iconConfig: IconConfig, winLength: number, setSquare: (x: number, y: number) => void) {
-	const { isLimited, players, placements, turn } = gameState;
+	const { isLimited, players, placements, turn, map } = gameState;
 	if (checkWin(gameState, winLength)) {
 		const winner = flatten(
 			isLimited
@@ -77,43 +77,43 @@ function postMove(gameState: GameState, iconConfig: IconConfig, winLength: numbe
 			if (window.getComputedStyle(element).boxShadow !== "none") {
 				shadow.push(window.getComputedStyle(element).boxShadow);
 			}
-			if (getValue(gameState, placement.x, placement.y + 1) === 0) {
+			if (getValue(map, placement.x, placement.y + 1) === 0) {
 				shadow.push(`${iconConfig.playerColors[winner]} 0rem 5rem`);
 			}
 			if (
-				getValue(gameState, placement.x + 1, placement.y) === 0 &&
-				getValue(gameState, placement.x, placement.y + 1) === 0 &&
-				getValue(gameState, placement.x + 1, placement.y + 1) === 0
+				getValue(map, placement.x + 1, placement.y) === 0 &&
+				getValue(map, placement.x, placement.y + 1) === 0 &&
+				getValue(map, placement.x + 1, placement.y + 1) === 0
 			) {
 				shadow.push(`${iconConfig.playerColors[winner]} 5rem 5rem`);
 			}
-			if (getValue(gameState, placement.x + 1, placement.y) === 0) {
+			if (getValue(map, placement.x + 1, placement.y) === 0) {
 				shadow.push(`${iconConfig.playerColors[winner]} 5rem 0rem`);
 			}
 			if (
-				getValue(gameState, placement.x + 1, placement.y) === 0 &&
-				getValue(gameState, placement.x, placement.y - 1) === 0 &&
-				getValue(gameState, placement.x + 1, placement.y - 1) === 0
+				getValue(map, placement.x + 1, placement.y) === 0 &&
+				getValue(map, placement.x, placement.y - 1) === 0 &&
+				getValue(map, placement.x + 1, placement.y - 1) === 0
 			) {
 				shadow.push(`${iconConfig.playerColors[winner]} 5rem -5rem`);
 			}
-			if (getValue(gameState, placement.x, placement.y - 1) === 0) {
+			if (getValue(map, placement.x, placement.y - 1) === 0) {
 				shadow.push(`${iconConfig.playerColors[winner]} 0rem -5rem`);
 			}
 			if (
-				getValue(gameState, placement.x - 1, placement.y) === 0 &&
-				getValue(gameState, placement.x, placement.y + 1) === 0 &&
-				getValue(gameState, placement.x - 1, placement.y + 1) === 0
+				getValue(map, placement.x - 1, placement.y) === 0 &&
+				getValue(map, placement.x, placement.y + 1) === 0 &&
+				getValue(map, placement.x - 1, placement.y + 1) === 0
 			) {
 				shadow.push(`${iconConfig.playerColors[winner]} -5rem 5rem`);
 			}
-			if (getValue(gameState, placement.x - 1, placement.y) === 0) {
+			if (getValue(map, placement.x - 1, placement.y) === 0) {
 				shadow.push(`${iconConfig.playerColors[winner]} -5rem 0rem`);
 			}
 			if (
-				getValue(gameState, placement.x - 1, placement.y) === 0 &&
-				getValue(gameState, placement.x, placement.y - 1) === 0 &&
-				getValue(gameState, placement.x - 1, placement.y - 1) === 0
+				getValue(map, placement.x - 1, placement.y) === 0 &&
+				getValue(map, placement.x, placement.y - 1) === 0 &&
+				getValue(map, placement.x - 1, placement.y - 1) === 0
 			) {
 				shadow.push(`${iconConfig.playerColors[winner]} -5rem -5rem`);
 			}

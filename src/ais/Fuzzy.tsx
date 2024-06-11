@@ -4,7 +4,7 @@ import { countLineOld, getRandomElement } from "./utils";
 
 export class Fuzzy extends AI {
 	async doTurn(gameState: GameState) {
-		const { placements } = gameState;
+		const { placements, map } = gameState;
 		let heatMap: { x: number; y: number; att: number; def: number }[] = [];
 		placements.forEach((e) => {
 			for (let x = -1; x <= 1; x++) {
@@ -12,7 +12,7 @@ export class Fuzzy extends AI {
 					if (x === 0 && y === 0) {
 						continue;
 					}
-					if (getValue(gameState, e.x + x, e.y + y) !== 0) {
+					if (getValue(map, e.x + x, e.y + y) !== 0) {
 						continue;
 					}
 					if (heatMap.find((h) => h.x === e.x + x && h.y === e.y + y)) {
@@ -22,14 +22,14 @@ export class Fuzzy extends AI {
 						.fill(0)
 						.map((_, i) =>
 							Math.max(
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, 0, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, -1, -1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 0, -1, getValue, this.winLength),
-								countLineOld(gameState, e.x + x, e.y + y, i + 1, 1, -1, getValue, this.winLength)
+								countLineOld(map, e.x + x, e.y + y, i + 1, 1, 0, getValue, this.winLength),
+								countLineOld(map, e.x + x, e.y + y, i + 1, 1, 1, getValue, this.winLength),
+								countLineOld(map, e.x + x, e.y + y, i + 1, 0, 1, getValue, this.winLength),
+								countLineOld(map, e.x + x, e.y + y, i + 1, -1, 1, getValue, this.winLength),
+								countLineOld(map, e.x + x, e.y + y, i + 1, -1, 0, getValue, this.winLength),
+								countLineOld(map, e.x + x, e.y + y, i + 1, -1, -1, getValue, this.winLength),
+								countLineOld(map, e.x + x, e.y + y, i + 1, 0, -1, getValue, this.winLength),
+								countLineOld(map, e.x + x, e.y + y, i + 1, 1, -1, getValue, this.winLength)
 							)
 						);
 					heatMap.push({

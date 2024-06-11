@@ -1,19 +1,16 @@
 import { Board } from "./Board";
-import { addChunk, GameState } from "./GameState";
-import { AI } from "./AI";
-import React, { useState } from "react";
 import { GameProps } from "./GameProps";
+import { GameState } from "./GameState";
 import { IconConfig } from "./IconConfig";
-import { generateInitialGameState } from "./utils";
 
 interface GameControllerProps {
 	gameProps: GameProps;
+	gameState: GameState;
+	setGameState: (gameState: GameState) => void;
 	iconConfig: IconConfig;
 }
 
-export function GameController({ gameProps, gameProps: { delay, winLength }, iconConfig }: GameControllerProps) {
-	const [gameState, setGameState] = useState<GameState>(generateInitialGameState(gameProps));
-
+export function GameController({ gameState, setGameState, gameProps: { delay, winLength }, iconConfig }: GameControllerProps) {
 	const { players, turn } = gameState;
 
 	return (

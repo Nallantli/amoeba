@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { GameController } from "./GameController";
 import { GameProps } from "./GameProps";
+import { GameState } from "./GameState";
 import { Menu } from "./Menu";
 import ThemeSelector from "./ThemeSelector";
 import { AttAndDef } from "./ais/AttAndDef";
@@ -18,7 +19,6 @@ import { CrossIcon } from "./assets/CrossIcon";
 import { DiamondIcon } from "./assets/DiamondIcon";
 import { SquareIcon } from "./assets/SquareIcon";
 import reportWebVitals from "./reportWebVitals";
-import { GameState } from "./GameState";
 import { generateInitialGameState } from "./utils";
 
 const darkTheme = createTheme({
@@ -47,8 +47,6 @@ const iconConfig = {
 };
 
 function App() {
-	const [gameOpen, setGameOpen] = useState(false);
-
 	const [gameProps, setGameProps] = useState<GameProps>({
 		winLength: 5,
 		limit: 0,
@@ -57,15 +55,17 @@ function App() {
 		AISelectOptions: AISelectOptions,
 	});
 
+	const [gameState, setGameState] = useState<GameState | undefined>(undefined);
+
 	const startGame = () => {
-		setGameOpen(true);
+		setGameState(generateInitialGameState(gameProps))
 	};
 
 	return (
 		<ThemeProvider theme={darkTheme}>
-			{gameOpen ? (
+			{gameState?.isStarted ? (
 				<ThemeSelector theme={params.get("theme") || "default"}>
-					<GameController gameProps={gameProps} iconConfig={iconConfig} />
+					<GameController gameProps={gameProps} gameState={gameState} setGameState={setGameState} iconConfig={iconConfig} />
 				</ThemeSelector>
 			) : (
 				<Menu gameProps={gameProps} updateGameProps={setGameProps} iconConfig={iconConfig} startGame={startGame} />

@@ -13,29 +13,30 @@ export type GameState = {
 	isLimited: boolean;
 	turn: number;
 	players: (AI | null)[];
+	isStarted: boolean;
 };
 
-function horizontalCount(gameState: GameState, x: number, y: number, v: number) {
+function horizontalCount(map: GameMap, x: number, y: number, v: number) {
 	let ps = [];
-	while (getValue(gameState, x, y) === v) {
+	while (getValue(map, x, y) === v) {
 		ps.push({ x, y });
 		x++;
 	}
 	return { ps, type: 0 };
 }
 
-function verticalCount(gameState: GameState, x: number, y: number, v: number) {
+function verticalCount(map: GameMap, x: number, y: number, v: number) {
 	let ps = [];
-	while (getValue(gameState, x, y) === v) {
+	while (getValue(map, x, y) === v) {
 		ps.push({ x, y });
 		y++;
 	}
 	return { ps, type: 1 };
 }
 
-function diagonalUp(gameState: GameState, x: number, y: number, v: number) {
+function diagonalUp(map: GameMap, x: number, y: number, v: number) {
 	let ps = [];
-	while (getValue(gameState, x, y) === v) {
+	while (getValue(map, x, y) === v) {
 		ps.push({ x, y });
 		y++;
 		x++;
@@ -43,9 +44,9 @@ function diagonalUp(gameState: GameState, x: number, y: number, v: number) {
 	return { ps, type: 2 };
 }
 
-function diagonalDown(gameState: GameState, x: number, y: number, v: number) {
+function diagonalDown(map: GameMap, x: number, y: number, v: number) {
 	let ps = [];
-	while (getValue(gameState, x, y) === v) {
+	while (getValue(map, x, y) === v) {
 		ps.push({ x, y });
 		y--;
 		x++;
@@ -53,8 +54,7 @@ function diagonalDown(gameState: GameState, x: number, y: number, v: number) {
 	return { ps, type: 3 };
 }
 
-export function getValue(gameState: GameState, x: number, y: number) {
-	const { map } = gameState;
+export function getValue(map: GameMap, x: number, y: number) {
 	const chunk = map[Math.floor(x / chunkSize) + "_" + Math.floor(y / chunkSize)];
 	if (chunk === undefined) {
 		return 0;
@@ -77,17 +77,17 @@ export function getPlayerScores(gameState: GameState, winLength: number) {
 }
 
 export function calculateLimitScore(gameState: GameState, winLength: number) {
-	const { players, placements } = gameState;
+	const { players, placements, map } = gameState;
 	let matches: { type: number; ps: { x: number; y: number }[]; old?: boolean }[][] = [];
 	for (let i = 0; i < players.length; i++) {
 		matches.push([]);
 	}
 	placements.forEach((placement: { x: number; y: number; v: number }) => {
 		[
-			horizontalCount(gameState, placement.x, placement.y, placement.v),
-			verticalCount(gameState, placement.x, placement.y, placement.v),
-			diagonalUp(gameState, placement.x, placement.y, placement.v),
-			diagonalDown(gameState, placement.x, placement.y, placement.v),
+			horizontalCount(map, placement.x, placement.y, placement.v),
+			verticalCount(map, placement.x, placement.y, placement.v),
+			diagonalUp(map, placement.x, placement.y, placement.v),
+			diagonalDown(map, placement.x, placement.y, placement.v),
 		].forEach((e) => {
 			if (e.ps.length < winLength) {
 				return;
@@ -126,19 +126,19 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 		return false;
 	}
 	const { x, y } = gameState.placements[gameState.placements.length - 1];
-	const { isLimited, moveLimit } = gameState;
+	const { isLimited, moveLimit, map } = gameState;
 	if (isLimited) {
 		if (moveLimit === 0) {
 			return true;
 		}
 		return false;
 	} else {
-		const check = getValue(gameState, x, y);
+		const check = getValue(map, x, y);
 		if (check === 0) return false;
 		for (let i = 0; i < winLength; i++) {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
-				let s = getValue(gameState, x - i + j, y);
+				let s = getValue(map, x - i + j, y);
 				if (s === undefined) break;
 				if (s !== check) break;
 				squares.push(x - i + j + "_" + y);
@@ -151,7 +151,7 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 		for (let i = 0; i < winLength; i++) {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
-				const s = getValue(gameState, x, y - i + j);
+				const s = getValue(map, x, y - i + j);
 				if (s === undefined) break;
 				if (s !== check) break;
 				squares.push(x + "_" + (y - i + j));
@@ -164,7 +164,7 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 		for (let i = 0; i < winLength; i++) {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
-				let s = getValue(gameState, x - i + j, y - i + j);
+				let s = getValue(map, x - i + j, y - i + j);
 				if (s === undefined) break;
 				if (s !== check) break;
 				squares.push(x - i + j + "_" + (y - i + j));
@@ -177,7 +177,7 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 		for (let i = 0; i < winLength; i++) {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
-				let s = getValue(gameState, x - i + j, y + i - j);
+				let s = getValue(map, x - i + j, y + i - j);
 				if (s === undefined) break;
 				if (s !== check) break;
 				squares.push(x - i + j + "_" + (y + i - j));
@@ -212,38 +212,40 @@ export function addChunk(map: GameMap, x: number, y: number): GameMap {
 	};
 }
 
-function generateBorderChunks(gameState: GameState, chunkX: number, chunkY: number): GameState {
+function generateBorderChunks(map: GameMap, chunkX: number, chunkY: number): GameMap {
+	let newMap = {
+		...map,
+	};
 	for (let i = chunkX - 1; i <= chunkX + 1; i++) {
 		for (let j = chunkY - 1; j <= chunkY + 1; j++) {
-			gameState = { ...gameState, map: addChunk(gameState.map, i, j) };
+			newMap = addChunk(newMap, i, j);
 		}
 	}
-	return gameState;
+	return newMap;
 }
 
 export function selectSquare(gameState: GameState, x: number, y: number): GameState {
 	const { turn, moveLimit, placements, players, map } = gameState;
+	let newGameState = { ...gameState };
+
 	const chunkX = Math.floor(x / chunkSize);
 	const chunkY = Math.floor(y / chunkSize);
 	const v = turn + 1;
 	const chunk = gameState.map[chunkX + "_" + chunkY];
 	if (chunk === undefined) {
-		const newGameState = {
-			...gameState,
-			map: addChunk(map, chunkX, chunkY)
-		};
+		newGameState.map = addChunk(map, chunkX, chunkY);
 		return selectSquare(newGameState, x, y);
 	}
 	chunk.chunkData[flatten(x, chunkSize)][flatten(y, chunkSize)] = v;
-	gameState = generateBorderChunks(gameState, chunkX, chunkY);
-	return (gameState = {
-		...gameState,
+	newGameState.map = generateBorderChunks(map, chunkX, chunkY);
+	return {
+		...newGameState,
 		map: {
-			...gameState.map,
+			...newGameState.map,
 			[chunkX + "_" + chunkY]: chunk,
 		},
 		placements: [...placements, { x, y, v }],
 		turn: (turn + 1) % players.length,
 		moveLimit: moveLimit - (turn === players.length - 1 ? 1 : 0),
-	});
+	};
 }
