@@ -1,7 +1,7 @@
 import { ThemeProvider, createTheme } from "@mui/material";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { Game } from "./Game";
+import { GameController } from "./GameController";
 import { GameProps } from "./GameProps";
 import { Menu } from "./Menu";
 import ThemeSelector from "./ThemeSelector";
@@ -65,7 +65,7 @@ function App() {
 		<ThemeProvider theme={darkTheme}>
 			{gameOpen ? (
 				<ThemeSelector theme={params.get("theme") || "default"}>
-					<Game gameProps={gameProps} iconConfig={iconConfig}/>
+					<GameController gameProps={gameProps} iconConfig={iconConfig} />
 				</ThemeSelector>
 			) : (
 				<Menu gameProps={gameProps} updateGameProps={setGameProps} iconConfig={iconConfig} startGame={startGame} />

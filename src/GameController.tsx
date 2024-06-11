@@ -10,7 +10,7 @@ interface GameControllerProps {
 	iconConfig: IconConfig;
 }
 
-export class Game extends React.Component<GameControllerProps, GameState> {
+export class GameController extends React.Component<GameControllerProps, GameState> {
 	constructor(props: GameControllerProps) {
 		super(props);
 
