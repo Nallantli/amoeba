@@ -14,9 +14,22 @@ interface ChunkProps {
 	canPlayerMove: boolean;
 	view: { spaceSize: number };
 	iconConfig: IconConfig;
+	placements: { x: number; y: number; v: number }[];
 }
-
-export function Chunk({ chunkData, posX, posY, chunkX, chunkY, win, canPlayerMove, view, view: { spaceSize }, selectSquare, iconConfig }: ChunkProps) {
+export function Chunk({
+	chunkData,
+	posX,
+	posY,
+	chunkX,
+	chunkY,
+	win,
+	canPlayerMove,
+	view,
+	view: { spaceSize },
+	selectSquare,
+	iconConfig,
+	placements,
+}: ChunkProps) {
 	return (
 		<div
 			className="chunk"
@@ -29,20 +42,26 @@ export function Chunk({ chunkData, posX, posY, chunkX, chunkY, win, canPlayerMov
 			}}
 		>
 			{chunkData.map((col, x) => {
-				return col.map((cell, y) => (
-					<Space
-						key={`${x + chunkX * chunkSize}_${y + chunkY * chunkSize}`}
-						id={`${x + chunkX * chunkSize}_${y + chunkY * chunkSize}`}
-						value={cell}
-						x={x}
-						y={y}
-						onClick={() => selectSquare({ detail: { x: chunkX * chunkSize + x, y: chunkY * chunkSize + y } })}
-						win={win}
-						canPlayerMove={canPlayerMove}
-						view={view}
-						iconConfig={iconConfig}
-					/>
-				));
+				return col.map((cell, y) => {
+					const spaceX = x + chunkX * chunkSize;
+					const spaceY = y + chunkY * chunkSize;
+					const lastPlacement = placements.length > 0 && placements[placements.length - 1];
+					return (
+						<Space
+							key={`${spaceX}_${spaceY}`}
+							id={`${spaceX}_${spaceY}`}
+							value={cell}
+							x={x}
+							y={y}
+							onClick={() => selectSquare({ detail: { x: chunkX * chunkSize + x, y: chunkY * chunkSize + y } })}
+							win={win}
+							canPlayerMove={canPlayerMove}
+							view={view}
+							iconConfig={iconConfig}
+							isLastPlacement={lastPlacement ? lastPlacement.x === spaceX && lastPlacement.y === spaceY : false}
+						/>
+					);
+				});
 			})}
 		</div>
 	);

@@ -1,5 +1,6 @@
 import React from "react";
 import { AI } from "./AI";
+import './App.css';
 import { Chunk, chunkSize } from "./Chunk";
 import { GameState, checkWin, getPlayerScores, selectSquare } from "./GameState";
 import { IconConfig } from "./IconConfig";
@@ -268,7 +269,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				{isLimited && <Limit moveLimit={moveLimit} />}
 				{isLimited && <ScoreScreen playerScores={playerScores} iconConfig={iconConfig} />}
 				<button id="reset-button" onClick={() => this.props.resetGame()}>
-					Reset Game
+					Exit to Menu
 				</button>
 				<div className="board" ref={this.boardRef}>
 					<div
@@ -294,6 +295,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 								win={win}
 								canPlayerMove={canMove}
 								view={view}
+								placements={gameState.placements}
 							/>
 						))}
 					</div>

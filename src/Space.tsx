@@ -11,15 +11,16 @@ interface SpaceProps {
 	onClick: (e: any) => void;
 	view: { spaceSize: number };
 	iconConfig: IconConfig;
+	isLastPlacement: boolean;
 }
 
-export function Space({ x, y, id, value, win, canPlayerMove, onClick, view, iconConfig }: SpaceProps) {
+export function Space({ x, y, id, value, win, canPlayerMove, onClick, view, iconConfig, isLastPlacement }: SpaceProps) {
 	const { spaceSize } = view;
 	return (
 		<button
 			id={id}
 			onClick={value === 0 && !win && canPlayerMove ? onClick : () => {}}
-			className="space"
+			className={isLastPlacement ? "last-space" : "space"}
 			style={{
 				position: "absolute",
 				width: `${spaceSize}px`,
