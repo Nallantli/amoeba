@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/amoeba/static/css/main.58df4c56.css",
-    "main.js": "/amoeba/static/js/main.3d87548b.js",
+    "main.css": "/amoeba/static/css/main.809a5eaa.css",
+    "main.js": "/amoeba/static/js/main.c7278f78.js",
     "static/css/417.4a4855ed.chunk.css": "/amoeba/static/css/417.4a4855ed.chunk.css",
     "static/js/417.2e30607e.chunk.js": "/amoeba/static/js/417.2e30607e.chunk.js",
     "static/css/278.8e7493c9.chunk.css": "/amoeba/static/css/278.8e7493c9.chunk.css",
     "static/js/278.ef4dc09d.chunk.js": "/amoeba/static/js/278.ef4dc09d.chunk.js",
     "static/js/453.217f0d34.chunk.js": "/amoeba/static/js/453.217f0d34.chunk.js",
     "index.html": "/amoeba/index.html",
-    "main.58df4c56.css.map": "/amoeba/static/css/main.58df4c56.css.map",
-    "main.3d87548b.js.map": "/amoeba/static/js/main.3d87548b.js.map",
+    "main.809a5eaa.css.map": "/amoeba/static/css/main.809a5eaa.css.map",
+    "main.c7278f78.js.map": "/amoeba/static/js/main.c7278f78.js.map",
     "417.4a4855ed.chunk.css.map": "/amoeba/static/css/417.4a4855ed.chunk.css.map",
     "417.2e30607e.chunk.js.map": "/amoeba/static/js/417.2e30607e.chunk.js.map",
     "278.8e7493c9.chunk.css.map": "/amoeba/static/css/278.8e7493c9.chunk.css.map",
@@ -17,7 +17,7 @@
     "453.217f0d34.chunk.js.map": "/amoeba/static/js/453.217f0d34.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.58df4c56.css",
-    "static/js/main.3d87548b.js"
+    "static/css/main.809a5eaa.css",
+    "static/js/main.c7278f78.js"
   ]
 }
