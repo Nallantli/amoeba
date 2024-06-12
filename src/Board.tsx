@@ -201,7 +201,6 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		}
 	}
 	componentDidMount() {
-		const { gameState } = this.props;
 		window.addEventListener("wheel", this.handleScroll, { passive: false });
 		window.addEventListener("touchstart", this.handleTouchStart, { passive: false });
 		window.addEventListener("touchmove", this.handleTouchMove, { passive: false });
@@ -210,7 +209,6 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		window.addEventListener("keydown", this.handleKeyDown, { passive: false });
 		window.addEventListener("keyup", this.handleKeyUp, { passive: false });
 		this.boardRef.current?.addEventListener("selectSquare", this.selectSquare);
-		doLocalTurn(gameState, this.setSquare);
 	}
 	setSquare(x: number, y: number) {
 		const { delay } = this.props;
@@ -268,7 +266,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				<button id="reset-button" onClick={() => this.props.resetGame()}>
 					Open Menu
 				</button>
-				<div className="board" ref={this.boardRef}>
+				<div id="board" ref={this.boardRef}>
 					<div
 						className="chunk-container"
 						style={{

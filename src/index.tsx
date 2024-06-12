@@ -91,6 +91,13 @@ function App() {
 				gameState: gameState,
 				multiplayerState: undefined,
 			});
+			if (gameState.players[0] !== null) {
+				gameState.players[0]
+					.doTurn(gameState)
+					.then(({ x, y }) =>
+						setTimeout(() => document.getElementById("board")?.dispatchEvent(new CustomEvent("selectSquare", { detail: { x: x, y: y } })), gameProps.delay)
+					);
+			}
 		}
 	};
 
