@@ -7,7 +7,13 @@ import { GameState } from "./GameState";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
 
-function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void, checkMPWin: (gameState: GameState) => void, closeSocket: () => void) {
+function setUpSocket(
+	socket: WebSocket,
+	setAppState: (appState: AppState) => void,
+	checkMPWin: (gameState: GameState) => void,
+	closeSocket: () => void,
+	startClientGame: () => void
+) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
 		console.log(data);
@@ -20,6 +26,7 @@ function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => voi
 			}
 			case "START": {
 				// TODO
+				startClientGame();
 				break;
 			}
 			case "WIN": {
@@ -144,6 +151,7 @@ interface MenuProps {
 	setAppState: (appState: AppState) => void;
 	checkMPWin: (gameState: GameState) => void;
 	closeSocket: () => void;
+	startClientGame: () => void;
 }
 
 export function Menu({
@@ -156,6 +164,7 @@ export function Menu({
 	setAppState,
 	checkMPWin,
 	closeSocket,
+	startClientGame,
 }: MenuProps) {
 	const [tabValue, setTabValue] = useState(socket && !multiplayerState?.players[multiplayerState.playerIndex].isHost ? 2 : 0);
 	const [roomCode, setRoomCode] = useState(multiplayerState?.id || "");
@@ -178,7 +187,7 @@ export function Menu({
 	const canDelete = AINames.length > 1;
 	const AIMenuOptions = Object.keys(AISelectOptions);
 	return (
-		<div style={{ background: "#222", padding: "15px", borderRadius: "10px", maxWidth: "600px", margin: "auto", marginTop: "30px" }}>
+		<div style={{ background: "#222", padding: "15px", borderRadius: "10px", maxWidth: "600px" }}>
 			<Tabs
 				value={tabValue}
 				onChange={(_, value) => {
@@ -247,7 +256,7 @@ export function Menu({
 										])
 									);
 								});
-								setUpSocket(socket, setAppState, checkMPWin, closeSocket);
+								setUpSocket(socket, setAppState, checkMPWin, closeSocket, startClientGame);
 								updateGameProps({
 									...gameProps,
 									socket,
@@ -336,7 +345,7 @@ export function Menu({
 						onClick={startGame}
 						disabled={!socket ? false : multiplayerState?.players && multiplayerState?.players.filter(({ isReady }) => !isReady).length > 0}
 					>
-						Play!
+						Start New Game
 					</Button>
 				</>
 			) : (
@@ -358,7 +367,7 @@ export function Menu({
 											])
 										);
 									});
-									setUpSocket(socket, setAppState, checkMPWin, closeSocket);
+									setUpSocket(socket, setAppState, checkMPWin, closeSocket, startClientGame);
 									updateGameProps({
 										...gameProps,
 										socket,

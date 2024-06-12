@@ -4,7 +4,7 @@ import "./App.css";
 import { Chunk, chunkSize } from "./Chunk";
 import { GameState, checkWin, getPlayerScores, selectSquare } from "./GameState";
 import { IconConfig } from "./IconConfig";
-import { calculateWinner, displayWin, flatten } from "./utils";
+import { calculateWinner, flatten } from "./utils";
 
 type BoardProps = {
 	gameState: GameState;
@@ -245,10 +245,6 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
 		const playerScores = getPlayerScores(gameState, winLength);
 		const [win, winSquares] = checkWin(gameState, winLength);
-		if (win) {
-			const winner = calculateWinner(gameState, winLength);
-			displayWin(gameState, iconConfig, winner);
-		}
 		return (
 			<div id="screen">
 				<div
@@ -270,7 +266,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				{isLimited && <Limit moveLimit={moveLimit} />}
 				{isLimited && <ScoreScreen playerScores={playerScores} iconConfig={iconConfig} />}
 				<button id="reset-button" onClick={() => this.props.resetGame()}>
-					Exit to Menu
+					Open Menu
 				</button>
 				<div className="board" ref={this.boardRef}>
 					<div
@@ -285,6 +281,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 					>
 						{Object.values(map).map((value) => (
 							<Chunk
+								map={map}
 								iconConfig={iconConfig}
 								key={value.x + "_" + value.y}
 								posX={value.x - xLow}
@@ -293,11 +290,11 @@ export class Board extends React.Component<BoardProps, BoardState> {
 								chunkY={value.y}
 								chunkData={value.chunkData}
 								selectSquare={this.selectSquare}
-								win={win}
 								canPlayerMove={canMove}
 								view={view}
 								placements={gameState.placements}
 								winSquares={winSquares}
+								winner={win ? calculateWinner(gameState, winLength) : undefined}
 							/>
 						))}
 					</div>

@@ -49,60 +49,49 @@ export function generateInitialGameState(gameProps: GameProps, appState: AppStat
 	};
 }
 
-export function displayWin(gameState: GameState, iconConfig: IconConfig, winner: number) {
-	const { placements, map } = gameState;
-	placements.forEach((placement) => {
-		let element = document.getElementById(placement.x + "_" + placement.y) as HTMLElement;
-		if (!element) {
-			return;
-		}
-		let shadow = [];
-		if (window.getComputedStyle(element).boxShadow !== "none") {
-			shadow.push(window.getComputedStyle(element).boxShadow);
-		}
-		if (getValue(map, placement.x, placement.y + 1) === 0) {
-			shadow.push(`${iconConfig.playerColors[winner]} 0rem 0.4rem`);
-		}
-		if (
-			getValue(map, placement.x + 1, placement.y) === 0 &&
-			getValue(map, placement.x, placement.y + 1) === 0 &&
-			getValue(map, placement.x + 1, placement.y + 1) === 0
-		) {
-			shadow.push(`${iconConfig.playerColors[winner]} 0.4rem 0.4rem`);
-		}
-		if (getValue(map, placement.x + 1, placement.y) === 0) {
-			shadow.push(`${iconConfig.playerColors[winner]} 0.4rem 0rem`);
-		}
-		if (
-			getValue(map, placement.x + 1, placement.y) === 0 &&
-			getValue(map, placement.x, placement.y - 1) === 0 &&
-			getValue(map, placement.x + 1, placement.y - 1) === 0
-		) {
-			shadow.push(`${iconConfig.playerColors[winner]} 0.4rem -0.4rem`);
-		}
-		if (getValue(map, placement.x, placement.y - 1) === 0) {
-			shadow.push(`${iconConfig.playerColors[winner]} 0rem -0.4rem`);
-		}
-		if (
-			getValue(map, placement.x - 1, placement.y) === 0 &&
-			getValue(map, placement.x, placement.y + 1) === 0 &&
-			getValue(map, placement.x - 1, placement.y + 1) === 0
-		) {
-			shadow.push(`${iconConfig.playerColors[winner]} -0.4rem 0.4rem`);
-		}
-		if (getValue(map, placement.x - 1, placement.y) === 0) {
-			shadow.push(`${iconConfig.playerColors[winner]} -0.4rem 0rem`);
-		}
-		if (
-			getValue(map, placement.x - 1, placement.y) === 0 &&
-			getValue(map, placement.x, placement.y - 1) === 0 &&
-			getValue(map, placement.x - 1, placement.y - 1) === 0
-		) {
-			shadow.push(`${iconConfig.playerColors[winner]} -0.4rem -0.4rem`);
-		}
-		element.style.boxShadow = shadow.join(", ");
-		element.style.zIndex = "2";
-	});
+export function getWinBorder(map: GameMap, x: number, y: number, winner: number, iconConfig: IconConfig) {
+	let shadow = [];
+	if (getValue(map, x, y + 1) === 0) {
+		shadow.push(`${iconConfig.playerColors[winner]} 0rem 0.4rem`);
+	}
+	if (
+		getValue(map, x + 1, y) === 0 &&
+		getValue(map, x, y + 1) === 0 &&
+		getValue(map, x + 1, y + 1) === 0
+	) {
+		shadow.push(`${iconConfig.playerColors[winner]} 0.4rem 0.4rem`);
+	}
+	if (getValue(map, x + 1, y) === 0) {
+		shadow.push(`${iconConfig.playerColors[winner]} 0.4rem 0rem`);
+	}
+	if (
+		getValue(map, x + 1, y) === 0 &&
+		getValue(map, x, y - 1) === 0 &&
+		getValue(map, x + 1, y - 1) === 0
+	) {
+		shadow.push(`${iconConfig.playerColors[winner]} 0.4rem -0.4rem`);
+	}
+	if (getValue(map, x, y - 1) === 0) {
+		shadow.push(`${iconConfig.playerColors[winner]} 0rem -0.4rem`);
+	}
+	if (
+		getValue(map, x - 1, y) === 0 &&
+		getValue(map, x, y + 1) === 0 &&
+		getValue(map, x - 1, y + 1) === 0
+	) {
+		shadow.push(`${iconConfig.playerColors[winner]} -0.4rem 0.4rem`);
+	}
+	if (getValue(map, x - 1, y) === 0) {
+		shadow.push(`${iconConfig.playerColors[winner]} -0.4rem 0rem`);
+	}
+	if (
+		getValue(map, x - 1, y) === 0 &&
+		getValue(map, x, y - 1) === 0 &&
+		getValue(map, x - 1, y - 1) === 0
+	) {
+		shadow.push(`${iconConfig.playerColors[winner]} -0.4rem -0.4rem`);
+	}
+	return shadow.join(", ");
 }
 
 export function calculateWinner(gameState: GameState, winLength: number) {

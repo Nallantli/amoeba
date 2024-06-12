@@ -1,29 +1,32 @@
+import { GameMap } from "./GameState";
 import { IconConfig } from "./IconConfig";
 import { Space } from "./Space";
+import { getWinBorder } from "./utils";
 
 export const chunkSize = 3;
 
 interface ChunkProps {
+	map: GameMap;
 	chunkX: number;
 	chunkY: number;
 	selectSquare: (e: any) => void;
 	chunkData: number[][];
 	posX: number;
 	posY: number;
-	win: boolean;
 	canPlayerMove: boolean;
 	view: { spaceSize: number };
 	iconConfig: IconConfig;
 	placements: { x: number; y: number; v: number }[];
 	winSquares: string[];
+	winner?: number;
 }
 export function Chunk({
+	map,
 	chunkData,
 	posX,
 	posY,
 	chunkX,
 	chunkY,
-	win,
 	canPlayerMove,
 	view,
 	view: { spaceSize },
@@ -31,6 +34,7 @@ export function Chunk({
 	iconConfig,
 	placements,
 	winSquares,
+	winner,
 }: ChunkProps) {
 	return (
 		<div
@@ -49,20 +53,25 @@ export function Chunk({
 					const spaceY = y + chunkY * chunkSize;
 					const lastPlacement = placements.length > 0 && placements[placements.length - 1];
 					const id = `${spaceX}_${spaceY}`;
+					const boxShadow =
+						winner !== undefined && placements.find(({ x, y }) => spaceX === x && spaceY === y) !== undefined
+							? getWinBorder(map, spaceX, spaceY, winner, iconConfig)
+							: undefined;
 					return (
 						<Space
 							key={id}
 							id={id}
 							value={cell}
-							x={x}
-							y={y}
+							relX={x}
+							relY={y}
 							onClick={() => selectSquare({ detail: { x: chunkX * chunkSize + x, y: chunkY * chunkSize + y } })}
-							win={win}
+							winner={winner}
 							canPlayerMove={canPlayerMove}
 							view={view}
 							iconConfig={iconConfig}
 							isLastPlacement={lastPlacement ? lastPlacement.x === spaceX && lastPlacement.y === spaceY : false}
 							isWinSquare={winSquares.includes(id)}
+							boxShadow={boxShadow}
 						/>
 					);
 				});

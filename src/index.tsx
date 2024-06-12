@@ -1,4 +1,4 @@
-import { ThemeProvider, createTheme } from "@mui/material";
+import { Modal, ThemeProvider, createTheme } from "@mui/material";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { AppState } from "./AppState";
@@ -20,7 +20,7 @@ import { CrossIcon } from "./assets/CrossIcon";
 import { DiamondIcon } from "./assets/DiamondIcon";
 import { SquareIcon } from "./assets/SquareIcon";
 import reportWebVitals from "./reportWebVitals";
-import { calculateWinner, displayWin, generateInitialGameState } from "./utils";
+import { generateInitialGameState } from "./utils";
 
 const darkTheme = createTheme({
 	palette: {
@@ -68,8 +68,11 @@ function App() {
 		});
 	};
 
-	const startGame = () => {
+	const startClientGame = () => {
 		setGameOpen(true);
+	};
+
+	const startGame = () => {
 		const gameState = generateInitialGameState(gameProps, appState);
 		if (gameProps.socket && appState.multiplayerState?.players[appState.multiplayerState?.playerIndex]?.isHost) {
 			gameProps.socket?.send(
@@ -82,6 +85,7 @@ function App() {
 				])
 			);
 		} else {
+			setGameOpen(true);
 			setAppState({
 				...appState,
 				gameState: gameState,
@@ -92,14 +96,14 @@ function App() {
 
 	const checkMPWin = (gameState: GameState) => {
 		if (checkWin(gameState, gameProps.winLength) && gameOpen) {
-			const winner = calculateWinner(gameState, gameProps.winLength);
-			displayWin(gameState, iconConfig, winner);
+			// const winner = calculateWinner(gameState, gameProps.winLength);
+			// displayWin(gameState, iconConfig, winner);
 		}
 	};
 
 	return (
 		<ThemeProvider theme={darkTheme}>
-			{gameOpen && appState.gameState ? (
+			{appState.gameState && (
 				<ThemeSelector theme={params.get("theme") || "default"}>
 					<GameController
 						gameProps={gameProps}
@@ -110,7 +114,8 @@ function App() {
 						iconConfig={iconConfig}
 					/>
 				</ThemeSelector>
-			) : (
+			)}
+			<Modal open={!gameOpen} onClose={() => setGameOpen(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
 				<Menu
 					gameProps={gameProps}
 					multiplayerState={appState.multiplayerState}
@@ -120,8 +125,9 @@ function App() {
 					setAppState={setAppState}
 					checkMPWin={checkMPWin}
 					closeSocket={closeSocket}
+					startClientGame={startClientGame}
 				/>
-			)}
+			</Modal>
 		</ThemeProvider>
 	);
 }
