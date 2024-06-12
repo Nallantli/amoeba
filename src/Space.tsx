@@ -28,17 +28,6 @@ export function Space({ x, y, id, value, win, canPlayerMove, onClick, view, icon
 				top: `${y * spaceSize}px`,
 			}}
 		>
-			<span
-				style={{
-					position: "absolute",
-					left: `0`,
-					top: `0`,
-					color: "#888",
-					fontSize: "10px",
-				}}
-			>
-				{id}
-			</span>
 			{value > 0 && React.createElement(iconConfig.playerIcons[value - 1], { color: iconConfig.playerColors[value - 1] })}
 		</button>
 	);
