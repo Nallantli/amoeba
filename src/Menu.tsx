@@ -77,19 +77,56 @@ function PlayerItem(props: PlayerItemProps) {
 interface MultiplayerDialogProps {
 	iconConfig: IconConfig;
 	multiplayerState?: MultiplayerState;
+	socket: WebSocket;
 }
 
-function MultiplayerDialog({ iconConfig, multiplayerState }: MultiplayerDialogProps) {
+function MultiplayerDialog({ iconConfig, multiplayerState, socket }: MultiplayerDialogProps) {
+	const isHost = multiplayerState?.players[multiplayerState.playerIndex].isHost;
 	return (
 		<div>
 			{multiplayerState?.players.map(({ isReady }, index) => (
-				<div>
-					<SvgIcon>
+				<div style={{ display: "flex", alignItems: "center" }}>
+					{multiplayerState.playerIndex === index && <span>&gt;&gt;</span>}
+					<SvgIcon style={{ margin: "10px" }}>
 						{React.createElement(iconConfig.playerIcons[index], {
 							color: iconConfig.playerColors[index],
 						})}
 					</SvgIcon>
 					<span style={{ fontWeight: multiplayerState.playerIndex === index ? "bold" : "normal" }}>{isReady ? "READY" : "NOT READY"}</span>
+					{isHost && (
+						<>
+							<Button
+								onClick={() =>
+									socket.send(
+										JSON.stringify([
+											{
+												action: "MOVE_UP",
+												id: multiplayerState?.id,
+												pos: index,
+											},
+										])
+									)
+								}
+							>
+								Down
+							</Button>
+							<Button
+								onClick={() =>
+									socket.send(
+										JSON.stringify([
+											{
+												action: "MOVE_DOWN",
+												id: multiplayerState?.id,
+												pos: index,
+											},
+										])
+									)
+								}
+							>
+								Up
+							</Button>
+						</>
+					)}
 				</div>
 			))}
 		</div>
@@ -114,9 +151,9 @@ export function Menu({
 	updateGameProps,
 	startGame,
 	setAppState,
-	checkMPWin
+	checkMPWin,
 }: MenuProps) {
-	const [tabValue, setTabValue] = useState((socket && !multiplayerState?.players[multiplayerState.playerIndex].isHost) ? 2 : 0);
+	const [tabValue, setTabValue] = useState(socket && !multiplayerState?.players[multiplayerState.playerIndex].isHost ? 2 : 0);
 	const [roomCode, setRoomCode] = useState(multiplayerState?.id || "");
 	const removeItem = (index: number) => {
 		let newAINames = [...AINames];
@@ -221,7 +258,7 @@ export function Menu({
 						}}
 					>
 						<Tab label="Singleplayer" />
-						<Tab label="Multiplayer (Beta)" />
+						<Tab label="Host Multiplayer (Beta)" />
 					</Tabs>
 					{socket === undefined ? (
 						<>
@@ -258,7 +295,7 @@ export function Menu({
 							<div>
 								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
 							</div>
-							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} />
+							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} socket={socket} />
 							<FormControlLabel
 								control={
 									<Checkbox
@@ -332,7 +369,7 @@ export function Menu({
 							<div style={{ color: "white" }}>
 								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
 							</div>
-							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} />
+							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} socket={socket} />
 							<FormControlLabel
 								control={
 									<Checkbox

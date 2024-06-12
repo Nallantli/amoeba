@@ -4,7 +4,6 @@ export interface MultiplayerState {
 	id: string;
     playerIndex: number;
     players: {
-        pos: number;
         isReady: boolean,
         isHost: boolean
     }[]
