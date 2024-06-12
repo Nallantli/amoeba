@@ -1,6 +1,7 @@
 import { ThemeProvider, createTheme } from "@mui/material";
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
+import { AppState } from "./AppState";
 import { GameController } from "./GameController";
 import { GameProps } from "./GameProps";
 import { GameState, checkWin } from "./GameState";
@@ -20,7 +21,6 @@ import { DiamondIcon } from "./assets/DiamondIcon";
 import { SquareIcon } from "./assets/SquareIcon";
 import reportWebVitals from "./reportWebVitals";
 import { calculateWinner, displayWin, generateInitialGameState } from "./utils";
-import { AppState } from "./AppState";
 
 const darkTheme = createTheme({
 	palette: {
@@ -60,7 +60,7 @@ function App() {
 
 	const startGame = () => {
 		const gameState = generateInitialGameState(gameProps, appState);
-		if (appState.multiplayerState?.players[appState.multiplayerState?.playerIndex]?.isHost) {
+		if (gameProps.socket && appState.multiplayerState?.players[appState.multiplayerState?.playerIndex]?.isHost) {
 			gameProps.socket?.send(
 				JSON.stringify([
 					{
