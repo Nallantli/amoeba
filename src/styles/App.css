@@ -4,10 +4,6 @@
 	--tertiary-color: #080808;
 }
 
-html {
-	font-size: 1px;
-}
-
 body {
 	margin: 0;
 	padding: 0;
@@ -24,8 +20,8 @@ body {
 }
 
 .space {
-	outline: 1rem solid var(--primary-color);
-	outline-offset: -1rem;
+	outline: 0.1rem solid var(--primary-color);
+	outline-offset: -0.1rem;
 	background-color: var(--secondary-color);
 	border: none;
 	padding: 0;
@@ -68,7 +64,7 @@ body {
 	right: 0;
 	content: "";
 	z-index: -1;
-	box-shadow: var(--primary-color) 5rem 5rem, var(--primary-color) -5rem 5rem, var(--primary-color) 5rem -5rem, var(--primary-color) -5rem -5rem;
+	box-shadow: var(--primary-color) 0.4rem 0.4rem, var(--primary-color) -0.4rem 0.4rem, var(--primary-color) 0.4rem -0.4rem, var(--primary-color) -0.4rem -0.4rem;
 }
 
 .amoeba-square {

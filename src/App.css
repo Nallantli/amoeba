@@ -98,7 +98,7 @@ body {
 	display: block;
 	top: 15px;
 	left: 10px;
-	font-size: 1rem;
+	font-size: 0.1rem;
 	font-family: "Iosevka", monospace;
 	padding: 10px;
 	border: 1px solid black;
@@ -113,7 +113,7 @@ body {
 	display: block;
 	bottom: 10px;
 	left: 10px;
-	font-size: 1rem;
+	font-size: 0.1rem;
 	font-family: "Iosevka", monospace;
 	border: 1px solid black;
 	padding: 10px;

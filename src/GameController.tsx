@@ -35,6 +35,7 @@ export function GameController({ gameState, setGameState, appState, gameProps: {
 				}
 				callback(gs);
 			}}
+			resetGame={() => setGameState({ ...gameState, isStarted: false })}
 			canMove={!socket ? players[turn] === null : turn === appState.multiplayerState?.playerIndex}
 			delay={delay}
 			winLength={winLength}

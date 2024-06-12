@@ -3,10 +3,11 @@ import React, { useState } from "react";
 import { AppState, MultiplayerState } from "./AppState";
 import "./Base.css";
 import { GameProps } from "./GameProps";
+import { GameState } from "./GameState";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
 
-function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void) {
+function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void, checkMPWin: (gameState: GameState) => void) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
 		console.log(data);
@@ -28,6 +29,7 @@ function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => voi
 			}
 			case "STATE_UPDATE": {
 				const { gameState, id, playerIndex, players } = data;
+				checkMPWin(gameState);
 				setAppState({
 					gameState,
 					multiplayerState: {
@@ -72,6 +74,28 @@ function PlayerItem(props: PlayerItemProps) {
 	);
 }
 
+interface MultiplayerDialogProps {
+	iconConfig: IconConfig;
+	multiplayerState?: MultiplayerState;
+}
+
+function MultiplayerDialog({ iconConfig, multiplayerState }: MultiplayerDialogProps) {
+	return (
+		<div>
+			{multiplayerState?.players.map(({ isReady }, index) => (
+				<div>
+					<SvgIcon>
+						{React.createElement(iconConfig.playerIcons[index], {
+							color: iconConfig.playerColors[index],
+						})}
+					</SvgIcon>
+					<span style={{ fontWeight: multiplayerState.playerIndex === index ? "bold" : "normal" }}>{isReady ? "READY" : "NOT READY"}</span>
+				</div>
+			))}
+		</div>
+	);
+}
+
 interface MenuProps {
 	gameProps: GameProps;
 	multiplayerState?: MultiplayerState;
@@ -79,6 +103,7 @@ interface MenuProps {
 	updateGameProps: (gameProps: GameProps) => void;
 	startGame: () => void;
 	setAppState: (appState: AppState) => void;
+	checkMPWin: (gameState: GameState) => void;
 }
 
 export function Menu({
@@ -89,9 +114,10 @@ export function Menu({
 	updateGameProps,
 	startGame,
 	setAppState,
+	checkMPWin
 }: MenuProps) {
-	const [tabValue, setTabValue] = useState(0);
-	const [roomCode, setRoomCode] = useState("");
+	const [tabValue, setTabValue] = useState((socket && !multiplayerState?.players[multiplayerState.playerIndex].isHost) ? 2 : 0);
+	const [roomCode, setRoomCode] = useState(multiplayerState?.id || "");
 	const removeItem = (index: number) => {
 		let newAINames = [...AINames];
 		newAINames.splice(index, 1);
@@ -180,7 +206,7 @@ export function Menu({
 										])
 									);
 								});
-								setUpSocket(socket, setAppState);
+								setUpSocket(socket, setAppState, checkMPWin);
 								updateGameProps({
 									...gameProps,
 									socket,
@@ -232,6 +258,7 @@ export function Menu({
 							<div>
 								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
 							</div>
+							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} />
 							<FormControlLabel
 								control={
 									<Checkbox
@@ -263,7 +290,11 @@ export function Menu({
 							/>
 						</Box>
 					)}
-					<Button variant="contained" onClick={startGame}>
+					<Button
+						variant="contained"
+						onClick={startGame}
+						disabled={!socket ? false : multiplayerState?.players && multiplayerState?.players.filter(({ isReady }) => !isReady).length > 0}
+					>
 						Play!
 					</Button>
 				</>
@@ -286,7 +317,7 @@ export function Menu({
 											])
 										);
 									});
-									setUpSocket(socket, setAppState);
+									setUpSocket(socket, setAppState, checkMPWin);
 									updateGameProps({
 										...gameProps,
 										socket,
@@ -301,6 +332,7 @@ export function Menu({
 							<div style={{ color: "white" }}>
 								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
 							</div>
+							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} />
 							<FormControlLabel
 								control={
 									<Checkbox

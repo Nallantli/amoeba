@@ -1,7 +1,3 @@
-html {
-	font-size: 1px;
-}
-
 body {
 	margin: 0;
 	padding: 0;
@@ -37,12 +33,12 @@ body {
 	z-index: 1;
 	border-radius: 0;
 	background: #c0c0c0;
-	box-shadow: inset -2rem -2rem #0a0a0a, inset 2rem 2rem #ffffff, inset -4rem -4rem #808080, inset 4rem 4rem #dfdfdf;
+	box-shadow: inset -0.2rem -0.2rem #0a0a0a, inset 0.2rem 0.2rem #ffffff, inset -4rem -4rem #808080, inset 4rem 4rem #dfdfdf;
 }
 
 .space:hover,
 .space-pressed {
-	box-shadow: inset -2rem -2rem #ffffff, inset 2rem 2rem #0a0a0a, inset -4rem -2rem #dfdfdf, inset 4rem 4rem #808080;
+	box-shadow: inset -0.2rem -0.2rem #ffffff, inset 0.2rem 0.2rem #0a0a0a, inset -4rem -0.2rem #dfdfdf, inset 4rem 4rem #808080;
 }
 
 .chunk-container {
@@ -99,7 +95,7 @@ body {
 	right: 0;
 	content: "";
 	z-index: -1;
-	box-shadow: #242424 5rem 5rem, #242424 -5rem 5rem, #242424 5rem -5rem, #242424 -5rem -5rem;
+	box-shadow: #242424 0.4rem 0.4rem, #242424 -0.4rem 0.4rem, #242424 0.4rem -0.4rem, #242424 -0.4rem -0.4rem;
 }
 
 #limit-dialog {

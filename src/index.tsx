@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { GameController } from "./GameController";
 import { GameProps } from "./GameProps";
-import { GameState } from "./GameState";
+import { GameState, checkWin } from "./GameState";
 import { Menu } from "./Menu";
 import ThemeSelector from "./ThemeSelector";
 import { AttAndDef } from "./ais/AttAndDef";
@@ -19,7 +19,7 @@ import { CrossIcon } from "./assets/CrossIcon";
 import { DiamondIcon } from "./assets/DiamondIcon";
 import { SquareIcon } from "./assets/SquareIcon";
 import reportWebVitals from "./reportWebVitals";
-import { generateInitialGameState } from "./utils";
+import { calculateWinner, displayWin, generateInitialGameState } from "./utils";
 import { AppState } from "./AppState";
 
 const darkTheme = createTheme({
@@ -76,7 +76,14 @@ function App() {
 				gameState: gameState,
 			});
 		}
-	};
+	}; 
+
+	const checkMPWin = (gameState: GameState) => {
+		if (checkWin(gameState, gameProps.winLength)) {
+			const winner = calculateWinner(gameState, gameProps.winLength);
+			displayWin(gameState, iconConfig, winner);
+		}
+	}
 
 	return (
 		<ThemeProvider theme={darkTheme}>
@@ -98,6 +105,7 @@ function App() {
 					iconConfig={iconConfig}
 					startGame={startGame}
 					setAppState={setAppState}
+					checkMPWin={checkMPWin}
 				/>
 			)}
 		</ThemeProvider>

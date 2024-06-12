@@ -1,9 +1,9 @@
 import React from "react";
 import { AI } from "./AI";
 import { Chunk, chunkSize } from "./Chunk";
-import { calculateLimitScore, checkWin, GameState, getPlayerScores, getValue, selectSquare } from "./GameState";
+import { GameState, checkWin, getPlayerScores, selectSquare } from "./GameState";
 import { IconConfig } from "./IconConfig";
-import { flatten } from "./utils";
+import { calculateWinner, displayWin, flatten } from "./utils";
 
 type BoardProps = {
 	gameState: GameState;
@@ -12,6 +12,7 @@ type BoardProps = {
 	canMove: boolean;
 	delay: number;
 	winLength: number;
+	resetGame: () => void;
 };
 
 type BoardState = {
@@ -60,65 +61,9 @@ function doLocalTurn(gameState: GameState, callback: (x: number, y: number) => v
 }
 
 function postMove(gameState: GameState, iconConfig: IconConfig, winLength: number, setSquare: (x: number, y: number) => void) {
-	const { isLimited, players, placements, turn, map } = gameState;
 	if (checkWin(gameState, winLength)) {
-		const winner = flatten(
-			isLimited
-				? calculateLimitScore(gameState, winLength)
-						.map((e, i) => ({ e, i }))
-						.sort((a, b) => b.e - a.e)[0].i
-				: turn - 1,
-			players.length
-		);
-		placements.forEach((placement) => {
-			let element = document.getElementById(placement.x + "_" + placement.y) as HTMLElement;
-			element.classList.add("amoeba-square");
-			let shadow = [];
-			if (window.getComputedStyle(element).boxShadow !== "none") {
-				shadow.push(window.getComputedStyle(element).boxShadow);
-			}
-			if (getValue(map, placement.x, placement.y + 1) === 0) {
-				shadow.push(`${iconConfig.playerColors[winner]} 0rem 5rem`);
-			}
-			if (
-				getValue(map, placement.x + 1, placement.y) === 0 &&
-				getValue(map, placement.x, placement.y + 1) === 0 &&
-				getValue(map, placement.x + 1, placement.y + 1) === 0
-			) {
-				shadow.push(`${iconConfig.playerColors[winner]} 5rem 5rem`);
-			}
-			if (getValue(map, placement.x + 1, placement.y) === 0) {
-				shadow.push(`${iconConfig.playerColors[winner]} 5rem 0rem`);
-			}
-			if (
-				getValue(map, placement.x + 1, placement.y) === 0 &&
-				getValue(map, placement.x, placement.y - 1) === 0 &&
-				getValue(map, placement.x + 1, placement.y - 1) === 0
-			) {
-				shadow.push(`${iconConfig.playerColors[winner]} 5rem -5rem`);
-			}
-			if (getValue(map, placement.x, placement.y - 1) === 0) {
-				shadow.push(`${iconConfig.playerColors[winner]} 0rem -5rem`);
-			}
-			if (
-				getValue(map, placement.x - 1, placement.y) === 0 &&
-				getValue(map, placement.x, placement.y + 1) === 0 &&
-				getValue(map, placement.x - 1, placement.y + 1) === 0
-			) {
-				shadow.push(`${iconConfig.playerColors[winner]} -5rem 5rem`);
-			}
-			if (getValue(map, placement.x - 1, placement.y) === 0) {
-				shadow.push(`${iconConfig.playerColors[winner]} -5rem 0rem`);
-			}
-			if (
-				getValue(map, placement.x - 1, placement.y) === 0 &&
-				getValue(map, placement.x, placement.y - 1) === 0 &&
-				getValue(map, placement.x - 1, placement.y - 1) === 0
-			) {
-				shadow.push(`${iconConfig.playerColors[winner]} -5rem -5rem`);
-			}
-			element.style.boxShadow = shadow.join(", ");
-		});
+		const winner = calculateWinner(gameState, winLength);
+		displayWin(gameState, iconConfig, winner);
 	} else {
 		doLocalTurn(gameState, setSquare);
 	}
@@ -322,7 +267,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				</div>
 				{isLimited && <Limit moveLimit={moveLimit} />}
 				{isLimited && <ScoreScreen playerScores={playerScores} iconConfig={iconConfig} />}
-				<button id="reset-button" onClick={() => window.location.reload()}>
+				<button id="reset-button" onClick={() => this.props.resetGame()}>
 					Reset Game
 				</button>
 				<div className="board" ref={this.boardRef}>
