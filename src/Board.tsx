@@ -1,6 +1,6 @@
 import React from "react";
 import { AI } from "./AI";
-import './App.css';
+import "./App.css";
 import { Chunk, chunkSize } from "./Chunk";
 import { GameState, checkWin, getPlayerScores, selectSquare } from "./GameState";
 import { IconConfig } from "./IconConfig";
@@ -61,11 +61,8 @@ function doLocalTurn(gameState: GameState, callback: (x: number, y: number) => v
 	}
 }
 
-function postMove(gameState: GameState, iconConfig: IconConfig, winLength: number, setSquare: (x: number, y: number) => void) {
-	if (checkWin(gameState, winLength)) {
-		const winner = calculateWinner(gameState, winLength);
-		displayWin(gameState, iconConfig, winner);
-	} else {
+function postMove(gameState: GameState, winLength: number, setSquare: (x: number, y: number) => void) {
+	if (!checkWin(gameState, winLength)[0]) {
 		doLocalTurn(gameState, setSquare);
 	}
 }
@@ -220,10 +217,10 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		setTimeout(() => this.boardRef.current?.dispatchEvent(new CustomEvent("selectSquare", { detail: { x: x, y: y } })), delay);
 	}
 	selectSquare(e: any) {
-		const { broadcast, gameState, iconConfig, winLength } = this.props;
+		const { broadcast, gameState, winLength } = this.props;
 		const { x, y } = e.detail;
 		document.getElementById(x + "_" + y)?.classList.add("space-pressed");
-		broadcast(selectSquare(gameState, x, y), (gameState2: GameState) => postMove(gameState2, iconConfig, winLength, this.setSquare));
+		broadcast(selectSquare(gameState, x, y), (gameState2: GameState) => postMove(gameState2, winLength, this.setSquare));
 	}
 	render() {
 		const {
@@ -247,7 +244,11 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		const width = spaceSize * chunkSize * (xHigh - xLow + 1);
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
 		const playerScores = getPlayerScores(gameState, winLength);
-		const win = checkWin(gameState, winLength);
+		const [win, winSquares] = checkWin(gameState, winLength);
+		if (win) {
+			const winner = calculateWinner(gameState, winLength);
+			displayWin(gameState, iconConfig, winner);
+		}
 		return (
 			<div id="screen">
 				<div
@@ -296,6 +297,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 								canPlayerMove={canMove}
 								view={view}
 								placements={gameState.placements}
+								winSquares={winSquares}
 							/>
 						))}
 					</div>

@@ -138,7 +138,3 @@ body {
 	height: 5px;
 	transition: all 0.1s;
 }
-
-.amoeba-square {
-	z-index: 2;
-}

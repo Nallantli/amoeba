@@ -7,7 +7,7 @@ import { GameState } from "./GameState";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
 
-function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void, checkMPWin: (gameState: GameState) => void) {
+function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void, checkMPWin: (gameState: GameState) => void, closeSocket: () => void) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
 		console.log(data);
@@ -15,7 +15,7 @@ function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => voi
 			case "JOIN_FAILURE": {
 				// const { message } = data;
 				// TODO
-				socket.close();
+				closeSocket();
 				break;
 			}
 			case "START": {
@@ -24,12 +24,14 @@ function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => voi
 			}
 			case "WIN": {
 				// TODO
-				socket.close();
+				closeSocket();
 				break;
 			}
 			case "STATE_UPDATE": {
 				const { gameState, id, playerIndex, players } = data;
-				checkMPWin(gameState);
+				if (gameState?.isStarted) {
+					checkMPWin(gameState);
+				}
 				setAppState({
 					gameState,
 					multiplayerState: {
@@ -141,6 +143,7 @@ interface MenuProps {
 	startGame: () => void;
 	setAppState: (appState: AppState) => void;
 	checkMPWin: (gameState: GameState) => void;
+	closeSocket: () => void;
 }
 
 export function Menu({
@@ -152,6 +155,7 @@ export function Menu({
 	startGame,
 	setAppState,
 	checkMPWin,
+	closeSocket,
 }: MenuProps) {
 	const [tabValue, setTabValue] = useState(socket && !multiplayerState?.players[multiplayerState.playerIndex].isHost ? 2 : 0);
 	const [roomCode, setRoomCode] = useState(multiplayerState?.id || "");
@@ -243,7 +247,7 @@ export function Menu({
 										])
 									);
 								});
-								setUpSocket(socket, setAppState, checkMPWin);
+								setUpSocket(socket, setAppState, checkMPWin, closeSocket);
 								updateGameProps({
 									...gameProps,
 									socket,
@@ -354,7 +358,7 @@ export function Menu({
 											])
 										);
 									});
-									setUpSocket(socket, setAppState, checkMPWin);
+									setUpSocket(socket, setAppState, checkMPWin, closeSocket);
 									updateGameProps({
 										...gameProps,
 										socket,

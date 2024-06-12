@@ -48,6 +48,8 @@ const iconConfig = {
 };
 
 function App() {
+	const [gameOpen, setGameOpen] = useState(false);
+
 	const [gameProps, setGameProps] = useState<GameProps>({
 		winLength: 5,
 		limit: 0,
@@ -58,13 +60,22 @@ function App() {
 
 	const [appState, setAppState] = useState<AppState>({});
 
+	const closeSocket = () => {
+		gameProps.socket?.close();
+		setGameProps({
+			...gameProps,
+			socket: undefined,
+		});
+	};
+
 	const startGame = () => {
+		setGameOpen(true);
 		const gameState = generateInitialGameState(gameProps, appState);
 		if (gameProps.socket && appState.multiplayerState?.players[appState.multiplayerState?.playerIndex]?.isHost) {
 			gameProps.socket?.send(
 				JSON.stringify([
 					{
-						action: "BROADCAST",
+						action: "START_GAME",
 						id: appState.multiplayerState.id,
 						gameState,
 					},
@@ -74,26 +85,28 @@ function App() {
 			setAppState({
 				...appState,
 				gameState: gameState,
+				multiplayerState: undefined,
 			});
 		}
-	}; 
+	};
 
 	const checkMPWin = (gameState: GameState) => {
-		if (checkWin(gameState, gameProps.winLength)) {
+		if (checkWin(gameState, gameProps.winLength) && gameOpen) {
 			const winner = calculateWinner(gameState, gameProps.winLength);
 			displayWin(gameState, iconConfig, winner);
 		}
-	}
+	};
 
 	return (
 		<ThemeProvider theme={darkTheme}>
-			{appState.gameState?.isStarted ? (
+			{gameOpen && appState.gameState ? (
 				<ThemeSelector theme={params.get("theme") || "default"}>
 					<GameController
 						gameProps={gameProps}
 						gameState={appState.gameState}
 						appState={appState}
 						setGameState={(gameState: GameState) => setAppState({ ...appState, gameState })}
+						returnToMenu={() => setGameOpen(false)}
 						iconConfig={iconConfig}
 					/>
 				</ThemeSelector>
@@ -106,6 +119,7 @@ function App() {
 					startGame={startGame}
 					setAppState={setAppState}
 					checkMPWin={checkMPWin}
+					closeSocket={closeSocket}
 				/>
 			)}
 		</ThemeProvider>

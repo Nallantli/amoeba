@@ -10,11 +10,18 @@ interface GameControllerProps {
 	appState: AppState;
 	setGameState: (gameState: GameState) => void;
 	iconConfig: IconConfig;
+	returnToMenu: () => void;
 }
 
-export function GameController({ gameState, setGameState, appState, gameProps: { delay, winLength, socket }, iconConfig }: GameControllerProps) {
-	const { players, turn } = gameState;
-
+export function GameController({
+	gameState,
+	gameState: { players, turn },
+	setGameState,
+	appState,
+	gameProps: { delay, winLength, socket },
+	iconConfig,
+	returnToMenu,
+}: GameControllerProps) {
 	return (
 		<Board
 			iconConfig={iconConfig}
@@ -35,7 +42,7 @@ export function GameController({ gameState, setGameState, appState, gameProps: {
 				}
 				callback(gs);
 			}}
-			resetGame={() => setGameState({ ...gameState, isStarted: false })}
+			resetGame={() => returnToMenu()}
 			canMove={!socket ? players[turn] === null : turn === appState.multiplayerState?.playerIndex}
 			delay={delay}
 			winLength={winLength}

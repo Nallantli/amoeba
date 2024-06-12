@@ -28,7 +28,7 @@ function generateInitialChunks() {
 }
 
 function getPlayers(gameProps: GameProps, appState: AppState) {
-	if (appState.multiplayerState) {
+	if (gameProps.socket && appState.multiplayerState) {
 		return appState.multiplayerState.players.map(() => null);
 	}
 	const { AINames, AISelectOptions, winLength } = gameProps;
@@ -53,7 +53,9 @@ export function displayWin(gameState: GameState, iconConfig: IconConfig, winner:
 	const { placements, map } = gameState;
 	placements.forEach((placement) => {
 		let element = document.getElementById(placement.x + "_" + placement.y) as HTMLElement;
-		element.classList.add("amoeba-square");
+		if (!element) {
+			return;
+		}
 		let shadow = [];
 		if (window.getComputedStyle(element).boxShadow !== "none") {
 			shadow.push(window.getComputedStyle(element).boxShadow);
@@ -99,6 +101,7 @@ export function displayWin(gameState: GameState, iconConfig: IconConfig, winner:
 			shadow.push(`${iconConfig.playerColors[winner]} -0.4rem -0.4rem`);
 		}
 		element.style.boxShadow = shadow.join(", ");
+		element.style.zIndex = "2";
 	});
 }
 

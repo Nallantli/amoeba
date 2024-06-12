@@ -12,15 +12,15 @@ interface SpaceProps {
 	view: { spaceSize: number };
 	iconConfig: IconConfig;
 	isLastPlacement: boolean;
+	isWinSquare: boolean;
 }
 
-export function Space({ x, y, id, value, win, canPlayerMove, onClick, view, iconConfig, isLastPlacement }: SpaceProps) {
-	const { spaceSize } = view;
+export function Space({ x, y, id, value, win, canPlayerMove, onClick, view: { spaceSize }, iconConfig, isLastPlacement, isWinSquare }: SpaceProps) {
 	return (
 		<button
 			id={id}
 			onClick={value === 0 && !win && canPlayerMove ? onClick : () => {}}
-			className={isLastPlacement ? "last-space" : "space"}
+			className={isWinSquare ? "win-square" : isLastPlacement ? "last-space" : "space"}
 			style={{
 				position: "absolute",
 				width: `${spaceSize}px`,

@@ -37,7 +37,8 @@ body {
 	overflow: visible;
 }
 
-.space, .last-space {
+.space,
+.last-space {
 	outline: 1px solid #242424;
 	outline-offset: -1px;
 	background-color: #121212;
@@ -47,7 +48,8 @@ body {
 	transition: background-color 0.1s;
 }
 
-.space:hover, .last-space:hover {
+.space:hover,
+.last-space:hover {
 	background-color: #242424;
 }
 
@@ -96,7 +98,8 @@ body {
 	transition: all 0.1s ease-in-out;
 }
 
-#zoom-bar button:hover, #reset-button:hover {
+#zoom-bar button:hover,
+#reset-button:hover {
 	background-color: black;
 	color: white;
 	border-color: white;

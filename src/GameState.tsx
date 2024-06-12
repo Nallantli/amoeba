@@ -121,20 +121,20 @@ export function calculateLimitScore(gameState: GameState, winLength: number) {
 	return playerScores;
 }
 
-export function checkWin(gameState: GameState, winLength: number): boolean {
+export function checkWin(gameState: GameState, winLength: number): [boolean, string[]] {
 	if (gameState.placements.length === 0) {
-		return false;
+		return [false, []];
 	}
 	const { x, y } = gameState.placements[gameState.placements.length - 1];
 	const { isLimited, moveLimit, map } = gameState;
 	if (isLimited) {
 		if (moveLimit === 0) {
-			return true;
+			return [true, []];
 		}
-		return false;
+		return [false, []];
 	} else {
 		const check = getValue(map, x, y);
-		if (check === 0) return false;
+		if (check === 0) return [false, []];
 		for (let i = 0; i < winLength; i++) {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
@@ -144,8 +144,7 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 				squares.push(x - i + j + "_" + y);
 			}
 			if (squares.length === winLength) {
-				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
-				return true;
+				return [true, squares];
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -157,8 +156,7 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 				squares.push(x + "_" + (y - i + j));
 			}
 			if (squares.length === winLength) {
-				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
-				return true;
+				return [true, squares];
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -170,8 +168,7 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 				squares.push(x - i + j + "_" + (y - i + j));
 			}
 			if (squares.length === winLength) {
-				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
-				return true;
+				return [true, squares];
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -183,12 +180,11 @@ export function checkWin(gameState: GameState, winLength: number): boolean {
 				squares.push(x - i + j + "_" + (y + i - j));
 			}
 			if (squares.length === winLength) {
-				squares.forEach((e) => document.getElementById(e)?.classList.add("win-square"));
-				return true;
+				return [true, squares];
 			}
 		}
 	}
-	return false;
+	return [false, []];
 }
 
 export function addChunk(map: GameMap, x: number, y: number): GameMap {

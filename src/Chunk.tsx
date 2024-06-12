@@ -15,6 +15,7 @@ interface ChunkProps {
 	view: { spaceSize: number };
 	iconConfig: IconConfig;
 	placements: { x: number; y: number; v: number }[];
+	winSquares: string[];
 }
 export function Chunk({
 	chunkData,
@@ -29,6 +30,7 @@ export function Chunk({
 	selectSquare,
 	iconConfig,
 	placements,
+	winSquares,
 }: ChunkProps) {
 	return (
 		<div
@@ -46,10 +48,11 @@ export function Chunk({
 					const spaceX = x + chunkX * chunkSize;
 					const spaceY = y + chunkY * chunkSize;
 					const lastPlacement = placements.length > 0 && placements[placements.length - 1];
+					const id = `${spaceX}_${spaceY}`;
 					return (
 						<Space
-							key={`${spaceX}_${spaceY}`}
-							id={`${spaceX}_${spaceY}`}
+							key={id}
+							id={id}
 							value={cell}
 							x={x}
 							y={y}
@@ -59,6 +62,7 @@ export function Chunk({
 							view={view}
 							iconConfig={iconConfig}
 							isLastPlacement={lastPlacement ? lastPlacement.x === spaceX && lastPlacement.y === spaceY : false}
+							isWinSquare={winSquares.includes(id)}
 						/>
 					);
 				});
