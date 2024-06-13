@@ -41,7 +41,6 @@ export class TicTacToeGPT extends AI {
 					if (gameState.placements.find((placement) => placement.x === x && placement.y === y)) {
 						throw new Error();
 					}
-					console.log(query);
 					return { x, y };
 				}
 				throw new Error();

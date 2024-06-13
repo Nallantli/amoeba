@@ -1,6 +1,22 @@
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, Button, Checkbox, FormControlLabel, MenuItem, Select, SvgIcon, Tab, Tabs, TextField, Typography } from "@mui/material";
+import {
+	Box,
+	Button,
+	Checkbox,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	FormControlLabel,
+	MenuItem,
+	Select,
+	SvgIcon,
+	Tab,
+	Tabs,
+	TextField,
+	Typography,
+} from "@mui/material";
 import React, { useState } from "react";
 import { AppState, MultiplayerState } from "./AppState";
 import "./Base.css";
@@ -11,7 +27,6 @@ import { serverUrl } from "./utils";
 function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void, closeSocket: () => void, startClientGame: () => void) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
-		console.log(data);
 		switch (data.action) {
 			case "JOIN_FAILURE": {
 				// const { message } = data;
@@ -175,6 +190,10 @@ export function Menu({
 }: MenuProps) {
 	const [tabValue, setTabValue] = useState(socket && !multiplayerState?.players[multiplayerState.playerIndex].isHost ? 2 : 0);
 	const [roomCode, setRoomCode] = useState(multiplayerState?.id || "");
+
+	const [disconnectSocketDialog, setDisconnectSocketDialog] = useState(false);
+	const [proceedTabValue, setProceedTabValue] = useState(-1);
+
 	const removeItem = (index: number) => {
 		let newAINames = [...AINames];
 		newAINames.splice(index, 1);
@@ -198,12 +217,10 @@ export function Menu({
 			<Tabs
 				value={tabValue}
 				onChange={(_, value) => {
-					if (socket && (value === 2 || tabValue === 2)) {
-						socket?.close();
-						updateGameProps({
-							...gameProps,
-							socket: undefined,
-						});
+					if (socket && ((value !== 2 && tabValue === 2) || (value === 2 && tabValue !== 2))) {
+						setDisconnectSocketDialog(true);
+						setProceedTabValue(value);
+						return;
 					}
 					if (tabValue === 1 && value !== 1) {
 						updateGameProps({
@@ -278,11 +295,10 @@ export function Menu({
 									socket,
 								});
 							} else {
-								socket?.close();
-								updateGameProps({
-									...gameProps,
-									socket: undefined,
-								});
+								if (socket) {
+									setDisconnectSocketDialog(true);
+									setProceedTabValue(-1);
+								}
 							}
 						}}
 					>
@@ -330,7 +346,7 @@ export function Menu({
 								control={
 									<Checkbox
 										sx={{ margin: 1 }}
-										checked={multiplayerState?.players[multiplayerState.playerIndex].isReady}
+										checked={multiplayerState?.players[multiplayerState.playerIndex].isReady || false}
 										onChange={() => {
 											if (multiplayerState?.players[multiplayerState.playerIndex].isReady) {
 												socket.send(
@@ -370,33 +386,37 @@ export function Menu({
 			) : (
 				<>
 					{!socket ? (
-						<Box>
-							<TextField sx={{ margin: 1 }} label="Room Code" variant="filled" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} />
-							<Button
-								sx={{ margin: 1 }}
-								variant="contained"
-								onClick={() => {
-									const socket = new WebSocket(serverUrl);
-									socket.addEventListener("open", () => {
-										socket.send(
-											JSON.stringify([
-												{
-													action: "JOIN_GAME",
-													id: roomCode,
-												},
-											])
-										);
-									});
-									setUpSocket(socket, setAppState, closeSocket, startClientGame);
-									updateGameProps({
-										...gameProps,
-										socket,
-									});
-								}}
-							>
-								Join Room
-							</Button>
-						</Box>
+						<>
+							<Box>
+								<TextField sx={{ margin: 1 }} label="Room Code" variant="filled" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} />
+							</Box>
+							<Box>
+								<Button
+									sx={{ margin: 1 }}
+									variant="contained"
+									onClick={() => {
+										const socket = new WebSocket(serverUrl);
+										socket.addEventListener("open", () => {
+											socket.send(
+												JSON.stringify([
+													{
+														action: "JOIN_GAME",
+														id: roomCode,
+													},
+												])
+											);
+										});
+										setUpSocket(socket, setAppState, closeSocket, startClientGame);
+										updateGameProps({
+											...gameProps,
+											socket,
+										});
+									}}
+								>
+									Join Room
+								</Button>
+							</Box>
+						</>
 					) : (
 						<Box style={{ color: "white" }}>
 							<Typography sx={{ margin: 1 }} style={{ color: "white" }}>
@@ -407,7 +427,7 @@ export function Menu({
 								control={
 									<Checkbox
 										sx={{ margin: 1 }}
-										checked={multiplayerState?.players[multiplayerState.playerIndex]?.isReady}
+										checked={multiplayerState?.players[multiplayerState.playerIndex]?.isReady || false}
 										onChange={() => {
 											if (multiplayerState?.players[multiplayerState.playerIndex]?.isReady) {
 												socket.send(
@@ -437,6 +457,26 @@ export function Menu({
 					)}
 				</>
 			)}
+			<Dialog open={disconnectSocketDialog} onClose={() => setDisconnectSocketDialog(false)}>
+				<DialogContent>
+					<DialogContentText>Are you sure you want to disconnect from the current multiplayer game?</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setDisconnectSocketDialog(false)}>Cancel</Button>
+					<Button
+						onClick={() => {
+							closeSocket();
+							setDisconnectSocketDialog(false);
+							if (proceedTabValue >= 0) {
+								setTabValue(proceedTabValue);
+							}
+						}}
+						autoFocus
+					>
+						Proceed
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }
