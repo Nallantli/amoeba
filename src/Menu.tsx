@@ -1,19 +1,14 @@
-import { Box, Button, Checkbox, FormControlLabel, MenuItem, Select, SvgIcon, Tab, Tabs, TextField } from "@mui/material";
+import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Box, Button, Checkbox, FormControlLabel, MenuItem, Select, SvgIcon, Tab, Tabs, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { AppState, MultiplayerState } from "./AppState";
 import "./Base.css";
 import { GameProps } from "./GameProps";
-import { GameState } from "./GameState";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
 
-function setUpSocket(
-	socket: WebSocket,
-	setAppState: (appState: AppState) => void,
-	checkMPWin: (gameState: GameState) => void,
-	closeSocket: () => void,
-	startClientGame: () => void
-) {
+function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void, closeSocket: () => void, startClientGame: () => void) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
 		console.log(data);
@@ -36,9 +31,6 @@ function setUpSocket(
 			}
 			case "STATE_UPDATE": {
 				const { gameState, id, playerIndex, players } = data;
-				if (gameState?.isStarted) {
-					checkMPWin(gameState);
-				}
 				setAppState({
 					gameState,
 					multiplayerState: {
@@ -66,19 +58,23 @@ type PlayerItemProps = {
 function PlayerItem(props: PlayerItemProps) {
 	const { AIName, index, iconConfig, removeItem, changeAI, canDelete, AIMenuOptions } = props;
 	return (
-		<div style={{ padding: "5px", border: "1px solid white" }}>
-			<SvgIcon>
+		<div style={{ padding: "5px", border: "1px solid white", display: "flex", alignItems: "center" }}>
+			<SvgIcon sx={{ margin: 1 }}>
 				{React.createElement(iconConfig.playerIcons[index], {
 					color: iconConfig.playerColors[index],
 				})}
 			</SvgIcon>
-			<Select variant="filled" id={`p${index + 1}`} value={AIName} onChange={(e) => changeAI(index, e.target.value)}>
+			<Select sx={{ margin: 1 }} variant="filled" id={`p${index + 1}`} value={AIName} onChange={(e) => changeAI(index, e.target.value)}>
 				<MenuItem value="player">No AI</MenuItem>
 				{AIMenuOptions.map((selectOption) => (
 					<MenuItem value={selectOption}>{selectOption}</MenuItem>
 				))}
 			</Select>
-			{canDelete && <Button onClick={() => removeItem(index)}>Remove</Button>}
+			{canDelete && (
+				<Button sx={{ margin: 1 }} onClick={() => removeItem(index)}>
+					Remove
+				</Button>
+			)}
 		</div>
 	);
 }
@@ -94,32 +90,30 @@ function MultiplayerDialog({ iconConfig, multiplayerState, socket }: Multiplayer
 	return (
 		<div>
 			{multiplayerState?.players.map(({ isReady }, index) => (
-				<div style={{ display: "flex", alignItems: "center" }}>
-					{multiplayerState.playerIndex === index && <span>&gt;&gt;</span>}
-					<SvgIcon style={{ margin: "10px" }}>
+				<Box
+					style={{
+						display: "flex",
+						alignItems: "center",
+						background: multiplayerState.playerIndex === index ? "#203645" : "rgb(54, 54, 54)",
+						borderRadius: "5px",
+						margin: "10px",
+						padding: "5px",
+						position: "relative",
+					}}
+				>
+					<SvgIcon sx={{ margin: 1 }}>
 						{React.createElement(iconConfig.playerIcons[index], {
 							color: iconConfig.playerColors[index],
 						})}
 					</SvgIcon>
-					<span style={{ fontWeight: multiplayerState.playerIndex === index ? "bold" : "normal" }}>{isReady ? "READY" : "NOT READY"}</span>
+					<Typography sx={{ margin: 1 }} style={{ fontWeight: multiplayerState.playerIndex === index ? "bold" : "normal" }}>
+						{isReady ? "READY" : "NOT READY"}
+					</Typography>
 					{isHost && (
-						<>
+						<div style={{ display: "flex", flexDirection: "column", right: "5px", position: "absolute" }}>
 							<Button
-								onClick={() =>
-									socket.send(
-										JSON.stringify([
-											{
-												action: "MOVE_UP",
-												id: multiplayerState?.id,
-												pos: index,
-											},
-										])
-									)
-								}
-							>
-								Down
-							</Button>
-							<Button
+								disabled={index === 0}
+								style={{ fontSize: "20px", height: "20px" }}
 								onClick={() =>
 									socket.send(
 										JSON.stringify([
@@ -132,11 +126,28 @@ function MultiplayerDialog({ iconConfig, multiplayerState, socket }: Multiplayer
 									)
 								}
 							>
-								Up
+								<FontAwesomeIcon icon={faCaretUp} />
 							</Button>
-						</>
+							<Button
+								disabled={index === multiplayerState.players.length - 1}
+								style={{ fontSize: "20px", height: "20px" }}
+								onClick={() =>
+									socket.send(
+										JSON.stringify([
+											{
+												action: "MOVE_UP",
+												id: multiplayerState?.id,
+												pos: index,
+											},
+										])
+									)
+								}
+							>
+								<FontAwesomeIcon icon={faCaretDown} />
+							</Button>
+						</div>
 					)}
-				</div>
+				</Box>
 			))}
 		</div>
 	);
@@ -149,7 +160,6 @@ interface MenuProps {
 	updateGameProps: (gameProps: GameProps) => void;
 	startGame: () => void;
 	setAppState: (appState: AppState) => void;
-	checkMPWin: (gameState: GameState) => void;
 	closeSocket: () => void;
 	startClientGame: () => void;
 }
@@ -162,7 +172,6 @@ export function Menu({
 	updateGameProps,
 	startGame,
 	setAppState,
-	checkMPWin,
 	closeSocket,
 	startClientGame,
 }: MenuProps) {
@@ -198,6 +207,12 @@ export function Menu({
 							socket: undefined,
 						});
 					}
+					if (tabValue === 1 && value !== 1) {
+						updateGameProps({
+							...gameProps,
+							limit: 0,
+						});
+					}
 					setTabValue(value);
 				}}
 			>
@@ -210,6 +225,7 @@ export function Menu({
 					{tabValue === 1 && (
 						<Box>
 							<TextField
+								sx={{ margin: 1 }}
 								label="Maximum Amount of Rounds"
 								variant="filled"
 								value={limit}
@@ -219,6 +235,7 @@ export function Menu({
 					)}
 					<Box>
 						<TextField
+							sx={{ margin: 1 }}
 							label="Length to Win or (Limit Mode) Gain Score:"
 							variant="filled"
 							value={winLength}
@@ -230,6 +247,7 @@ export function Menu({
 							}
 						/>
 						<TextField
+							sx={{ margin: 1 }}
 							label="Millisecond Delay Between Moves:"
 							variant="filled"
 							value={delay}
@@ -256,7 +274,7 @@ export function Menu({
 										])
 									);
 								});
-								setUpSocket(socket, setAppState, checkMPWin, closeSocket, startClientGame);
+								setUpSocket(socket, setAppState, closeSocket, startClientGame);
 								updateGameProps({
 									...gameProps,
 									socket,
@@ -275,7 +293,7 @@ export function Menu({
 					</Tabs>
 					{socket === undefined ? (
 						<>
-							<Box>
+							<Box sx={{ margin: 1 }}>
 								<div style={{ border: "3px solid white" }}>
 									{AINames.map((AIName, index) =>
 										PlayerItem({
@@ -291,6 +309,7 @@ export function Menu({
 								</div>
 								{AINames.length < 4 && (
 									<Button
+										sx={{ margin: 1 }}
 										onClick={() => {
 											updateGameProps({
 												...gameProps,
@@ -305,13 +324,14 @@ export function Menu({
 						</>
 					) : (
 						<Box style={{ color: "white" }}>
-							<div>
+							<Typography sx={{ margin: 1 }}>
 								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
-							</div>
+							</Typography>
 							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} socket={socket} />
 							<FormControlLabel
 								control={
 									<Checkbox
+										sx={{ margin: 1 }}
 										checked={multiplayerState?.players[multiplayerState.playerIndex].isReady}
 										onChange={() => {
 											if (multiplayerState?.players[multiplayerState.playerIndex].isReady) {
@@ -341,6 +361,7 @@ export function Menu({
 						</Box>
 					)}
 					<Button
+						sx={{ margin: 1 }}
 						variant="contained"
 						onClick={startGame}
 						disabled={!socket ? false : multiplayerState?.players && multiplayerState?.players.filter(({ isReady }) => !isReady).length > 0}
@@ -352,8 +373,9 @@ export function Menu({
 				<>
 					{!socket ? (
 						<Box>
-							<TextField label="Room Code" variant="filled" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} />
+							<TextField sx={{ margin: 1 }} label="Room Code" variant="filled" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} />
 							<Button
+								sx={{ margin: 1 }}
 								variant="contained"
 								onClick={() => {
 									const socket = new WebSocket(serverUrl);
@@ -367,7 +389,7 @@ export function Menu({
 											])
 										);
 									});
-									setUpSocket(socket, setAppState, checkMPWin, closeSocket, startClientGame);
+									setUpSocket(socket, setAppState, closeSocket, startClientGame);
 									updateGameProps({
 										...gameProps,
 										socket,
@@ -379,13 +401,14 @@ export function Menu({
 						</Box>
 					) : (
 						<Box style={{ color: "white" }}>
-							<div style={{ color: "white" }}>
+							<Typography sx={{ margin: 1 }} style={{ color: "white" }}>
 								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
-							</div>
+							</Typography>
 							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} socket={socket} />
 							<FormControlLabel
 								control={
 									<Checkbox
+										sx={{ margin: 1 }}
 										checked={multiplayerState?.players[multiplayerState.playerIndex]?.isReady}
 										onChange={() => {
 											if (multiplayerState?.players[multiplayerState.playerIndex]?.isReady) {

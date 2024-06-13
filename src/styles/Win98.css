@@ -47,7 +47,8 @@ body {
 	left: 50%;
 }
 
-.space svg {
+.space svg,
+.win-square svg {
 	display: block;
 	padding: 10%;
 }

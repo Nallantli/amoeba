@@ -10,7 +10,6 @@ interface GameControllerProps {
 	appState: AppState;
 	setGameState: (gameState: GameState) => void;
 	iconConfig: IconConfig;
-	returnToMenu: () => void;
 }
 
 export function GameController({
@@ -20,7 +19,6 @@ export function GameController({
 	appState,
 	gameProps: { delay, winLength, socket },
 	iconConfig,
-	returnToMenu,
 }: GameControllerProps) {
 	return (
 		<Board
@@ -42,7 +40,6 @@ export function GameController({
 				}
 				callback(gs);
 			}}
-			resetGame={() => returnToMenu()}
 			canMove={!socket ? players[turn] === null : turn === appState.multiplayerState?.playerIndex}
 			delay={delay}
 			winLength={winLength}

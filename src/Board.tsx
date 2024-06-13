@@ -1,3 +1,5 @@
+import { faArrowsToDot, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { AI } from "./AI";
 import "./App.css";
@@ -13,7 +15,6 @@ type BoardProps = {
 	canMove: boolean;
 	delay: number;
 	winLength: number;
-	resetGame: () => void;
 };
 
 type BoardState = {
@@ -255,17 +256,24 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				/>
 				<div id="zoom-bar">
 					<button id="zoom-in" onClick={() => this.handleZoom(3 / 2)}>
-						+
+						<FontAwesomeIcon icon={faPlus}/>
 					</button>
 					<button id="zoom-out" onClick={() => this.handleZoom(2 / 3)}>
-						-
+						<FontAwesomeIcon icon={faMinus}/>
+					</button>
+					<button id="zoom-reset" onClick={() => this.setState({
+						...this.state,
+						view: {
+							offsetX: 0,
+							offsetY: 0,
+							spaceSize: 50,
+						}
+					})}>
+						<FontAwesomeIcon icon={faArrowsToDot}/>
 					</button>
 				</div>
 				{isLimited && <Limit moveLimit={moveLimit} />}
 				{isLimited && <ScoreScreen playerScores={playerScores} iconConfig={iconConfig} />}
-				<button id="reset-button" onClick={() => this.props.resetGame()}>
-					Open Menu
-				</button>
 				<div id="board" ref={this.boardRef}>
 					<div
 						className="chunk-container"

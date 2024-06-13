@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import { AppState } from "./AppState";
 import { GameController } from "./GameController";
 import { GameProps } from "./GameProps";
-import { GameState, checkWin } from "./GameState";
+import { GameState } from "./GameState";
 import { Menu } from "./Menu";
 import ThemeSelector from "./ThemeSelector";
 import { AttAndDef } from "./ais/AttAndDef";
@@ -26,7 +26,6 @@ const darkTheme = createTheme({
 	palette: {
 		mode: "dark",
 	},
-	spacing: 8,
 });
 
 const AISelectOptions: { [key: string]: any } = {
@@ -101,13 +100,6 @@ function App() {
 		}
 	};
 
-	const checkMPWin = (gameState: GameState) => {
-		if (checkWin(gameState, gameProps.winLength) && gameOpen) {
-			// const winner = calculateWinner(gameState, gameProps.winLength);
-			// displayWin(gameState, iconConfig, winner);
-		}
-	};
-
 	return (
 		<ThemeProvider theme={darkTheme}>
 			{appState.gameState && (
@@ -117,7 +109,6 @@ function App() {
 						gameState={appState.gameState}
 						appState={appState}
 						setGameState={(gameState: GameState) => setAppState({ ...appState, gameState })}
-						returnToMenu={() => setGameOpen(false)}
 						iconConfig={iconConfig}
 					/>
 				</ThemeSelector>
@@ -130,11 +121,13 @@ function App() {
 					iconConfig={iconConfig}
 					startGame={startGame}
 					setAppState={setAppState}
-					checkMPWin={checkMPWin}
 					closeSocket={closeSocket}
 					startClientGame={startClientGame}
 				/>
 			</Modal>
+			<button id="reset-button" onClick={() => setGameOpen(false)}>
+				Open Menu
+			</button>
 		</ThemeProvider>
 	);
 }
