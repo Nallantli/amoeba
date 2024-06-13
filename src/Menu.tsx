@@ -401,7 +401,14 @@ export function Menu({
 					{!socket ? (
 						<>
 							<Box>
-								<TextField sx={{ margin: 1 }} label="Room Code" variant="filled" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} />
+								<TextField
+									sx={{ margin: 1 }}
+									label="Room Code"
+									variant="filled"
+									value={roomCode}
+									inputProps={{ style: { textTransform: "uppercase" } }}
+									onChange={(e) => setRoomCode(e.target.value)}
+								/>
 							</Box>
 							<Box>
 								<Button
@@ -414,7 +421,7 @@ export function Menu({
 												JSON.stringify([
 													{
 														action: "JOIN_GAME",
-														id: roomCode,
+														id: roomCode.toUpperCase(),
 													},
 												])
 											);
