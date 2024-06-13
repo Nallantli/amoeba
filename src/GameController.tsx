@@ -29,7 +29,7 @@ export function GameController({
 					socket?.send(
 						JSON.stringify([
 							{
-								action: "BROADCAST",
+								action: "BROADCAST_MOVE",
 								id: appState?.multiplayerState?.id,
 								gameState: gs,
 							},

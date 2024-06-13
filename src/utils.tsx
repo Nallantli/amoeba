@@ -3,8 +3,17 @@ import { AppState } from "./AppState";
 import { GameProps } from "./GameProps";
 import { GameMap, GameState, addChunk, calculateLimitScore, getValue } from "./GameState";
 import { IconConfig } from "./IconConfig";
+import startSoundFile from "./audio/start.ogg";
+import buttonSoundFile from "./audio/button.wav";
+import winSoundFile from "./audio/win.wav";
+import loseSoundFile from "./audio/lose.wav";
 
 export const serverUrl = "wss://wmgs.nallant.li:8081";
+
+export const startAudio = new Audio(startSoundFile);
+export const buttonAudio = new Audio(buttonSoundFile);
+export const winSoundAudio = new Audio(winSoundFile);
+export const loseSoundAudio = new Audio(loseSoundFile);
 
 export function flatten(x: number, d: number): number {
 	while (x < 0) x += d;
@@ -54,41 +63,25 @@ export function getWinBorder(map: GameMap, x: number, y: number, winner: number,
 	if (getValue(map, x, y + 1) === 0) {
 		shadow.push(`${iconConfig.playerColors[winner]} 0rem 0.4rem`);
 	}
-	if (
-		getValue(map, x + 1, y) === 0 &&
-		getValue(map, x, y + 1) === 0 &&
-		getValue(map, x + 1, y + 1) === 0
-	) {
+	if (getValue(map, x + 1, y) === 0 && getValue(map, x, y + 1) === 0 && getValue(map, x + 1, y + 1) === 0) {
 		shadow.push(`${iconConfig.playerColors[winner]} 0.4rem 0.4rem`);
 	}
 	if (getValue(map, x + 1, y) === 0) {
 		shadow.push(`${iconConfig.playerColors[winner]} 0.4rem 0rem`);
 	}
-	if (
-		getValue(map, x + 1, y) === 0 &&
-		getValue(map, x, y - 1) === 0 &&
-		getValue(map, x + 1, y - 1) === 0
-	) {
+	if (getValue(map, x + 1, y) === 0 && getValue(map, x, y - 1) === 0 && getValue(map, x + 1, y - 1) === 0) {
 		shadow.push(`${iconConfig.playerColors[winner]} 0.4rem -0.4rem`);
 	}
 	if (getValue(map, x, y - 1) === 0) {
 		shadow.push(`${iconConfig.playerColors[winner]} 0rem -0.4rem`);
 	}
-	if (
-		getValue(map, x - 1, y) === 0 &&
-		getValue(map, x, y + 1) === 0 &&
-		getValue(map, x - 1, y + 1) === 0
-	) {
+	if (getValue(map, x - 1, y) === 0 && getValue(map, x, y + 1) === 0 && getValue(map, x - 1, y + 1) === 0) {
 		shadow.push(`${iconConfig.playerColors[winner]} -0.4rem 0.4rem`);
 	}
 	if (getValue(map, x - 1, y) === 0) {
 		shadow.push(`${iconConfig.playerColors[winner]} -0.4rem 0rem`);
 	}
-	if (
-		getValue(map, x - 1, y) === 0 &&
-		getValue(map, x, y - 1) === 0 &&
-		getValue(map, x - 1, y - 1) === 0
-	) {
+	if (getValue(map, x - 1, y) === 0 && getValue(map, x, y - 1) === 0 && getValue(map, x - 1, y - 1) === 0) {
 		shadow.push(`${iconConfig.playerColors[winner]} -0.4rem -0.4rem`);
 	}
 	return shadow.join(", ");

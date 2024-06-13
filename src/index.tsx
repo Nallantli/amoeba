@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import { AppState } from "./AppState";
 import { GameController } from "./GameController";
 import { GameProps } from "./GameProps";
-import { GameState } from "./GameState";
+import { GameState, checkWin } from "./GameState";
 import { Menu } from "./Menu";
 import ThemeSelector from "./ThemeSelector";
 import { AttAndDef } from "./ais/AttAndDef";
@@ -20,7 +20,7 @@ import { CrossIcon } from "./assets/CrossIcon";
 import { DiamondIcon } from "./assets/DiamondIcon";
 import { SquareIcon } from "./assets/SquareIcon";
 import reportWebVitals from "./reportWebVitals";
-import { generateInitialGameState } from "./utils";
+import { buttonAudio, calculateWinner, generateInitialGameState, loseSoundAudio, startAudio, winSoundAudio } from "./utils";
 
 const darkTheme = createTheme({
 	palette: {
@@ -68,7 +68,23 @@ function App() {
 	};
 
 	const startClientGame = () => {
+		startAudio.play();
 		setGameOpen(true);
+	};
+
+	const checkMPWin = (gameState: GameState) => {
+		if (gameState) {
+			const [win] = checkWin(gameState, gameProps.winLength);
+			if (win) {
+				if (calculateWinner(gameState, gameProps.winLength) === appState.multiplayerState?.playerIndex) {
+					winSoundAudio.play();
+				} else {
+					loseSoundAudio.play();
+				}
+			} else {
+				buttonAudio.play();
+			}
+		}
 	};
 
 	const startGame = () => {
@@ -84,6 +100,7 @@ function App() {
 				])
 			);
 		} else {
+			startAudio.play();
 			setGameOpen(true);
 			setAppState({
 				...appState,
@@ -123,6 +140,7 @@ function App() {
 					setAppState={setAppState}
 					closeSocket={closeSocket}
 					startClientGame={startClientGame}
+					checkMPWin={checkMPWin}
 				/>
 			</Modal>
 			<button id="reset-button" onClick={() => setGameOpen(false)}>

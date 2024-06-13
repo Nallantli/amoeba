@@ -23,8 +23,15 @@ import "./Base.css";
 import { GameProps } from "./GameProps";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
+import { GameState } from "./GameState";
 
-function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => void, closeSocket: () => void, startClientGame: () => void) {
+function setUpSocket(
+	socket: WebSocket,
+	setAppState: (appState: AppState) => void,
+	closeSocket: () => void,
+	startClientGame: () => void,
+	checkMPWin: (gameState: GameState) => void
+) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
 		switch (data.action) {
@@ -42,6 +49,10 @@ function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => voi
 				closeSocket();
 				break;
 			}
+			// @ts-ignore
+			case "STATE_UPDATE_MOVE":
+				const { gameState } = data;
+				checkMPWin(gameState);
 			case "STATE_UPDATE": {
 				const { gameState, id, playerIndex, players } = data;
 				setAppState({
@@ -175,6 +186,7 @@ interface MenuProps {
 	setAppState: (appState: AppState) => void;
 	closeSocket: () => void;
 	startClientGame: () => void;
+	checkMPWin: (gameState: GameState) => void;
 }
 
 export function Menu({
@@ -187,6 +199,7 @@ export function Menu({
 	setAppState,
 	closeSocket,
 	startClientGame,
+	checkMPWin,
 }: MenuProps) {
 	const [tabValue, setTabValue] = useState(socket && !multiplayerState?.players[multiplayerState.playerIndex].isHost ? 2 : 0);
 	const [roomCode, setRoomCode] = useState(multiplayerState?.id || "");
@@ -289,7 +302,7 @@ export function Menu({
 										])
 									);
 								});
-								setUpSocket(socket, setAppState, closeSocket, startClientGame);
+								setUpSocket(socket, setAppState, closeSocket, startClientGame, checkMPWin);
 								updateGameProps({
 									...gameProps,
 									socket,
@@ -406,7 +419,7 @@ export function Menu({
 												])
 											);
 										});
-										setUpSocket(socket, setAppState, closeSocket, startClientGame);
+										setUpSocket(socket, setAppState, closeSocket, startClientGame, checkMPWin);
 										updateGameProps({
 											...gameProps,
 											socket,

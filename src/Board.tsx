@@ -6,7 +6,7 @@ import "./App.css";
 import { Chunk, chunkSize } from "./Chunk";
 import { GameState, checkWin, getPlayerScores, selectSquare } from "./GameState";
 import { IconConfig } from "./IconConfig";
-import { calculateWinner, flatten } from "./utils";
+import { buttonAudio, calculateWinner, flatten } from "./utils";
 
 type BoardProps = {
 	gameState: GameState;
@@ -218,6 +218,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 	selectSquare(e: any) {
 		const { broadcast, gameState, winLength } = this.props;
 		const { x, y } = e.detail;
+		buttonAudio.play();
 		document.getElementById(x + "_" + y)?.classList.add("space-pressed");
 		broadcast(selectSquare(gameState, x, y), (gameState2: GameState) => postMove(gameState2, winLength, this.setSquare));
 	}
@@ -256,20 +257,25 @@ export class Board extends React.Component<BoardProps, BoardState> {
 				/>
 				<div id="zoom-bar">
 					<button id="zoom-in" onClick={() => this.handleZoom(3 / 2)}>
-						<FontAwesomeIcon icon={faPlus}/>
+						<FontAwesomeIcon icon={faPlus} />
 					</button>
 					<button id="zoom-out" onClick={() => this.handleZoom(2 / 3)}>
-						<FontAwesomeIcon icon={faMinus}/>
+						<FontAwesomeIcon icon={faMinus} />
 					</button>
-					<button id="zoom-reset" onClick={() => this.setState({
-						...this.state,
-						view: {
-							offsetX: 0,
-							offsetY: 0,
-							spaceSize: 50,
+					<button
+						id="zoom-reset"
+						onClick={() =>
+							this.setState({
+								...this.state,
+								view: {
+									offsetX: 0,
+									offsetY: 0,
+									spaceSize: 50,
+								},
+							})
 						}
-					})}>
-						<FontAwesomeIcon icon={faArrowsToDot}/>
+					>
+						<FontAwesomeIcon icon={faArrowsToDot} />
 					</button>
 				</div>
 				{isLimited && <Limit moveLimit={moveLimit} />}
