@@ -20,12 +20,10 @@ function setUpSocket(socket: WebSocket, setAppState: (appState: AppState) => voi
 				break;
 			}
 			case "START": {
-				// TODO
 				startClientGame();
 				break;
 			}
-			case "WIN": {
-				// TODO
+			case "CLOSE": {
 				closeSocket();
 				break;
 			}
