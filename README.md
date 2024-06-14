@@ -1,6 +1,6 @@
 # Amőba
 
-[amoeba.nallant.li](amoeba.nallant.li)
+[amoeba.nallant.li](https://amoeba.nallant.li)
 
 `/ˈɒmøːbɒ/`
 
