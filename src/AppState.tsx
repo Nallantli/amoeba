@@ -6,6 +6,7 @@ export interface MultiplayerState {
 	players: {
 		isReady: boolean;
 		isHost: boolean;
+		wins: number;
 	}[];
 }
 

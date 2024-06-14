@@ -84,23 +84,24 @@ function App() {
 		setSocketClosedOpen(true);
 	};
 
-	const checkMPWin = (appState: AppState) => {
+	const checkMPWin = (appState: AppState): [boolean, number] => {
 		const { gameState, multiplayerState } = appState;
 		if (gameState) {
 			const [win] = checkWin(gameState, gameProps.winLength);
 			if (win) {
-				if (calculateWinner(gameState, gameProps.winLength) === multiplayerState?.playerIndex) {
+				const winner = calculateWinner(gameState, gameProps.winLength);
+				if (winner === multiplayerState?.playerIndex) {
 					winSoundAudio.play();
 					confettiConductor?.shoot();
 				} else {
 					loseSoundAudio.play();
 				}
-				return true;
+				return [true, winner];
 			} else {
 				buttonAudio.play();
 			}
 		}
-		return false;
+		return [false, 0];
 	};
 
 	const startGame = () => {

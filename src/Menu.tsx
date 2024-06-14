@@ -31,7 +31,7 @@ function setUpSocket(
 	closeSocket: () => void,
 	startClientGame: () => void,
 	clientSocketClosed: () => void,
-	checkMPWin: (appState: AppState) => boolean
+	checkMPWin: (appState: AppState) => [boolean, number]
 ) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
@@ -62,12 +62,14 @@ function setUpSocket(
 						players,
 					},
 				};
-				if (checkMPWin(newAppState) && players[playerIndex].isHost) {
+				const [win, winner] = checkMPWin(newAppState);
+				if (win && players[playerIndex].isHost) {
 					socket.send(
 						JSON.stringify([
 							{
 								action: "END_GAME",
 								id,
+								winner,
 							},
 						])
 					);
@@ -84,6 +86,7 @@ function setUpSocket(
 							{
 								action: "END_GAME",
 								id,
+								winner: 0
 							},
 						])
 					);
@@ -239,7 +242,7 @@ interface MenuProps {
 	closeSocket: () => void;
 	startClientGame: () => void;
 	clientSocketClosed: () => void;
-	checkMPWin: (appState: AppState) => boolean;
+	checkMPWin: (appState: AppState) => [boolean, number];
 }
 
 export function Menu({
