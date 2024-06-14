@@ -14,7 +14,6 @@ import { ElkDef } from "./ais/ElkDef";
 import { ElkSurf } from "./ais/ElkSurf";
 import { ElkTimid } from "./ais/ElkTimid";
 import { Fuzzy } from "./ais/Fuzzy";
-import { TicTacToeGPT } from "./ais/TicTacToeGPT";
 import { CircleIcon } from "./assets/CircleIcon";
 import { CrossIcon } from "./assets/CrossIcon";
 import { DiamondIcon } from "./assets/DiamondIcon";
@@ -36,7 +35,6 @@ const AISelectOptions: { [key: string]: any } = {
 	elksurf: ElkSurf,
 	elktimid: ElkTimid,
 	attanddef: AttAndDef,
-	"tictactoe-gpt": TicTacToeGPT,
 };
 
 const params = new URLSearchParams(window.location.search);
