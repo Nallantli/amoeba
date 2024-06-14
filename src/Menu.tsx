@@ -23,14 +23,13 @@ import "./Base.css";
 import { GameProps } from "./GameProps";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
-import { GameState } from "./GameState";
 
 function setUpSocket(
 	socket: WebSocket,
 	setAppState: (appState: AppState) => void,
 	closeSocket: () => void,
 	startClientGame: () => void,
-	checkMPWin: (gameState: GameState) => void
+	checkMPWin: (appState: AppState) => void
 ) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
@@ -50,9 +49,20 @@ function setUpSocket(
 				break;
 			}
 			// @ts-ignore
-			case "STATE_UPDATE_MOVE":
-				const { gameState } = data;
-				checkMPWin(gameState);
+			case "STATE_UPDATE_MOVE": {
+				const { gameState, id, playerIndex, players } = data;
+				const newAppState = {
+					gameState,
+					multiplayerState: {
+						id,
+						playerIndex,
+						players,
+					},
+				};
+				checkMPWin(newAppState);
+				setAppState(newAppState);
+				break;
+			}
 			case "STATE_UPDATE": {
 				const { gameState, id, playerIndex, players } = data;
 				setAppState({
@@ -186,7 +196,7 @@ interface MenuProps {
 	setAppState: (appState: AppState) => void;
 	closeSocket: () => void;
 	startClientGame: () => void;
-	checkMPWin: (gameState: GameState) => void;
+	checkMPWin: (appState: AppState) => void;
 }
 
 export function Menu({

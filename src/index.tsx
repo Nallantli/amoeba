@@ -1,5 +1,7 @@
 import { Modal, ThemeProvider, createTheme } from "@mui/material";
 import React, { useState } from "react";
+import Crossfire from "react-canvas-confetti/dist/presets/crossfire";
+import { TConductorInstance } from "react-canvas-confetti/dist/types";
 import ReactDOM from "react-dom";
 import { AppState } from "./AppState";
 import { GameController } from "./GameController";
@@ -57,6 +59,12 @@ function App() {
 
 	const [appState, setAppState] = useState<AppState>({});
 
+	let confettiConductor: TConductorInstance | undefined;
+
+	const onInitHandler = ({ conductor }: { conductor: TConductorInstance }) => {
+		confettiConductor = conductor;
+	};
+
 	const closeSocket = () => {
 		gameProps.socket?.close();
 		setGameProps({
@@ -70,12 +78,14 @@ function App() {
 		setGameOpen(true);
 	};
 
-	const checkMPWin = (gameState: GameState) => {
+	const checkMPWin = (appState: AppState) => {
+		const { gameState, multiplayerState } = appState;
 		if (gameState) {
 			const [win] = checkWin(gameState, gameProps.winLength);
 			if (win) {
-				if (calculateWinner(gameState, gameProps.winLength) === appState.multiplayerState?.playerIndex) {
+				if (calculateWinner(gameState, gameProps.winLength) === multiplayerState?.playerIndex) {
 					winSoundAudio.play();
+					confettiConductor?.shoot();
 				} else {
 					loseSoundAudio.play();
 				}
@@ -141,6 +151,7 @@ function App() {
 					checkMPWin={checkMPWin}
 				/>
 			</Modal>
+			<Crossfire onInit={onInitHandler} style={{ width: "100vw", height: "100vh", zIndex: 99, position: "absolute", pointerEvents: "none" }} />
 			<button id="reset-button" onClick={() => setGameOpen(false)}>
 				Open Menu
 			</button>
