@@ -18,20 +18,22 @@ import {
 	Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { AppState, MultiplayerState } from "./AppState";
+import { MultiplayerState } from "./MultiplayerState";
 import "./Base.css";
-import { GameProps } from "./GameProps";
+import { GameProps, LocalGameProps } from "./GameProps";
+import { GameState } from "./GameState";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
-import { GameState } from "./GameState";
 
 function setUpSocket(
 	socket: WebSocket,
-	setAppState: (appState: AppState) => void,
+	setGameState: (gameState: GameState) => void,
+	setMultiplayerState: (multiplayerState: MultiplayerState) => void,
+	setGameProps: (gameProps: GameProps) => void,
 	closeSocket: () => void,
 	startClientGame: () => void,
 	clientSocketClosed: () => void,
-	checkMPWin: (appState: AppState) => [boolean, number]
+	checkMPWin: (gameState: GameState, multiplayerState: MultiplayerState) => [boolean, number?]
 ) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
@@ -43,6 +45,8 @@ function setUpSocket(
 				break;
 			}
 			case "START": {
+				const { gameProps } = data;
+				setGameProps(gameProps);
 				startClientGame();
 				break;
 			}
@@ -54,15 +58,11 @@ function setUpSocket(
 			// @ts-ignore
 			case "STATE_UPDATE_MOVE": {
 				const { gameState, id, playerIndex, players } = data;
-				const newAppState = {
-					gameState,
-					multiplayerState: {
-						id,
-						playerIndex,
-						players,
-					},
-				};
-				const [win, winner] = checkMPWin(newAppState);
+				const [win, winner] = checkMPWin(gameState, {
+					id,
+					playerIndex,
+					players,
+				});
 				if (win && players[playerIndex].isHost) {
 					socket.send(
 						JSON.stringify([
@@ -74,7 +74,12 @@ function setUpSocket(
 						])
 					);
 				} else {
-					setAppState(newAppState);
+					setGameState(gameState);
+					setMultiplayerState({
+						id,
+						playerIndex,
+						players,
+					});
 				}
 				break;
 			}
@@ -86,18 +91,16 @@ function setUpSocket(
 							{
 								action: "END_GAME",
 								id,
-								winner: 0
+								winner: 0,
 							},
 						])
 					);
 				} else {
-					setAppState({
-						gameState,
-						multiplayerState: {
-							id,
-							playerIndex,
-							players,
-						},
+					setGameState(gameState);
+					setMultiplayerState({
+						id,
+						playerIndex,
+						players,
 					});
 				}
 				break;
@@ -232,28 +235,35 @@ function canStartGame(socket?: WebSocket, multiplayerState?: MultiplayerState, g
 }
 
 interface MenuProps {
-	gameProps: GameProps;
 	gameState?: GameState;
 	multiplayerState?: MultiplayerState;
+	gameProps: GameProps;
+	setGameProps: (gameProps: GameProps) => void;
 	iconConfig: IconConfig;
-	updateGameProps: (gameProps: GameProps) => void;
+	localGameProps: LocalGameProps;
+	setLocalGameProps: (localGameProps: LocalGameProps) => void;
 	startGame: () => void;
-	setAppState: (appState: AppState) => void;
+	setMultiplayerState: (multiplayerState: MultiplayerState) => void;
+	setGameState: (gameState: GameState) => void;
 	closeSocket: () => void;
 	startClientGame: () => void;
 	clientSocketClosed: () => void;
-	checkMPWin: (appState: AppState) => [boolean, number];
+	checkMPWin: (gameState: GameState, multiplayerState: MultiplayerState) => [boolean, number?];
 }
 
 export function Menu({
-	gameProps,
 	gameState,
-	multiplayerState,
 	iconConfig,
-	gameProps: { AISelectOptions, AINames, winLength, delay, limit, socket },
-	updateGameProps,
+	gameProps,
+	gameProps: { winLength, delay, limit },
+	multiplayerState,
+	localGameProps,
+	localGameProps: { socket, AINames, AISelectOptions },
+	setLocalGameProps,
+	setGameProps,
+	setGameState,
+	setMultiplayerState,
 	startGame,
-	setAppState,
 	closeSocket,
 	startClientGame,
 	clientSocketClosed,
@@ -268,16 +278,16 @@ export function Menu({
 	const removeItem = (index: number) => {
 		let newAINames = [...AINames];
 		newAINames.splice(index, 1);
-		updateGameProps({
-			...gameProps,
+		setLocalGameProps({
+			...localGameProps,
 			AINames: newAINames,
 		});
 	};
 	const changeAI = (index: number, value: string) => {
 		let newAINames = [...AINames];
 		newAINames[index] = value;
-		updateGameProps({
-			...gameProps,
+		setLocalGameProps({
+			...localGameProps,
 			AINames: newAINames,
 		});
 	};
@@ -294,7 +304,7 @@ export function Menu({
 						return;
 					}
 					if (tabValue === 1 && value !== 1) {
-						updateGameProps({
+						setGameProps({
 							...gameProps,
 							limit: 0,
 						});
@@ -315,7 +325,7 @@ export function Menu({
 								label="Maximum Amount of Rounds"
 								variant="filled"
 								value={limit}
-								onChange={(e) => updateGameProps({ ...gameProps, limit: parseInt(e.target.value, 10) || 0 })}
+								onChange={(e) => setGameProps({ ...gameProps, limit: parseInt(e.target.value, 10) || 0 })}
 							/>
 						</Box>
 					)}
@@ -326,7 +336,7 @@ export function Menu({
 							variant="filled"
 							value={winLength}
 							onChange={(e) =>
-								updateGameProps({
+								setGameProps({
 									...gameProps,
 									winLength: parseInt(e.target.value, 10) || 0,
 								})
@@ -338,7 +348,7 @@ export function Menu({
 							variant="filled"
 							value={delay}
 							onChange={(e) =>
-								updateGameProps({
+								setGameProps({
 									...gameProps,
 									delay: parseInt(e.target.value, 10) || 0,
 								})
@@ -360,9 +370,9 @@ export function Menu({
 										])
 									);
 								});
-								setUpSocket(socket, setAppState, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
-								updateGameProps({
-									...gameProps,
+								setUpSocket(socket, setGameState, setMultiplayerState, setGameProps, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
+								setLocalGameProps({
+									...localGameProps,
 									socket,
 								});
 							} else {
@@ -396,8 +406,8 @@ export function Menu({
 									<Button
 										sx={{ margin: 1 }}
 										onClick={() => {
-											updateGameProps({
-												...gameProps,
+											setLocalGameProps({
+												...localGameProps,
 												AINames: [...AINames, "player"],
 											});
 										}}
@@ -480,9 +490,9 @@ export function Menu({
 												])
 											);
 										});
-										setUpSocket(socket, setAppState, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
-										updateGameProps({
-											...gameProps,
+										setUpSocket(socket, setGameState, setMultiplayerState, setGameProps, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
+										setLocalGameProps({
+											...localGameProps,
 											socket,
 										});
 									}}

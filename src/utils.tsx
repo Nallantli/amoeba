@@ -1,12 +1,12 @@
 import { AI } from "./AI";
-import { AppState } from "./AppState";
-import { GameProps } from "./GameProps";
+import { MultiplayerState } from "./MultiplayerState";
+import { GameProps, LocalGameProps } from "./GameProps";
 import { GameMap, GameState, addChunk, calculateLimitScore, getValue } from "./GameState";
 import { IconConfig } from "./IconConfig";
-import startSoundFile from "./audio/start.ogg";
 import buttonSoundFile from "./audio/button.wav";
-import winSoundFile from "./audio/win.wav";
 import loseSoundFile from "./audio/lose.wav";
+import startSoundFile from "./audio/start.ogg";
+import winSoundFile from "./audio/win.wav";
 
 export const serverUrl = "wss://wmgs.nallant.li:8081";
 
@@ -36,17 +36,17 @@ function generateInitialChunks() {
 	return map;
 }
 
-function getPlayers(gameProps: GameProps, appState: AppState) {
-	if (gameProps.socket && appState.multiplayerState) {
-		return appState.multiplayerState.players.map(() => null);
+function getPlayers(localGameProps: LocalGameProps, winLength: number, multiplayerState?: MultiplayerState) {
+	if (localGameProps.socket && multiplayerState) {
+		return multiplayerState.players.map(() => null);
 	}
-	const { AINames, AISelectOptions, winLength } = gameProps;
+	const { AINames, AISelectOptions } = localGameProps;
 	return AINames.map((AIName, i) => (AIName === "player" ? null : new AISelectOptions[AIName](winLength, i + 1, AINames.length)));
 }
 
-export function generateInitialGameState(gameProps: GameProps, appState: AppState): GameState {
-	const { limit } = gameProps;
-	const players: (AI | null)[] = getPlayers(gameProps, appState);
+export function generateInitialGameState(localGameProps: LocalGameProps, gameProps: GameProps, multiplayerState?: MultiplayerState): GameState {
+	const { limit, winLength } = gameProps;
+	const players: (AI | null)[] = getPlayers(localGameProps, winLength, multiplayerState);
 	return {
 		turn: 0,
 		placements: [],
@@ -88,13 +88,7 @@ export function getWinBorder(map: GameMap, x: number, y: number, winner: number,
 }
 
 export function calculateWinner(gameState: GameState, winLength: number) {
-	const { isLimited, players, turn } = gameState;
-	return flatten(
-		isLimited
-			? calculateLimitScore(gameState, winLength)
-					.map((e, i) => ({ e, i }))
-					.sort((a, b) => b.e - a.e)[0].i
-			: turn - 1,
-		players.length
-	);
+	return calculateLimitScore(gameState, winLength)
+		.map((e, i) => ({ e, i }))
+		.sort((a, b) => b.e - a.e)[0].i;
 }

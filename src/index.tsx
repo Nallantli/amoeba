@@ -1,11 +1,11 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Modal, ThemeProvider, createTheme } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import Crossfire from "react-canvas-confetti/dist/presets/crossfire";
 import { TConductorInstance } from "react-canvas-confetti/dist/types";
 import ReactDOM from "react-dom";
-import { AppState } from "./AppState";
+import { MultiplayerState } from "./MultiplayerState";
 import { GameController } from "./GameController";
-import { GameProps } from "./GameProps";
+import { GameProps, LocalGameProps } from "./GameProps";
 import { GameState, checkWin } from "./GameState";
 import { MPPanel } from "./MPPanel";
 import { Menu } from "./Menu";
@@ -22,7 +22,7 @@ import { CrossIcon } from "./assets/CrossIcon";
 import { DiamondIcon } from "./assets/DiamondIcon";
 import { SquareIcon } from "./assets/SquareIcon";
 import reportWebVitals from "./reportWebVitals";
-import { buttonAudio, calculateWinner, generateInitialGameState, loseSoundAudio, startAudio, winSoundAudio } from "./utils";
+import { buttonAudio, generateInitialGameState, loseSoundAudio, startAudio, winSoundAudio } from "./utils";
 
 const darkTheme = createTheme({
 	palette: {
@@ -47,50 +47,77 @@ const iconConfig = {
 	playerIcons: [CircleIcon, CrossIcon, DiamondIcon, SquareIcon],
 };
 
-function App() {
-	const [gameOpen, setGameOpen] = useState(false);
-	const [socketClosedOpen, setSocketClosedOpen] = useState(false);
+class App extends React.Component<
+	{},
+	{
+		gameOpen: boolean;
+		socketClosedOpen: boolean;
+		gameProps: GameProps;
+		localGameProps: LocalGameProps;
+		gameState?: GameState;
+		multiplayerState?: MultiplayerState;
+		confettiConductor: TConductorInstance | undefined;
+	}
+> {
+	constructor(props: {}) {
+		super(props);
 
-	const [gameProps, setGameProps] = useState<GameProps>({
-		winLength: 5,
-		limit: 0,
-		delay: 0,
-		AINames: ["player", "player"],
-		AISelectOptions: AISelectOptions,
-	});
+		this.state = {
+			gameOpen: false,
+			socketClosedOpen: false,
+			gameProps: {
+				winLength: 5,
+				limit: 0,
+				delay: 0,
+			},
+			localGameProps: {
+				AINames: ["player", "player"],
+				AISelectOptions: AISelectOptions,
+			},
+			confettiConductor: undefined,
+		};
 
-	const [appState, setAppState] = useState<AppState>({});
+		this.closeSocket = this.closeSocket.bind(this);
+		this.startClientGame = this.startClientGame.bind(this);
+		this.clientSocketClosed = this.clientSocketClosed.bind(this);
+		this.checkMPWin = this.checkMPWin.bind(this);
+		this.startGame = this.startGame.bind(this);
+	}
 
-	let confettiConductor: TConductorInstance | undefined;
-
-	const onInitHandler = ({ conductor }: { conductor: TConductorInstance }) => {
-		confettiConductor = conductor;
-	};
-
-	const closeSocket = () => {
-		gameProps.socket?.close();
-		setGameProps({
-			...gameProps,
-			socket: undefined,
+	closeSocket() {
+		this.setState(({ localGameProps, localGameProps: { socket } }) => {
+			socket?.close();
+			return {
+				localGameProps: {
+					...localGameProps,
+					socket: undefined,
+				},
+			};
 		});
-	};
+	}
 
-	const startClientGame = () => {
+	startClientGame() {
 		startAudio.play();
-		setGameOpen(true);
-	};
+		this.setState({
+			gameOpen: true,
+		});
+	}
 
-	const clientSocketClosed = () => {
-		setSocketClosedOpen(true);
-	};
+	clientSocketClosed() {
+		this.setState({
+			socketClosedOpen: true,
+		});
+	}
 
-	const checkMPWin = (appState: AppState): [boolean, number] => {
-		const { gameState, multiplayerState } = appState;
-		if (gameState) {
-			const [win] = checkWin(gameState, gameProps.winLength);
+	checkMPWin(newGameState: GameState, newMultiplayerState: MultiplayerState): [boolean, number?] {
+		const {
+			gameProps: { winLength },
+			confettiConductor,
+		} = this.state;
+		if (newGameState) {
+			const [win, _, winner] = checkWin(newGameState, winLength);
 			if (win) {
-				const winner = calculateWinner(gameState, gameProps.winLength);
-				if (winner === multiplayerState?.playerIndex) {
+				if (winner === newMultiplayerState?.playerIndex) {
 					winSoundAudio.play();
 					confettiConductor?.shoot();
 				} else {
@@ -101,96 +128,147 @@ function App() {
 				buttonAudio.play();
 			}
 		}
-		return [false, 0];
-	};
+		return [false, undefined];
+	}
 
-	const startGame = () => {
-		const gameState = generateInitialGameState(gameProps, appState);
-		if (gameProps.socket && appState.multiplayerState?.players[appState.multiplayerState?.playerIndex]?.isHost) {
-			gameProps.socket?.send(
+	startGame() {
+		const {
+			localGameProps,
+			multiplayerState,
+			gameProps,
+			localGameProps: { socket },
+		} = this.state;
+		const initialGameState = generateInitialGameState(localGameProps, gameProps, multiplayerState);
+		if (socket && multiplayerState?.players[multiplayerState?.playerIndex]?.isHost) {
+			socket?.send(
 				JSON.stringify([
 					{
 						action: "START_GAME",
-						id: appState.multiplayerState.id,
-						gameState,
+						id: multiplayerState.id,
+						gameState: initialGameState,
+						gameProps,
 					},
 				])
 			);
 		} else {
 			startAudio.play();
-			setGameOpen(true);
-			setAppState({
-				...appState,
-				gameState: gameState,
+			this.setState({
+				gameOpen: true,
+			});
+			this.setState({
+				gameOpen: true,
+				gameState: initialGameState,
 				multiplayerState: undefined,
 			});
-			if (gameState.players[0] !== null) {
-				gameState.players[0]
-					.doTurn(gameState)
+			if (initialGameState.players[0] !== null) {
+				initialGameState.players[0]
+					.doTurn(initialGameState)
 					.then(({ x, y }) =>
 						setTimeout(() => document.getElementById("board")?.dispatchEvent(new CustomEvent("selectSquare", { detail: { x: x, y: y } })), gameProps.delay)
 					);
 			}
 		}
-	};
+	}
 
-	return (
-		<ThemeProvider theme={darkTheme}>
-			{appState.gameState && (
-				<ThemeSelector theme={params.get("theme") || "default"}>
-					<GameController
+	render() {
+		const {
+			gameOpen,
+			socketClosedOpen,
+			gameState,
+			multiplayerState,
+			gameProps,
+			localGameProps,
+			localGameProps: { socket },
+		} = this.state;
+
+		return (
+			<ThemeProvider theme={darkTheme}>
+				{gameState && (
+					<ThemeSelector theme={params.get("theme") || "default"}>
+						<GameController
+							socket={socket}
+							gameProps={gameProps}
+							gameState={gameState}
+							multiplayerState={multiplayerState}
+							setGameState={(newGameState: GameState) => this.setState({ gameState: newGameState })}
+							iconConfig={iconConfig}
+						/>
+					</ThemeSelector>
+				)}
+				{multiplayerState && socket && <MPPanel iconConfig={iconConfig} multiplayerState={multiplayerState} />}
+				<Modal
+					open={!gameOpen}
+					onClose={() =>
+						this.setState({
+							gameOpen: true,
+						})
+					}
+					style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+				>
+					<Menu
+						gameState={gameState}
+						setGameState={(newGameState: GameState) => this.setState({ gameState: newGameState })}
+						multiplayerState={multiplayerState}
+						setMultiplayerState={(newMultiplayerState: MultiplayerState) => this.setState({ multiplayerState: newMultiplayerState })}
 						gameProps={gameProps}
-						gameState={appState.gameState}
-						appState={appState}
-						setGameState={(gameState: GameState) => setAppState({ ...appState, gameState })}
+						setGameProps={(newGameProps: GameProps) => this.setState({ gameProps: newGameProps })}
+						localGameProps={localGameProps}
 						iconConfig={iconConfig}
+						startGame={this.startGame}
+						setLocalGameProps={(newLocalGameProps: LocalGameProps) => this.setState({ localGameProps: newLocalGameProps })}
+						closeSocket={this.closeSocket}
+						startClientGame={this.startClientGame}
+						clientSocketClosed={this.clientSocketClosed}
+						checkMPWin={this.checkMPWin}
 					/>
-				</ThemeSelector>
-			)}
-			{appState.multiplayerState && gameProps.socket && <MPPanel iconConfig={iconConfig} multiplayerState={appState.multiplayerState} />}
-			<Modal open={!gameOpen} onClose={() => setGameOpen(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-				<Menu
-					gameProps={gameProps}
-					gameState={appState.gameState}
-					multiplayerState={appState.multiplayerState}
-					updateGameProps={setGameProps}
-					iconConfig={iconConfig}
-					startGame={startGame}
-					setAppState={setAppState}
-					closeSocket={closeSocket}
-					startClientGame={startClientGame}
-					clientSocketClosed={clientSocketClosed}
-					checkMPWin={checkMPWin}
+				</Modal>
+				<Crossfire
+					onInit={({ conductor }: { conductor: TConductorInstance }) => {
+						this.setState({
+							confettiConductor: conductor,
+						});
+					}}
+					style={{ width: "100vw", height: "100vh", zIndex: 99, position: "absolute", pointerEvents: "none" }}
 				/>
-			</Modal>
-			<Crossfire onInit={onInitHandler} style={{ width: "100vw", height: "100vh", zIndex: 99, position: "absolute", pointerEvents: "none" }} />
-			<button id="reset-button" onClick={() => setGameOpen(false)}>
-				Open Menu
-			</button>
-			<Dialog
-				open={socketClosedOpen}
-				onClose={() => {
-					setSocketClosedOpen(false);
-					setGameOpen(false);
-				}}
-			>
-				<DialogContent>
-					<DialogContentText>Host has disconnected.</DialogContentText>
-				</DialogContent>
-				<DialogActions>
-					<Button
-						autoFocus
-						onClick={() => {
-							setSocketClosedOpen(false);
-							setGameOpen(false);
-						}}
-					>
-						Ok
-					</Button>
-				</DialogActions>
-			</Dialog>
-		</ThemeProvider>
-	);
+				<button
+					id="reset-button"
+					onClick={() =>
+						this.setState({
+							gameOpen: false,
+						})
+					}
+				>
+					Open Menu
+				</button>
+				<Dialog
+					open={socketClosedOpen}
+					onClose={() => {
+						this.setState({
+							socketClosedOpen: false,
+							gameOpen: false,
+						});
+					}}
+				>
+					<DialogContent>
+						<DialogContentText>Host has disconnected.</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+						<Button
+							autoFocus
+							onClick={() => {
+								this.setState({
+									socketClosedOpen: false,
+									gameOpen: false,
+								});
+							}}
+						>
+							Ok
+						</Button>
+					</DialogActions>
+				</Dialog>
+			</ThemeProvider>
+		);
+	}
 }
 
 ReactDOM.render(

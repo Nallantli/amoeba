@@ -1,5 +1,3 @@
-import { GameState } from "./GameState";
-
 export interface MultiplayerState {
 	id: string;
 	playerIndex: number;
@@ -8,9 +6,4 @@ export interface MultiplayerState {
 		isHost: boolean;
 		wins: number;
 	}[];
-}
-
-export interface AppState {
-	gameState?: GameState;
-	multiplayerState?: MultiplayerState;
 }

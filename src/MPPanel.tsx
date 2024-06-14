@@ -1,4 +1,4 @@
-import { MultiplayerState } from "./AppState";
+import { MultiplayerState } from "./MultiplayerState";
 import { IconConfig } from "./IconConfig";
 import React from "react";
 

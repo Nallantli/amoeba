@@ -6,7 +6,7 @@ import "./App.css";
 import { Chunk, chunkSize } from "./Chunk";
 import { GameState, checkWin, getPlayerScores, selectSquare } from "./GameState";
 import { IconConfig } from "./IconConfig";
-import { buttonAudio, calculateWinner, flatten } from "./utils";
+import { buttonAudio, flatten } from "./utils";
 
 type BoardProps = {
 	gameState: GameState;
@@ -244,7 +244,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 		const width = spaceSize * chunkSize * (xHigh - xLow + 1);
 		const height = spaceSize * chunkSize * (yHigh - yLow + 1);
 		const playerScores = getPlayerScores(gameState, winLength);
-		const [win, winSquares] = checkWin(gameState, winLength);
+		const [win, winSquares, winner] = checkWin(gameState, winLength);
 		return (
 			<div id="screen">
 				<div
@@ -306,7 +306,7 @@ export class Board extends React.Component<BoardProps, BoardState> {
 								view={view}
 								placements={gameState.placements}
 								winSquares={winSquares}
-								winner={win ? calculateWinner(gameState, winLength) : undefined}
+								winner={winner}
 							/>
 						))}
 					</div>

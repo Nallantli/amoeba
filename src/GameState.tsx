@@ -1,6 +1,6 @@
 import { AI } from "./AI";
 import { chunkSize } from "./Chunk";
-import { fib, flatten } from "./utils";
+import { calculateWinner, fib, flatten } from "./utils";
 
 export interface GameMap {
 	[key: string]: { x: number; y: number; chunkData: number[][] };
@@ -121,20 +121,20 @@ export function calculateLimitScore(gameState: GameState, winLength: number) {
 	return playerScores;
 }
 
-export function checkWin(gameState: GameState, winLength: number): [boolean, string[]] {
+export function checkWin(gameState: GameState, winLength: number): [boolean, string[], number?] {
 	if (gameState.placements.length === 0) {
-		return [false, []];
+		return [false, [], undefined];
 	}
 	const { x, y } = gameState.placements[gameState.placements.length - 1];
 	const { isLimited, moveLimit, map } = gameState;
 	if (isLimited) {
 		if (moveLimit === 0) {
-			return [true, []];
+			return [true, [], calculateWinner(gameState, winLength)];
 		}
-		return [false, []];
+		return [false, [], undefined];
 	} else {
 		const check = getValue(map, x, y);
-		if (check === 0) return [false, []];
+		if (check === 0) return [false, [], undefined];
 		for (let i = 0; i < winLength; i++) {
 			let squares = [];
 			for (let j = 0; j < winLength; j++) {
@@ -144,7 +144,7 @@ export function checkWin(gameState: GameState, winLength: number): [boolean, str
 				squares.push(x - i + j + "_" + y);
 			}
 			if (squares.length === winLength) {
-				return [true, squares];
+				return [true, squares, check - 1];
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -156,7 +156,7 @@ export function checkWin(gameState: GameState, winLength: number): [boolean, str
 				squares.push(x + "_" + (y - i + j));
 			}
 			if (squares.length === winLength) {
-				return [true, squares];
+				return [true, squares, check - 1];
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -168,7 +168,7 @@ export function checkWin(gameState: GameState, winLength: number): [boolean, str
 				squares.push(x - i + j + "_" + (y - i + j));
 			}
 			if (squares.length === winLength) {
-				return [true, squares];
+				return [true, squares, check - 1];
 			}
 		}
 		for (let i = 0; i < winLength; i++) {
@@ -180,11 +180,11 @@ export function checkWin(gameState: GameState, winLength: number): [boolean, str
 				squares.push(x - i + j + "_" + (y + i - j));
 			}
 			if (squares.length === winLength) {
-				return [true, squares];
+				return [true, squares, check - 1];
 			}
 		}
 	}
-	return [false, []];
+	return [false, [], undefined];
 }
 
 export function addChunk(map: GameMap, x: number, y: number): GameMap {

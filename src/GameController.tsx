@@ -1,23 +1,26 @@
-import { AppState } from "./AppState";
+import { MultiplayerState } from "./MultiplayerState";
 import { Board } from "./Board";
 import { GameProps } from "./GameProps";
 import { GameState } from "./GameState";
 import { IconConfig } from "./IconConfig";
 
 interface GameControllerProps {
+	socket?: WebSocket;
 	gameProps: GameProps;
 	gameState: GameState;
-	appState: AppState;
+	multiplayerState?: MultiplayerState;
 	setGameState: (gameState: GameState) => void;
 	iconConfig: IconConfig;
 }
 
 export function GameController({
+	socket,
 	gameState,
+	multiplayerState,
 	gameState: { players, turn },
 	setGameState,
-	appState,
-	gameProps: { delay, winLength, socket },
+	gameProps,
+	gameProps: { delay, winLength },
 	iconConfig,
 }: GameControllerProps) {
 	return (
@@ -30,8 +33,9 @@ export function GameController({
 						JSON.stringify([
 							{
 								action: "BROADCAST_MOVE",
-								id: appState?.multiplayerState?.id,
+								id: multiplayerState?.id,
 								gameState: gs,
+								gameProps,
 							},
 						])
 					);
@@ -40,7 +44,7 @@ export function GameController({
 				}
 				callback(gs);
 			}}
-			canMove={!socket ? players[turn] === null : turn === appState.multiplayerState?.playerIndex}
+			canMove={!socket ? players[turn] === null : turn === multiplayerState?.playerIndex}
 			delay={delay}
 			winLength={winLength}
 		/>
