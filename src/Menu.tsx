@@ -23,13 +23,15 @@ import "./Base.css";
 import { GameProps } from "./GameProps";
 import { IconConfig } from "./IconConfig";
 import { serverUrl } from "./utils";
+import { GameState } from "./GameState";
 
 function setUpSocket(
 	socket: WebSocket,
 	setAppState: (appState: AppState) => void,
 	closeSocket: () => void,
 	startClientGame: () => void,
-	checkMPWin: (appState: AppState) => void
+	clientSocketClosed: () => void,
+	checkMPWin: (appState: AppState) => boolean
 ) {
 	socket.addEventListener("message", (event) => {
 		const data = JSON.parse(event.data);
@@ -45,6 +47,7 @@ function setUpSocket(
 				break;
 			}
 			case "CLOSE": {
+				clientSocketClosed();
 				closeSocket();
 				break;
 			}
@@ -59,20 +62,41 @@ function setUpSocket(
 						players,
 					},
 				};
-				checkMPWin(newAppState);
-				setAppState(newAppState);
+				if (checkMPWin(newAppState) && players[playerIndex].isHost) {
+					socket.send(
+						JSON.stringify([
+							{
+								action: "END_GAME",
+								id,
+							},
+						])
+					);
+				} else {
+					setAppState(newAppState);
+				}
 				break;
 			}
 			case "STATE_UPDATE": {
 				const { gameState, id, playerIndex, players } = data;
-				setAppState({
-					gameState,
-					multiplayerState: {
-						id,
-						playerIndex,
-						players,
-					},
-				});
+				if (players.length < 2 && gameState.status === 1) {
+					socket.send(
+						JSON.stringify([
+							{
+								action: "END_GAME",
+								id,
+							},
+						])
+					);
+				} else {
+					setAppState({
+						gameState,
+						multiplayerState: {
+							id,
+							playerIndex,
+							players,
+						},
+					});
+				}
 				break;
 			}
 		}
@@ -117,9 +141,10 @@ interface MultiplayerDialogProps {
 	iconConfig: IconConfig;
 	multiplayerState?: MultiplayerState;
 	socket: WebSocket;
+	status: number;
 }
 
-function MultiplayerDialog({ iconConfig, multiplayerState, socket }: MultiplayerDialogProps) {
+function MultiplayerDialog({ iconConfig, multiplayerState, socket, status }: MultiplayerDialogProps) {
 	const isHost = multiplayerState?.players[multiplayerState.playerIndex].isHost;
 	return (
 		<div>
@@ -146,7 +171,7 @@ function MultiplayerDialog({ iconConfig, multiplayerState, socket }: Multiplayer
 					{isHost && (
 						<div style={{ display: "flex", flexDirection: "column", right: "5px", position: "absolute" }}>
 							<Button
-								disabled={index === 0}
+								disabled={index === 0 || status === 1}
 								style={{ fontSize: "20px", height: "20px" }}
 								onClick={() =>
 									socket.send(
@@ -163,7 +188,7 @@ function MultiplayerDialog({ iconConfig, multiplayerState, socket }: Multiplayer
 								<FontAwesomeIcon icon={faCaretUp} />
 							</Button>
 							<Button
-								disabled={index === multiplayerState.players.length - 1}
+								disabled={index === multiplayerState.players.length - 1 || status === 1}
 								style={{ fontSize: "20px", height: "20px" }}
 								onClick={() =>
 									socket.send(
@@ -187,8 +212,25 @@ function MultiplayerDialog({ iconConfig, multiplayerState, socket }: Multiplayer
 	);
 }
 
+function canStartGame(socket?: WebSocket, multiplayerState?: MultiplayerState, gameState?: GameState) {
+	if (socket === undefined) {
+		return true;
+	}
+	if (gameState?.status === 1) {
+		return false;
+	}
+	if (multiplayerState?.players && multiplayerState?.players.filter(({ isReady }) => !isReady).length > 0) {
+		return false;
+	}
+	if (multiplayerState?.players && multiplayerState?.players.length < 2) {
+		return false;
+	}
+	return true;
+}
+
 interface MenuProps {
 	gameProps: GameProps;
+	gameState?: GameState;
 	multiplayerState?: MultiplayerState;
 	iconConfig: IconConfig;
 	updateGameProps: (gameProps: GameProps) => void;
@@ -196,11 +238,13 @@ interface MenuProps {
 	setAppState: (appState: AppState) => void;
 	closeSocket: () => void;
 	startClientGame: () => void;
-	checkMPWin: (appState: AppState) => void;
+	clientSocketClosed: () => void;
+	checkMPWin: (appState: AppState) => boolean;
 }
 
 export function Menu({
 	gameProps,
+	gameState,
 	multiplayerState,
 	iconConfig,
 	gameProps: { AISelectOptions, AINames, winLength, delay, limit, socket },
@@ -209,6 +253,7 @@ export function Menu({
 	setAppState,
 	closeSocket,
 	startClientGame,
+	clientSocketClosed,
 	checkMPWin,
 }: MenuProps) {
 	const [tabValue, setTabValue] = useState(socket && !multiplayerState?.players[multiplayerState.playerIndex].isHost ? 2 : 0);
@@ -312,7 +357,7 @@ export function Menu({
 										])
 									);
 								});
-								setUpSocket(socket, setAppState, closeSocket, startClientGame, checkMPWin);
+								setUpSocket(socket, setAppState, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
 								updateGameProps({
 									...gameProps,
 									socket,
@@ -364,11 +409,12 @@ export function Menu({
 							<Typography sx={{ margin: 1 }}>
 								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
 							</Typography>
-							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} socket={socket} />
+							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} socket={socket} status={gameState?.status || 0} />
 							<FormControlLabel
 								control={
 									<Checkbox
 										sx={{ margin: 1 }}
+										disabled={gameState?.status === 1}
 										checked={multiplayerState?.players[multiplayerState.playerIndex].isReady || false}
 										onChange={() => {
 											if (multiplayerState?.players[multiplayerState.playerIndex].isReady) {
@@ -397,12 +443,7 @@ export function Menu({
 							/>
 						</Box>
 					)}
-					<Button
-						sx={{ margin: 1 }}
-						variant="contained"
-						onClick={startGame}
-						disabled={!socket ? false : multiplayerState?.players && multiplayerState?.players.filter(({ isReady }) => !isReady).length > 0}
-					>
+					<Button sx={{ margin: 1 }} variant="contained" onClick={startGame} disabled={!canStartGame(socket, multiplayerState, gameState)}>
 						Start New Game
 					</Button>
 				</>
@@ -436,7 +477,7 @@ export function Menu({
 												])
 											);
 										});
-										setUpSocket(socket, setAppState, closeSocket, startClientGame, checkMPWin);
+										setUpSocket(socket, setAppState, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
 										updateGameProps({
 											...gameProps,
 											socket,
@@ -452,11 +493,12 @@ export function Menu({
 							<Typography sx={{ margin: 1 }} style={{ color: "white" }}>
 								Room Code: <span style={{ fontWeight: "bold" }}>{multiplayerState?.id}</span>
 							</Typography>
-							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} socket={socket} />
+							<MultiplayerDialog iconConfig={iconConfig} multiplayerState={multiplayerState} socket={socket} status={gameState?.status || 0} />
 							<FormControlLabel
 								control={
 									<Checkbox
 										sx={{ margin: 1 }}
+										disabled={gameState?.status === 1}
 										checked={multiplayerState?.players[multiplayerState.playerIndex]?.isReady || false}
 										onChange={() => {
 											if (multiplayerState?.players[multiplayerState.playerIndex]?.isReady) {

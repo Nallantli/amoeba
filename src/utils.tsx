@@ -54,7 +54,7 @@ export function generateInitialGameState(gameProps: GameProps, appState: AppStat
 		moveLimit: limit > 0 ? limit : 0,
 		isLimited: limit > 0,
 		players,
-		isStarted: true,
+		status: 0,
 	};
 }
 

@@ -13,7 +13,7 @@ export type GameState = {
 	isLimited: boolean;
 	turn: number;
 	players: (AI | null)[];
-	isStarted: boolean;
+	status: number;
 };
 
 function horizontalCount(map: GameMap, x: number, y: number, v: number) {

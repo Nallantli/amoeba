@@ -1,4 +1,4 @@
-import { Modal, ThemeProvider, createTheme } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Modal, ThemeProvider, createTheme } from "@mui/material";
 import React, { useState } from "react";
 import Crossfire from "react-canvas-confetti/dist/presets/crossfire";
 import { TConductorInstance } from "react-canvas-confetti/dist/types";
@@ -7,6 +7,7 @@ import { AppState } from "./AppState";
 import { GameController } from "./GameController";
 import { GameProps } from "./GameProps";
 import { GameState, checkWin } from "./GameState";
+import { MPPanel } from "./MPPanel";
 import { Menu } from "./Menu";
 import ThemeSelector from "./ThemeSelector";
 import { AttAndDef } from "./ais/AttAndDef";
@@ -48,6 +49,7 @@ const iconConfig = {
 
 function App() {
 	const [gameOpen, setGameOpen] = useState(false);
+	const [socketClosedOpen, setSocketClosedOpen] = useState(false);
 
 	const [gameProps, setGameProps] = useState<GameProps>({
 		winLength: 5,
@@ -78,6 +80,10 @@ function App() {
 		setGameOpen(true);
 	};
 
+	const clientSocketClosed = () => {
+		setSocketClosedOpen(true);
+	};
+
 	const checkMPWin = (appState: AppState) => {
 		const { gameState, multiplayerState } = appState;
 		if (gameState) {
@@ -89,10 +95,12 @@ function App() {
 				} else {
 					loseSoundAudio.play();
 				}
+				return true;
 			} else {
 				buttonAudio.play();
 			}
 		}
+		return false;
 	};
 
 	const startGame = () => {
@@ -138,9 +146,11 @@ function App() {
 					/>
 				</ThemeSelector>
 			)}
+			{appState.multiplayerState && gameProps.socket && <MPPanel iconConfig={iconConfig} multiplayerState={appState.multiplayerState} />}
 			<Modal open={!gameOpen} onClose={() => setGameOpen(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
 				<Menu
 					gameProps={gameProps}
+					gameState={appState.gameState}
 					multiplayerState={appState.multiplayerState}
 					updateGameProps={setGameProps}
 					iconConfig={iconConfig}
@@ -148,6 +158,7 @@ function App() {
 					setAppState={setAppState}
 					closeSocket={closeSocket}
 					startClientGame={startClientGame}
+					clientSocketClosed={clientSocketClosed}
 					checkMPWin={checkMPWin}
 				/>
 			</Modal>
@@ -155,6 +166,28 @@ function App() {
 			<button id="reset-button" onClick={() => setGameOpen(false)}>
 				Open Menu
 			</button>
+			<Dialog
+				open={socketClosedOpen}
+				onClose={() => {
+					setSocketClosedOpen(false);
+					setGameOpen(false);
+				}}
+			>
+				<DialogContent>
+					<DialogContentText>Host has disconnected.</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button
+						autoFocus
+						onClick={() => {
+							setSocketClosedOpen(false);
+							setGameOpen(false);
+						}}
+					>
+						Ok
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</ThemeProvider>
 	);
 }
