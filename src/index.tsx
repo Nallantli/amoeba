@@ -1,14 +1,27 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Modal, ThemeProvider, createTheme } from "@mui/material";
+import {
+	AppBar,
+	Box,
+	Button,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	Modal,
+	ThemeProvider,
+	Toolbar,
+	Typography,
+	createTheme,
+} from "@mui/material";
 import React from "react";
 import Crossfire from "react-canvas-confetti/dist/presets/crossfire";
 import { TConductorInstance } from "react-canvas-confetti/dist/types";
 import ReactDOM from "react-dom";
-import { MultiplayerState } from "./MultiplayerState";
 import { GameController } from "./GameController";
 import { GameProps, LocalGameProps } from "./GameProps";
 import { GameState, checkWin } from "./GameState";
 import { MPPanel } from "./MPPanel";
 import { Menu } from "./Menu";
+import { MultiplayerState } from "./MultiplayerState";
 import ThemeSelector from "./ThemeSelector";
 import { AttAndDef } from "./ais/AttAndDef";
 import { Elk } from "./ais/Elk";
@@ -57,6 +70,8 @@ class App extends React.Component<
 		gameState?: GameState;
 		multiplayerState?: MultiplayerState;
 		confettiConductor: TConductorInstance | undefined;
+		fadeIn: boolean;
+		winnerBar?: number;
 	}
 > {
 	constructor(props: {}) {
@@ -75,6 +90,7 @@ class App extends React.Component<
 				AISelectOptions: AISelectOptions,
 			},
 			confettiConductor: undefined,
+			fadeIn: false,
 		};
 
 		this.closeSocket = this.closeSocket.bind(this);
@@ -99,6 +115,7 @@ class App extends React.Component<
 	startClientGame() {
 		startAudio.play();
 		this.setState({
+			winnerBar: undefined,
 			gameOpen: true,
 		});
 	}
@@ -123,6 +140,17 @@ class App extends React.Component<
 				} else {
 					loseSoundAudio.play();
 				}
+				this.setState({
+					winnerBar: winner,
+				});
+				setTimeout(
+					() =>
+						this.setState({
+							gameOpen: false,
+							fadeIn: true,
+						}),
+					1000
+				);
 				return [true, winner];
 			} else {
 				buttonAudio.play();
@@ -153,6 +181,7 @@ class App extends React.Component<
 		} else {
 			startAudio.play();
 			this.setState({
+				winnerBar: undefined,
 				gameOpen: true,
 			});
 			this.setState({
@@ -179,6 +208,8 @@ class App extends React.Component<
 			gameProps,
 			localGameProps,
 			localGameProps: { socket },
+			fadeIn,
+			winnerBar,
 		} = this.state;
 
 		return (
@@ -197,30 +228,45 @@ class App extends React.Component<
 				)}
 				{multiplayerState && socket && <MPPanel iconConfig={iconConfig} multiplayerState={multiplayerState} />}
 				<Modal
+					className={fadeIn ? "fade-in" : undefined}
 					open={!gameOpen}
 					onClose={() =>
 						this.setState({
 							gameOpen: true,
+							fadeIn: false,
 						})
 					}
 					style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
 				>
-					<Menu
-						gameState={gameState}
-						setGameState={(newGameState: GameState) => this.setState({ gameState: newGameState })}
-						multiplayerState={multiplayerState}
-						setMultiplayerState={(newMultiplayerState: MultiplayerState) => this.setState({ multiplayerState: newMultiplayerState })}
-						gameProps={gameProps}
-						setGameProps={(newGameProps: GameProps) => this.setState({ gameProps: newGameProps })}
-						localGameProps={localGameProps}
-						iconConfig={iconConfig}
-						startGame={this.startGame}
-						setLocalGameProps={(newLocalGameProps: LocalGameProps) => this.setState({ localGameProps: newLocalGameProps })}
-						closeSocket={this.closeSocket}
-						startClientGame={this.startClientGame}
-						clientSocketClosed={this.clientSocketClosed}
-						checkMPWin={this.checkMPWin}
-					/>
+					<Box sx={{ background: "#222", borderRadius: "5px", maxWidth: "600px", overflow: "hidden" }}>
+						{winnerBar !== undefined && (
+							<AppBar position="static" sx={{ background: iconConfig.playerColors[winnerBar] }}>
+								<Toolbar>
+									<Typography variant="h6" component={"div"} sx={{ flexGrow: 1 }}>
+										Player {winnerBar + 1} wins!
+									</Typography>
+								</Toolbar>
+							</AppBar>
+						)}
+						<Box sx={{ padding: "15px" }}>
+							<Menu
+								gameState={gameState}
+								setGameState={(newGameState: GameState) => this.setState({ gameState: newGameState })}
+								multiplayerState={multiplayerState}
+								setMultiplayerState={(newMultiplayerState: MultiplayerState) => this.setState({ multiplayerState: newMultiplayerState })}
+								gameProps={gameProps}
+								setGameProps={(newGameProps: GameProps) => this.setState({ gameProps: newGameProps })}
+								localGameProps={localGameProps}
+								iconConfig={iconConfig}
+								startGame={this.startGame}
+								setLocalGameProps={(newLocalGameProps: LocalGameProps) => this.setState({ localGameProps: newLocalGameProps })}
+								closeSocket={this.closeSocket}
+								startClientGame={this.startClientGame}
+								clientSocketClosed={this.clientSocketClosed}
+								checkMPWin={this.checkMPWin}
+							/>
+						</Box>
+					</Box>
 				</Modal>
 				<Crossfire
 					onInit={({ conductor }: { conductor: TConductorInstance }) => {

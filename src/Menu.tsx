@@ -294,7 +294,7 @@ export function Menu({
 	const canDelete = AINames.length > 1;
 	const AIMenuOptions = Object.keys(AISelectOptions);
 	return (
-		<div style={{ background: "#222", padding: "15px", borderRadius: "10px", maxWidth: "600px" }}>
+		<>
 			<Tabs
 				value={tabValue}
 				onChange={(_, value) => {
@@ -562,6 +562,6 @@ export function Menu({
 					</Button>
 				</DialogActions>
 			</Dialog>
-		</div>
+		</>
 	);
 }
