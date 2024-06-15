@@ -1,6 +1,6 @@
 # Amőba
 
-[amoeba.nallant.li](https://amoeba.nallant.li)
+[https://nallantli.github.io/amoeba](https://nallantli.github.io/amoeba)
 
 `/ˈɒmøːbɒ/`
 
