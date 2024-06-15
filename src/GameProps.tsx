@@ -2,6 +2,7 @@ export interface GameProps {
 	winLength: number;
 	limit: number;
 	delay: number;
+	playerName?: string;
 }
 
 export interface LocalGameProps {

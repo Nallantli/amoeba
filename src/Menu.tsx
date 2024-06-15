@@ -17,12 +17,12 @@ import {
 	TextField,
 	Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import { MultiplayerState } from "./MultiplayerState";
+import React, { useEffect, useState } from "react";
 import "./Base.css";
 import { GameProps, LocalGameProps } from "./GameProps";
 import { GameState } from "./GameState";
 import { IconConfig } from "./IconConfig";
+import { MultiplayerState } from "./MultiplayerState";
 import { serverUrl } from "./utils";
 
 function setUpSocket(
@@ -154,7 +154,7 @@ function MultiplayerDialog({ iconConfig, multiplayerState, socket, status }: Mul
 	const isHost = multiplayerState?.players[multiplayerState.playerIndex].isHost;
 	return (
 		<div>
-			{multiplayerState?.players.map(({ isReady }, index) => (
+			{multiplayerState?.players.map(({ isReady, name }, index) => (
 				<Box
 					style={{
 						display: "flex",
@@ -171,6 +171,9 @@ function MultiplayerDialog({ iconConfig, multiplayerState, socket, status }: Mul
 							color: iconConfig.playerColors[index],
 						})}
 					</SvgIcon>
+					<Typography sx={{ margin: 1 }} style={{ fontWeight: multiplayerState.playerIndex === index ? "bold" : "normal", fontStyle: 'italic' }}>
+						{name}
+					</Typography>
 					<Typography sx={{ margin: 1 }} style={{ fontWeight: multiplayerState.playerIndex === index ? "bold" : "normal" }}>
 						{isReady ? "READY" : "NOT READY"}
 					</Typography>
@@ -255,7 +258,7 @@ export function Menu({
 	gameState,
 	iconConfig,
 	gameProps,
-	gameProps: { winLength, delay, limit },
+	gameProps: { winLength, delay, limit, playerName },
 	multiplayerState,
 	localGameProps,
 	localGameProps: { socket, AINames, AISelectOptions },
@@ -273,7 +276,13 @@ export function Menu({
 	const [roomCode, setRoomCode] = useState(multiplayerState?.id || "");
 
 	const [disconnectSocketDialog, setDisconnectSocketDialog] = useState(false);
+	const [multiplayerNameDialog, setMultiplayerNameDialog] = useState(0);
 	const [proceedTabValue, setProceedTabValue] = useState(-1);
+
+	useEffect(() => {
+		if (playerName && playerName != "") {
+		}
+	}, [playerName]);
 
 	const removeItem = (index: number) => {
 		let newAINames = [...AINames];
@@ -359,22 +368,7 @@ export function Menu({
 						value={socket === undefined ? 0 : 1}
 						onChange={(_, value) => {
 							if (value === 1) {
-								const socket = new WebSocket(serverUrl);
-								socket.addEventListener("open", () => {
-									socket.send(
-										JSON.stringify([
-											{
-												action: "CREATE_GAME",
-												options: { limit },
-											},
-										])
-									);
-								});
-								setUpSocket(socket, setGameState, setMultiplayerState, setGameProps, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
-								setLocalGameProps({
-									...localGameProps,
-									socket,
-								});
+								setMultiplayerNameDialog(1);
 							} else {
 								if (socket) {
 									setDisconnectSocketDialog(true);
@@ -475,28 +469,7 @@ export function Menu({
 								/>
 							</Box>
 							<Box>
-								<Button
-									sx={{ margin: 1 }}
-									variant="contained"
-									onClick={() => {
-										const socket = new WebSocket(serverUrl);
-										socket.addEventListener("open", () => {
-											socket.send(
-												JSON.stringify([
-													{
-														action: "JOIN_GAME",
-														id: roomCode.toUpperCase(),
-													},
-												])
-											);
-										});
-										setUpSocket(socket, setGameState, setMultiplayerState, setGameProps, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
-										setLocalGameProps({
-											...localGameProps,
-											socket,
-										});
-									}}
-								>
+								<Button sx={{ margin: 1 }} variant="contained" onClick={() => setMultiplayerNameDialog(2)}>
 									Join Room
 								</Button>
 							</Box>
@@ -542,6 +515,71 @@ export function Menu({
 					)}
 				</>
 			)}
+			<Dialog open={multiplayerNameDialog > 0}>
+				<DialogContent>
+					<TextField
+						autoFocus
+						variant="filled"
+						value={playerName}
+						onChange={(e) => setGameProps({ ...gameProps, playerName: e.target.value })}
+						label="Enter a name for multiplayer"
+					></TextField>
+				</DialogContent>
+				<DialogActions sx={{ justifyContent: "center" }}>
+					<Button
+						variant="contained"
+						onClick={() => {
+							switch (multiplayerNameDialog) {
+								case 1: {
+									const socket = new WebSocket(serverUrl);
+									socket.addEventListener("open", () => {
+										socket.send(
+											JSON.stringify([
+												{
+													action: "CREATE_GAME",
+													options: { limit, playerName },
+												},
+											])
+										);
+									});
+									setUpSocket(socket, setGameState, setMultiplayerState, setGameProps, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
+									setLocalGameProps({
+										...localGameProps,
+										socket,
+									});
+									break;
+								}
+								case 2: {
+									const socket = new WebSocket(serverUrl);
+									socket.addEventListener("open", () => {
+										socket.send(
+											JSON.stringify([
+												{
+													action: "JOIN_GAME",
+													id: roomCode.toUpperCase(),
+													playerName,
+												},
+											])
+										);
+									});
+									setUpSocket(socket, setGameState, setMultiplayerState, setGameProps, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
+									setLocalGameProps({
+										...localGameProps,
+										socket,
+									});
+									break;
+								}
+							}
+							setMultiplayerNameDialog(0);
+						}}
+					>
+						Accept
+					</Button>
+					<Button variant="outlined" onClick={() => setMultiplayerNameDialog(0)}>
+						Cancel
+					</Button>
+				</DialogActions>
+			</Dialog>
 			<Dialog open={disconnectSocketDialog} onClose={() => setDisconnectSocketDialog(false)}>
 				<DialogContent>
 					<DialogContentText>Are you sure you want to disconnect from the current multiplayer game?</DialogContentText>

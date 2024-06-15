@@ -14,21 +14,32 @@ export function MPPanel({ multiplayerState, iconConfig }: MPPanelProps) {
 			<div style={{ fontSize: "16px", display: "flex", justifyContent: "center", fontWeight: "bold" }}>{id}</div>
 			<div style={{ fontSize: "12px", display: "flex", justifyContent: "center", marginBottom: "5px" }}>Currently Connected ({players.length}/4)</div>
 			<div style={{ display: "flex", justifyContent: "center" }}>
-				{players.map(({ wins }, index) => (
+				{players.map(({ wins, name }, index) => (
 					<div
 						style={{
-							padding: "5px",
-							borderBottom: playerIndex === index ? "3px white dotted" : "none",
-							boxSizing: "border-box",
-							width: "40px",
+							paddingRight: "15px",
+							paddingBottom: "5px",
+							borderBottom: playerIndex === index ? "3px white dotted" : "3px black dotted",
 							float: "left",
 							position: "relative",
+							display: "flex",
 						}}
 					>
-						{React.createElement(iconConfig.playerIcons[index], {
-							color: iconConfig.playerColors[index],
-						})}
-						<span style={{ fontSize: "12px", position: "absolute", top: 0, right: 0 }}>{wins}</span>
+						<div
+							style={{
+								width: "30px",
+								padding: "4px",
+								paddingLeft: 0,
+							}}
+						>
+							{React.createElement(iconConfig.playerIcons[index], {
+								color: iconConfig.playerColors[index],
+							})}
+						</div>
+						<div>
+							<div style={{ fontSize: "16px", alignContent: "center" }}>{name}</div>
+							<div style={{ fontSize: "10px" }}>{wins} WINS</div>
+						</div>
 					</div>
 				))}
 			</div>

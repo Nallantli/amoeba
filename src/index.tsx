@@ -71,7 +71,7 @@ class App extends React.Component<
 		multiplayerState?: MultiplayerState;
 		confettiConductor: TConductorInstance | undefined;
 		fadeIn: boolean;
-		winnerBar?: number;
+		winnerBar?: [number, string];
 	}
 > {
 	constructor(props: {}) {
@@ -104,6 +104,8 @@ class App extends React.Component<
 		this.setState(({ localGameProps, localGameProps: { socket } }) => {
 			socket?.close();
 			return {
+				winnerBar: undefined,
+				multiplayerState: undefined,
 				localGameProps: {
 					...localGameProps,
 					socket: undefined,
@@ -129,6 +131,7 @@ class App extends React.Component<
 	checkMPWin(newGameState: GameState, newMultiplayerState: MultiplayerState): [boolean, number?] {
 		const {
 			gameProps: { winLength },
+			multiplayerState,
 			confettiConductor,
 		} = this.state;
 		if (newGameState) {
@@ -141,7 +144,7 @@ class App extends React.Component<
 					loseSoundAudio.play();
 				}
 				this.setState({
-					winnerBar: winner,
+					winnerBar: winner ? [winner, multiplayerState?.players[winner]?.name || ""] : undefined,
 				});
 				setTimeout(
 					() =>
@@ -240,10 +243,10 @@ class App extends React.Component<
 				>
 					<Box sx={{ background: "#222", borderRadius: "5px", maxWidth: "600px", overflow: "hidden" }}>
 						{winnerBar !== undefined && (
-							<AppBar position="static" sx={{ background: iconConfig.playerColors[winnerBar] }}>
+							<AppBar position="static" sx={{ background: iconConfig.playerColors[winnerBar[0]] }}>
 								<Toolbar>
 									<Typography variant="h6" component={"div"} sx={{ flexGrow: 1 }}>
-										Player {winnerBar + 1} wins!
+										{winnerBar[1]} wins!
 									</Typography>
 								</Toolbar>
 							</AppBar>
