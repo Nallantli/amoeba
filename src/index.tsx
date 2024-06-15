@@ -144,7 +144,7 @@ class App extends React.Component<
 					loseSoundAudio.play();
 				}
 				this.setState({
-					winnerBar: winner ? [winner, multiplayerState?.players[winner]?.name || ""] : undefined,
+					winnerBar: winner !== undefined ? [winner, multiplayerState?.players[winner]?.name || ""] : undefined,
 				});
 				setTimeout(
 					() =>
@@ -214,6 +214,8 @@ class App extends React.Component<
 			fadeIn,
 			winnerBar,
 		} = this.state;
+
+		console.log(winnerBar);
 
 		return (
 			<ThemeProvider theme={darkTheme}>
