@@ -2,27 +2,27 @@ import { AppBar, Box, Button, Dialog, DialogActions, DialogContent, DialogConten
 import React from "react";
 import Crossfire from "react-canvas-confetti/dist/presets/crossfire";
 import { TConductorInstance } from "react-canvas-confetti/dist/types";
-import { GameController } from "./game/GameController";
-import { GameProps, LocalGameProps } from "./GameProps";
-import { GameState } from "./GameState";
-import { MPPanel } from "./MPPanel";
-import { MultiplayerState } from "./MultiplayerState";
-import ThemeSelector from "./ThemeSelector";
-import { AttAndDef } from "./ais/AttAndDef";
-import { Elk } from "./ais/Elk";
-import { ElkAtt } from "./ais/ElkAtt";
-import { ElkDef } from "./ais/ElkDef";
-import { ElkSurf } from "./ais/ElkSurf";
-import { ElkTimid } from "./ais/ElkTimid";
-import { Fuzzy } from "./ais/Fuzzy";
-import { CircleIcon } from "./assets/CircleIcon";
-import { CrossIcon } from "./assets/CrossIcon";
-import { DiamondIcon } from "./assets/DiamondIcon";
-import { SquareIcon } from "./assets/SquareIcon";
-import { GameMenu } from "./menu/GameMenu";
+import { buttonAudio, loseSoundAudio, startAudio, winSoundAudio } from "../utils/Constants";
+import { checkWin, generateInitialGameState } from "../utils/Helpers";
+import ThemeSelector from "../utils/ThemeSelector";
+import { AttAndDef } from "../ais/AttAndDef";
+import { Elk } from "../ais/Elk";
+import { ElkAtt } from "../ais/ElkAtt";
+import { ElkDef } from "../ais/ElkDef";
+import { ElkSurf } from "../ais/ElkSurf";
+import { ElkTimid } from "../ais/ElkTimid";
+import { Fuzzy } from "../ais/Fuzzy";
+import { CircleIcon } from "../assets/CircleIcon";
+import { CrossIcon } from "../assets/CrossIcon";
+import { DiamondIcon } from "../assets/DiamondIcon";
+import { SquareIcon } from "../assets/SquareIcon";
+import { GameController } from "../game/GameController";
+import { GameMenu } from "../menu/GameMenu";
+import { GameSettings, LocalGameSettings } from "../state/GameSettings";
+import { GameState } from "../state/GameState";
+import { MultiplayerState } from "../state/MultiplayerState";
 import "./Base.css";
-import { startAudio, winSoundAudio, loseSoundAudio, buttonAudio } from "./Constants";
-import { checkWin, generateInitialGameState } from "./utils";
+import { MultiplayerPanel } from "./MultiplayerPanel";
 
 const AISelectOptions: { [key: string]: any } = {
 	fuzzy: Fuzzy,
@@ -44,8 +44,8 @@ const iconConfig = {
 interface AppState {
 	gameOpen: boolean;
 	socketClosedOpen: boolean;
-	gameProps: GameProps;
-	localGameProps: LocalGameProps;
+	gameSettings: GameSettings;
+	localGameSettings: LocalGameSettings;
 	gameState?: GameState;
 	multiplayerState?: MultiplayerState;
 	confettiConductor: TConductorInstance | undefined;
@@ -60,12 +60,12 @@ export class App extends React.Component<{}, AppState> {
 		this.state = {
 			gameOpen: false,
 			socketClosedOpen: false,
-			gameProps: {
+			gameSettings: {
 				winLength: 5,
 				limit: 0,
 				delay: 0,
 			},
-			localGameProps: {
+			localGameSettings: {
 				AINames: ["player", "player"],
 				AISelectOptions: AISelectOptions,
 			},
@@ -81,13 +81,13 @@ export class App extends React.Component<{}, AppState> {
 	}
 
 	closeSocket() {
-		this.setState(({ localGameProps, localGameProps: { socket } }) => {
+		this.setState(({ localGameSettings, localGameSettings: { socket } }) => {
 			socket?.close();
 			return {
 				winnerBar: undefined,
 				multiplayerState: undefined,
-				localGameProps: {
-					...localGameProps,
+				localGameSettings: {
+					...localGameSettings,
 					socket: undefined,
 				},
 			};
@@ -110,7 +110,7 @@ export class App extends React.Component<{}, AppState> {
 
 	checkMPWin(newGameState: GameState, newMultiplayerState: MultiplayerState): [boolean, number?] {
 		const {
-			gameProps: { winLength },
+			gameSettings: { winLength },
 			multiplayerState,
 			confettiConductor,
 		} = this.state;
@@ -144,12 +144,12 @@ export class App extends React.Component<{}, AppState> {
 
 	startGame() {
 		const {
-			localGameProps,
+			localGameSettings,
 			multiplayerState,
-			gameProps,
-			localGameProps: { socket },
+			gameSettings,
+			localGameSettings: { socket },
 		} = this.state;
-		const initialGameState = generateInitialGameState(localGameProps, gameProps, multiplayerState);
+		const initialGameState = generateInitialGameState(localGameSettings, gameSettings, multiplayerState);
 		if (socket && multiplayerState?.players[multiplayerState?.playerIndex]?.isHost) {
 			socket?.send(
 				JSON.stringify([
@@ -157,7 +157,7 @@ export class App extends React.Component<{}, AppState> {
 						action: "START_GAME",
 						id: multiplayerState.id,
 						gameState: initialGameState,
-						gameProps,
+						gameSettings,
 					},
 				])
 			);
@@ -178,7 +178,7 @@ export class App extends React.Component<{}, AppState> {
 					.then(({ x, y }) =>
 						setTimeout(
 							() => document.getElementById("board")?.dispatchEvent(new CustomEvent("selectSquare", { detail: { x: x, y: y } })),
-							gameProps.delay
+							gameSettings.delay
 						)
 					);
 			}
@@ -191,9 +191,9 @@ export class App extends React.Component<{}, AppState> {
 			socketClosedOpen,
 			gameState,
 			multiplayerState,
-			gameProps,
-			localGameProps,
-			localGameProps: { socket },
+			gameSettings,
+			localGameSettings,
+			localGameSettings: { socket },
 			fadeIn,
 			winnerBar,
 		} = this.state;
@@ -201,20 +201,18 @@ export class App extends React.Component<{}, AppState> {
 		console.log(winnerBar);
 
 		return (
-			<>
+			<ThemeSelector theme={params.get("theme") || "default"}>
 				{gameState && (
-					<ThemeSelector theme={params.get("theme") || "default"}>
-						<GameController
-							socket={socket}
-							gameProps={gameProps}
-							gameState={gameState}
-							multiplayerState={multiplayerState}
-							setGameState={(newGameState: GameState) => this.setState({ gameState: newGameState })}
-							iconConfig={iconConfig}
-						/>
-					</ThemeSelector>
+					<GameController
+						socket={socket}
+						gameSettings={gameSettings}
+						gameState={gameState}
+						multiplayerState={multiplayerState}
+						setGameState={(newGameState: GameState) => this.setState({ gameState: newGameState })}
+						iconConfig={iconConfig}
+					/>
 				)}
-				{multiplayerState && socket && <MPPanel iconConfig={iconConfig} multiplayerState={multiplayerState} />}
+				{multiplayerState && socket && <MultiplayerPanel iconConfig={iconConfig} multiplayerState={multiplayerState} />}
 				<Modal
 					className={fadeIn ? "fade-in" : undefined}
 					open={!gameOpen}
@@ -242,12 +240,12 @@ export class App extends React.Component<{}, AppState> {
 								setGameState={(newGameState: GameState) => this.setState({ gameState: newGameState })}
 								multiplayerState={multiplayerState}
 								setMultiplayerState={(newMultiplayerState: MultiplayerState) => this.setState({ multiplayerState: newMultiplayerState })}
-								gameProps={gameProps}
-								setGameProps={(newGameProps: GameProps) => this.setState({ gameProps: newGameProps })}
-								localGameProps={localGameProps}
+								gameSettings={gameSettings}
+								setGameSettings={(newGameProps: GameSettings) => this.setState({ gameSettings: newGameProps })}
+								localGameSettings={localGameSettings}
 								iconConfig={iconConfig}
 								startGame={this.startGame}
-								setLocalGameProps={(newLocalGameProps: LocalGameProps) => this.setState({ localGameProps: newLocalGameProps })}
+								setLocalGameSettings={(newLocalGameProps: LocalGameSettings) => this.setState({ localGameSettings: newLocalGameProps })}
 								closeSocket={this.closeSocket}
 								startClientGame={this.startClientGame}
 								clientSocketClosed={this.clientSocketClosed}
@@ -300,7 +298,7 @@ export class App extends React.Component<{}, AppState> {
 						</Button>
 					</DialogActions>
 				</Dialog>
-			</>
+			</ThemeSelector>
 		);
 	}
 }

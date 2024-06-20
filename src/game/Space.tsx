@@ -1,5 +1,5 @@
 import React from "react";
-import { IconConfig } from "../IconConfig";
+import { IconConfig } from "../state/IconConfig";
 
 interface SpaceProps {
 	relX: number;

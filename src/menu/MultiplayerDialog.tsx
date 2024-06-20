@@ -2,8 +2,8 @@ import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, Button, SvgIcon, Typography } from "@mui/material";
 import React from "react";
-import { IconConfig } from "../IconConfig";
-import { MultiplayerState } from "../MultiplayerState";
+import { IconConfig } from "../state/IconConfig";
+import { MultiplayerState } from "../state/MultiplayerState";
 
 interface MultiplayerDialogProps {
 	iconConfig: IconConfig;

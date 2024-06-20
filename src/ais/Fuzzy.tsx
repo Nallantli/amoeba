@@ -1,6 +1,6 @@
 import { AI } from "../game/AI";
-import { GameState } from "../GameState";
-import { getValue } from "../utils";
+import { GameState } from "../state/GameState";
+import { getValue } from "../utils/Helpers";
 import { countLineOld, getRandomElement } from "./utils";
 
 export class Fuzzy extends AI {

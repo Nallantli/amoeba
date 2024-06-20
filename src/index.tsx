@@ -1,7 +1,7 @@
 import { ThemeProvider, createTheme } from "@mui/material";
 import React from "react";
 import ReactDOM from "react-dom";
-import { App } from "./App";
+import { App } from "./main/App";
 import reportWebVitals from "./reportWebVitals";
 
 const darkTheme = createTheme({

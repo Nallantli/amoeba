@@ -1,6 +1,6 @@
 import { SvgIcon, Select, MenuItem, Button } from "@mui/material";
 import React from "react";
-import { IconConfig } from "../IconConfig";
+import { IconConfig } from "../state/IconConfig";
 
 interface PlayerItemProps {
 	AIName: string;

@@ -1,4 +1,4 @@
-import { GameMap } from "../GameState";
+import { GameMap } from "../state/GameState";
 
 export function countLine(
 	map: GameMap,

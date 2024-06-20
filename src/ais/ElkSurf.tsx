@@ -1,6 +1,6 @@
 import { AI } from "../game/AI";
-import { GameState } from "../GameState";
-import { getValue, getPlayerScores } from "../utils";
+import { GameState } from "../state/GameState";
+import { getValue, getPlayerScores } from "../utils/Helpers";
 import { countLine, getRandomElement } from "./utils";
 
 // Becomes ElkAtt when winning, ElkDef when losing

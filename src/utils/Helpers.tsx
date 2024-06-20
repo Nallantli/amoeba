@@ -1,9 +1,9 @@
-import { AI } from "./game/AI";
-import { MultiplayerState } from "./MultiplayerState";
-import { GameProps, LocalGameProps } from "./GameProps";
-import { GameMap, GameState } from "./GameState";
-import { IconConfig } from "./IconConfig";
-import { chunkSize } from "./game/Chunk";
+import { AI } from "../game/AI";
+import { MultiplayerState } from "../state/MultiplayerState";
+import { GameMap, GameState } from "../state/GameState";
+import { IconConfig } from "../state/IconConfig";
+import { chunkSize } from "../game/Chunk";
+import { LocalGameSettings, GameSettings } from "../state/GameSettings";
 
 export function flatten(x: number, d: number): number {
 	while (x < 0) x += d;
@@ -26,17 +26,17 @@ function generateInitialChunks() {
 	return map;
 }
 
-function getPlayers(localGameProps: LocalGameProps, winLength: number, multiplayerState?: MultiplayerState) {
-	if (localGameProps.socket && multiplayerState) {
+function getPlayers(localGameSettings: LocalGameSettings, winLength: number, multiplayerState?: MultiplayerState) {
+	if (localGameSettings.socket && multiplayerState) {
 		return multiplayerState.players.map(() => null);
 	}
-	const { AINames, AISelectOptions } = localGameProps;
+	const { AINames, AISelectOptions } = localGameSettings;
 	return AINames.map((AIName, i) => (AIName === "player" ? null : new AISelectOptions[AIName](winLength, i + 1, AINames.length)));
 }
 
-export function generateInitialGameState(localGameProps: LocalGameProps, gameProps: GameProps, multiplayerState?: MultiplayerState): GameState {
-	const { limit, winLength } = gameProps;
-	const players: (AI | null)[] = getPlayers(localGameProps, winLength, multiplayerState);
+export function generateInitialGameState(localGameSettings: LocalGameSettings, gameSettings: GameSettings, multiplayerState?: MultiplayerState): GameState {
+	const { limit, winLength } = gameSettings;
+	const players: (AI | null)[] = getPlayers(localGameSettings, winLength, multiplayerState);
 	return {
 		turn: 0,
 		placements: [],
@@ -87,7 +87,7 @@ export function setUpSocket(
 	socket: WebSocket,
 	setGameState: (gameState: GameState) => void,
 	setMultiplayerState: (multiplayerState: MultiplayerState) => void,
-	setGameProps: (gameProps: GameProps) => void,
+	setGameSettings: (gameSettings: GameSettings) => void,
 	closeSocket: () => void,
 	startClientGame: () => void,
 	clientSocketClosed: () => void,
@@ -103,8 +103,8 @@ export function setUpSocket(
 				break;
 			}
 			case "START": {
-				const { gameProps } = data;
-				setGameProps(gameProps);
+				const { gameSettings } = data;
+				setGameSettings(gameSettings);
 				startClientGame();
 				break;
 			}

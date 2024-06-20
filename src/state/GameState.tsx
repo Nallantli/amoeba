@@ -1,10 +1,10 @@
-import { AI } from "./game/AI";
+import { AI } from "../game/AI";
 
 export interface GameMap {
 	[key: string]: { x: number; y: number; chunkData: number[][] };
 }
 
-export type GameState = {
+export interface GameState {
 	map: GameMap;
 	placements: { x: number; y: number; v: number }[];
 	moveLimit: number;
@@ -12,4 +12,4 @@ export type GameState = {
 	turn: number;
 	players: (AI | null)[];
 	status: number;
-};
+}

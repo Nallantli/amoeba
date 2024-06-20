@@ -13,14 +13,14 @@ import {
 	Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { GameProps, LocalGameProps } from "../GameProps";
-import { GameState } from "../GameState";
-import { IconConfig } from "../IconConfig";
-import { MultiplayerState } from "../MultiplayerState";
-import { setUpSocket } from "../utils";
+import { GameState } from "../state/GameState";
+import { IconConfig } from "../state/IconConfig";
+import { MultiplayerState } from "../state/MultiplayerState";
+import { setUpSocket } from "../utils/Helpers";
 import { MultiplayerDialog } from "./MultiplayerDialog";
 import { PlayerItem } from "./PlayerItem";
-import { serverUrl } from "../Constants";
+import { serverUrl } from "../utils/Constants";
+import { GameSettings, LocalGameSettings } from "../state/GameSettings";
 
 function canStartGame(socket?: WebSocket, multiplayerState?: MultiplayerState, gameState?: GameState) {
 	if (socket === undefined) {
@@ -41,11 +41,11 @@ function canStartGame(socket?: WebSocket, multiplayerState?: MultiplayerState, g
 interface MenuProps {
 	gameState?: GameState;
 	multiplayerState?: MultiplayerState;
-	gameProps: GameProps;
-	setGameProps: (gameProps: GameProps) => void;
+	gameSettings: GameSettings;
+	setGameSettings: (gameSettings: GameSettings) => void;
 	iconConfig: IconConfig;
-	localGameProps: LocalGameProps;
-	setLocalGameProps: (localGameProps: LocalGameProps) => void;
+	localGameSettings: LocalGameSettings;
+	setLocalGameSettings: (localGameSettings: LocalGameSettings) => void;
 	startGame: () => void;
 	setMultiplayerState: (multiplayerState: MultiplayerState) => void;
 	setGameState: (gameState: GameState) => void;
@@ -58,13 +58,13 @@ interface MenuProps {
 export function GameMenu({
 	gameState,
 	iconConfig,
-	gameProps,
-	gameProps: { winLength, delay, limit, playerName },
+	gameSettings,
+	gameSettings: { winLength, delay, limit, playerName },
 	multiplayerState,
-	localGameProps,
-	localGameProps: { socket, AINames, AISelectOptions },
-	setLocalGameProps,
-	setGameProps,
+	localGameSettings,
+	localGameSettings: { socket, AINames, AISelectOptions },
+	setLocalGameSettings,
+	setGameSettings,
 	setGameState,
 	setMultiplayerState,
 	startGame,
@@ -88,16 +88,16 @@ export function GameMenu({
 	const removeItem = (index: number) => {
 		let newAINames = [...AINames];
 		newAINames.splice(index, 1);
-		setLocalGameProps({
-			...localGameProps,
+		setLocalGameSettings({
+			...localGameSettings,
 			AINames: newAINames,
 		});
 	};
 	const changeAI = (index: number, value: string) => {
 		let newAINames = [...AINames];
 		newAINames[index] = value;
-		setLocalGameProps({
-			...localGameProps,
+		setLocalGameSettings({
+			...localGameSettings,
 			AINames: newAINames,
 		});
 	};
@@ -114,8 +114,8 @@ export function GameMenu({
 						return;
 					}
 					if (tabValue === 1 && value !== 1) {
-						setGameProps({
-							...gameProps,
+						setGameSettings({
+							...gameSettings,
 							limit: 0,
 						});
 					}
@@ -135,7 +135,7 @@ export function GameMenu({
 								label="Maximum Amount of Rounds"
 								variant="filled"
 								value={limit}
-								onChange={(e) => setGameProps({ ...gameProps, limit: parseInt(e.target.value, 10) || 0 })}
+								onChange={(e) => setGameSettings({ ...gameSettings, limit: parseInt(e.target.value, 10) || 0 })}
 							/>
 						</Box>
 					)}
@@ -146,8 +146,8 @@ export function GameMenu({
 							variant="filled"
 							value={winLength}
 							onChange={(e) =>
-								setGameProps({
-									...gameProps,
+								setGameSettings({
+									...gameSettings,
 									winLength: parseInt(e.target.value, 10) || 0,
 								})
 							}
@@ -158,8 +158,8 @@ export function GameMenu({
 							variant="filled"
 							value={delay}
 							onChange={(e) =>
-								setGameProps({
-									...gameProps,
+								setGameSettings({
+									...gameSettings,
 									delay: parseInt(e.target.value, 10) || 0,
 								})
 							}
@@ -201,8 +201,8 @@ export function GameMenu({
 									<Button
 										sx={{ margin: 1 }}
 										onClick={() => {
-											setLocalGameProps({
-												...localGameProps,
+											setLocalGameSettings({
+												...localGameSettings,
 												AINames: [...AINames, "player"],
 											});
 										}}
@@ -322,7 +322,7 @@ export function GameMenu({
 						autoFocus
 						variant="filled"
 						value={playerName}
-						onChange={(e) => setGameProps({ ...gameProps, playerName: e.target.value })}
+						onChange={(e) => setGameSettings({ ...gameSettings, playerName: e.target.value })}
 						label="Enter a name for multiplayer"
 					></TextField>
 				</DialogContent>
@@ -347,14 +347,14 @@ export function GameMenu({
 										socket,
 										setGameState,
 										setMultiplayerState,
-										setGameProps,
+										setGameSettings,
 										closeSocket,
 										startClientGame,
 										clientSocketClosed,
 										checkMPWin
 									);
-									setLocalGameProps({
-										...localGameProps,
+									setLocalGameSettings({
+										...localGameSettings,
 										socket,
 									});
 									break;
@@ -376,14 +376,14 @@ export function GameMenu({
 										socket,
 										setGameState,
 										setMultiplayerState,
-										setGameProps,
+										setGameSettings,
 										closeSocket,
 										startClientGame,
 										clientSocketClosed,
 										checkMPWin
 									);
-									setLocalGameProps({
-										...localGameProps,
+									setLocalGameSettings({
+										...localGameSettings,
 										socket,
 									});
 									break;

@@ -1,13 +1,13 @@
-import { MultiplayerState } from "./MultiplayerState";
-import { IconConfig } from "./IconConfig";
+import { MultiplayerState } from "../state/MultiplayerState";
+import { IconConfig } from "../state/IconConfig";
 import React from "react";
 
-interface MPPanelProps {
+interface MultiplayerPanelProps {
 	multiplayerState: MultiplayerState;
 	iconConfig: IconConfig;
 }
 
-export function MPPanel({ multiplayerState, iconConfig }: MPPanelProps) {
+export function MultiplayerPanel({ multiplayerState, iconConfig }: MultiplayerPanelProps) {
 	const { players, playerIndex, id } = multiplayerState;
 	return (
 		<div id="mp-panel">

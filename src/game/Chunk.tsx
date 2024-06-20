@@ -1,7 +1,7 @@
-import { GameMap } from "../GameState";
-import { IconConfig } from "../IconConfig";
+import { GameMap } from "../state/GameState";
+import { IconConfig } from "../state/IconConfig";
 import { Space } from "./Space";
-import { getWinBorder } from "../utils";
+import { getWinBorder } from "../utils/Helpers";
 
 export const chunkSize = 3;
 

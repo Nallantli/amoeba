@@ -1,23 +1,23 @@
 import { faPlus, faMinus, faArrowsToDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { buttonAudio } from "../Constants";
-import { GameState } from "../GameState";
-import { IconConfig } from "../IconConfig";
-import { checkWin, selectSquare, getPlayerScores, flatten } from "../utils";
+import { buttonAudio } from "../utils/Constants";
+import { GameState } from "../state/GameState";
+import { IconConfig } from "../state/IconConfig";
+import { checkWin, selectSquare, getPlayerScores, flatten } from "../utils/Helpers";
 import { AI } from "./AI";
 import { chunkSize, Chunk } from "./Chunk";
 
-type BoardProps = {
+interface BoardProps {
 	gameState: GameState;
 	iconConfig: IconConfig;
 	broadcast: (gameState: GameState, callback: (gameState: GameState) => void) => void;
 	canMove: boolean;
 	delay: number;
 	winLength: number;
-};
+}
 
-type BoardState = {
+interface BoardState {
 	view: {
 		offsetX: number;
 		offsetY: number;
@@ -32,7 +32,7 @@ type BoardState = {
 	touchOffset: { x: number; y: number };
 	shiftScroll: boolean;
 	ctrlScroll: boolean;
-};
+}
 
 const Limit = (props: { moveLimit: number }) => {
 	return <div id="limit-dialog">Turns Left: {props.moveLimit}</div>;

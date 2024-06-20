@@ -45,8 +45,8 @@ body {
 .space,
 .last-space,
 .win-square {
-	outline: 1px solid var(--primary-color);
-	outline-offset: -1px;
+	outline: 1.5px solid var(--primary-color);
+	outline-offset: -1.5px;
 	background-color: var(--secondary-color);
 	border: none;
 	padding: 0;

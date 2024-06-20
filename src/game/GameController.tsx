@@ -1,12 +1,12 @@
-import { MultiplayerState } from "../MultiplayerState";
+import { MultiplayerState } from "../state/MultiplayerState";
 import { Board } from "./Board";
-import { GameProps } from "../GameProps";
-import { GameState } from "../GameState";
-import { IconConfig } from "../IconConfig";
+import { GameState } from "../state/GameState";
+import { IconConfig } from "../state/IconConfig";
+import { GameSettings } from "../state/GameSettings";
 
 interface GameControllerProps {
 	socket?: WebSocket;
-	gameProps: GameProps;
+	gameSettings: GameSettings;
 	gameState: GameState;
 	multiplayerState?: MultiplayerState;
 	setGameState: (gameState: GameState) => void;
@@ -19,8 +19,8 @@ export function GameController({
 	multiplayerState,
 	gameState: { players, turn },
 	setGameState,
-	gameProps,
-	gameProps: { delay, winLength },
+	gameSettings,
+	gameSettings: { delay, winLength },
 	iconConfig,
 }: GameControllerProps) {
 	return (
@@ -35,7 +35,7 @@ export function GameController({
 								action: "BROADCAST_MOVE",
 								id: multiplayerState?.id,
 								gameState: gs,
-								gameProps,
+								gameSettings,
 							},
 						])
 					);
