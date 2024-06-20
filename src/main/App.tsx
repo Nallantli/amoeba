@@ -216,12 +216,14 @@ export class App extends React.Component<{}, AppState> {
 				<Modal
 					className={fadeIn ? "fade-in" : undefined}
 					open={!gameOpen}
-					onClose={() =>
-						this.setState({
-							gameOpen: true,
-							fadeIn: false,
-						})
-					}
+					onClose={() => {
+						if (gameState) {
+							this.setState({
+								gameOpen: true,
+								fadeIn: false,
+							});
+						}
+					}}
 					style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
 				>
 					<Box sx={{ background: "#222", borderRadius: "5px", maxWidth: "600px", overflow: "hidden" }}>
