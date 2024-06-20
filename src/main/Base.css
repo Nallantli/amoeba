@@ -115,3 +115,11 @@
 	display: block;
 	padding: 5px;
 }
+
+#version {
+	display: flex;
+	justify-content: flex-end;
+	font-size: 10px;
+	font-family: "Iosevka", monospace;
+	color: #555;
+}

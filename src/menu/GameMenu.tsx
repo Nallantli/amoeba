@@ -19,7 +19,7 @@ import { MultiplayerState } from "../state/MultiplayerState";
 import { setUpSocket } from "../utils/Helpers";
 import { MultiplayerDialog } from "./MultiplayerDialog";
 import { PlayerItem } from "./PlayerItem";
-import { serverUrl } from "../utils/Constants";
+import { serverUrl, version } from "../utils/Constants";
 import { GameSettings, LocalGameSettings } from "../state/GameSettings";
 
 function canStartGame(socket?: WebSocket, multiplayerState?: MultiplayerState, gameState?: GameState) {
@@ -419,6 +419,7 @@ export function GameMenu({
 					</Button>
 				</DialogActions>
 			</Dialog>
+			<div id="version">{version}</div>
 		</>
 	);
 }

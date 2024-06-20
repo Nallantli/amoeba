@@ -9,3 +9,5 @@ export const startAudio = new Audio(startSoundFile);
 export const buttonAudio = new Audio(buttonSoundFile);
 export const winSoundAudio = new Audio(winSoundFile);
 export const loseSoundAudio = new Audio(loseSoundFile);
+
+export const { version } = require('../../package.json');
