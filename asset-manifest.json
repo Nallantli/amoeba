@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/amoeba/static/css/main.d994a4c0.css",
-    "main.js": "/amoeba/static/js/main.9d236f34.js",
-    "static/css/417.89f0111f.chunk.css": "/amoeba/static/css/417.89f0111f.chunk.css",
-    "static/js/417.2e30607e.chunk.js": "/amoeba/static/js/417.2e30607e.chunk.js",
-    "static/css/278.67bdbfe8.chunk.css": "/amoeba/static/css/278.67bdbfe8.chunk.css",
+    "main.css": "/amoeba/static/css/main.1bb144b9.css",
+    "main.js": "/amoeba/static/js/main.e56115b9.js",
+    "static/css/659.1f58fb66.chunk.css": "/amoeba/static/css/659.1f58fb66.chunk.css",
+    "static/js/659.1e37887b.chunk.js": "/amoeba/static/js/659.1e37887b.chunk.js",
+    "static/css/278.b2c5c13f.chunk.css": "/amoeba/static/css/278.b2c5c13f.chunk.css",
     "static/js/278.ef4dc09d.chunk.js": "/amoeba/static/js/278.ef4dc09d.chunk.js",
     "static/js/453.217f0d34.chunk.js": "/amoeba/static/js/453.217f0d34.chunk.js",
     "static/media/win.wav": "/amoeba/static/media/win.1213d43917d866cb5f52.wav",
@@ -12,16 +12,16 @@
     "static/media/start.ogg": "/amoeba/static/media/start.3597223389a03ef79004.ogg",
     "static/media/button.wav": "/amoeba/static/media/button.3825fb2a0c9f1622341f.wav",
     "index.html": "/amoeba/index.html",
-    "main.d994a4c0.css.map": "/amoeba/static/css/main.d994a4c0.css.map",
-    "main.9d236f34.js.map": "/amoeba/static/js/main.9d236f34.js.map",
-    "417.89f0111f.chunk.css.map": "/amoeba/static/css/417.89f0111f.chunk.css.map",
-    "417.2e30607e.chunk.js.map": "/amoeba/static/js/417.2e30607e.chunk.js.map",
-    "278.67bdbfe8.chunk.css.map": "/amoeba/static/css/278.67bdbfe8.chunk.css.map",
+    "main.1bb144b9.css.map": "/amoeba/static/css/main.1bb144b9.css.map",
+    "main.e56115b9.js.map": "/amoeba/static/js/main.e56115b9.js.map",
+    "659.1f58fb66.chunk.css.map": "/amoeba/static/css/659.1f58fb66.chunk.css.map",
+    "659.1e37887b.chunk.js.map": "/amoeba/static/js/659.1e37887b.chunk.js.map",
+    "278.b2c5c13f.chunk.css.map": "/amoeba/static/css/278.b2c5c13f.chunk.css.map",
     "278.ef4dc09d.chunk.js.map": "/amoeba/static/js/278.ef4dc09d.chunk.js.map",
     "453.217f0d34.chunk.js.map": "/amoeba/static/js/453.217f0d34.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d994a4c0.css",
-    "static/js/main.9d236f34.js"
+    "static/css/main.1bb144b9.css",
+    "static/js/main.e56115b9.js"
   ]
 }

@@ -1,1 +1,0 @@
-{"version":3,"file":"static/js/417.2e30607e.chunk.js","mappings":"oJAGA,MAEA,EAFqBA,KAAMC,EAAAA,EAAAA,KAACC,EAAAA,SAAc,G","sources":["styles/App.tsx"],"sourcesContent":["import React from \"react\";\nimport \"./App.css\";\n\nconst DefaultTheme = () => <React.Fragment></React.Fragment>;\n\nexport default DefaultTheme;\n"],"names":["DefaultTheme","_jsx","React"],"sourceRoot":""}
