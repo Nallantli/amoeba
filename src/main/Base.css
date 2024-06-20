@@ -110,3 +110,8 @@
 .fade-in {
 	animation: fade-in 1s;
 }
+
+.player-icon {
+	display: block;
+	padding: 5px;
+}

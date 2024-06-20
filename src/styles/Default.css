@@ -98,8 +98,3 @@ body {
 .last-space {
 	animation: spaceFocusAnim 3s infinite;
 }
-
-.player-icon {
-	display: block;
-	padding: 5px;
-}

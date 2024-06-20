@@ -1,3 +1,17 @@
+@keyframes spaceFocusAnim {
+	0% {
+		border: 3px red solid;
+	}
+
+	50% {
+		border: 3px blue solid;
+	}
+
+	100% {
+		border: 3px red solid;
+	}
+}
+
 body {
 	margin: 0;
 	padding: 0;
@@ -8,12 +22,10 @@ body {
 }
 
 * {
-	touch-action: none;
 	border-radius: 0;
-	-ms-touch-action: none;
 }
 
-.board {
+#board {
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -24,21 +36,34 @@ body {
 	overflow: visible;
 }
 
-.space {
-	box-sizing: border-box;
+.space::before,
+.last-space::before,
+.win-square::before {
+	position: absolute;
+	content: "";
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	box-shadow: inset -2px -2px #0a0a0a, inset 2px 2px #ffffff, inset -4px -4px #808080, inset 4px 4px #dfdfdf;
+}
+
+.space,
+.last-space,
+.win-square {
+	outline-offset: -1.5px;
+	background-color: #c0c0c0;
 	border: none;
 	padding: 0;
 	margin: 0;
-	transition: background-color 0.5s;
+	transition: background-color 0.1s;
 	z-index: 1;
 	border-radius: 0;
-	background: #c0c0c0;
-	box-shadow: inset -0.2rem -0.2rem #0a0a0a, inset 0.2rem 0.2rem #ffffff, inset -4rem -4rem #808080, inset 4rem 4rem #dfdfdf;
 }
 
-.space:hover,
-.space-pressed {
-	box-shadow: inset -0.2rem -0.2rem #ffffff, inset 0.2rem 0.2rem #0a0a0a, inset -4rem -0.2rem #dfdfdf, inset 4rem 4rem #808080;
+.space:hover::before,
+.last-space:hover::before {
+	box-shadow: inset -2px -2px #ffffff, inset 2px 2px #0a0a0a, inset -4px -2px #dfdfdf, inset 4px 4px #808080;
 }
 
 .chunk-container {
@@ -48,34 +73,10 @@ body {
 }
 
 .space svg,
+.last-space svg,
 .win-square svg {
 	display: block;
-	padding: 10%;
-}
-
-#zoom-bar {
-	position: absolute;
-	top: 10px;
-	right: 5px;
-	z-index: 99;
-	display: block;
-}
-
-#zoom-bar button {
-	display: block;
-	width: 30px;
-	height: 30px;
-	margin: 5px;
-	background-color: white;
-	border: 1px solid black;
-	color: black;
-	transition: all 0.1s ease-in-out;
-}
-
-#zoom-bar button:hover {
-	background-color: black;
-	color: white;
-	border-color: white;
+	padding: 20%;
 }
 
 .win-square {
@@ -96,46 +97,14 @@ body {
 	right: 0;
 	content: "";
 	z-index: -1;
-	box-shadow: #242424 0.4rem 0.4rem, #242424 -0.4rem 0.4rem, #242424 0.4rem -0.4rem, #242424 -0.4rem -0.4rem;
+	box-shadow: 4px 4px #0a0a0a;
 }
 
-#limit-dialog {
+.last-space::before {
 	position: absolute;
-	display: block;
-	top: 15px;
-	left: 10px;
-	font-size: 16px;
-	font-family: "Iosevka", monospace;
-	padding: 10px;
-	border: 1px solid black;
-	border-radius: 0;
-	background-color: white;
-	color: black;
-	z-index: 99;
-}
-
-#score-dialog {
-	position: absolute;
-	display: block;
-	bottom: 10px;
-	left: 10px;
-	font-size: 16px;
-	font-family: "Iosevka", monospace;
-	border: 1px solid black;
-	padding: 10px;
-	border-radius: 0;
-	background-color: white;
-	color: black;
-	z-index: 99;
-}
-
-#player-bar {
-	position: absolute;
-	display: block;
-	z-index: 99;
 	top: 0;
+	bottom: 0;
 	left: 0;
-	width: 100%;
-	height: 5px;
-	transition: all 0.1s;
+	right: 0;
+	animation: spaceFocusAnim 3s infinite;
 }
