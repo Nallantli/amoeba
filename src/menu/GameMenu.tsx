@@ -1,5 +1,3 @@
-import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	Box,
 	Button,
@@ -9,217 +7,20 @@ import {
 	DialogContent,
 	DialogContentText,
 	FormControlLabel,
-	MenuItem,
-	Select,
-	SvgIcon,
 	Tab,
 	Tabs,
 	TextField,
 	Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import "./Base.css";
-import { GameProps, LocalGameProps } from "./GameProps";
-import { GameState } from "./GameState";
-import { IconConfig } from "./IconConfig";
-import { MultiplayerState } from "./MultiplayerState";
-import { serverUrl } from "./utils";
-
-function setUpSocket(
-	socket: WebSocket,
-	setGameState: (gameState: GameState) => void,
-	setMultiplayerState: (multiplayerState: MultiplayerState) => void,
-	setGameProps: (gameProps: GameProps) => void,
-	closeSocket: () => void,
-	startClientGame: () => void,
-	clientSocketClosed: () => void,
-	checkMPWin: (gameState: GameState, multiplayerState: MultiplayerState) => [boolean, number?]
-) {
-	socket.addEventListener("message", (event) => {
-		const data = JSON.parse(event.data);
-		switch (data.action) {
-			case "JOIN_FAILURE": {
-				// const { message } = data;
-				// TODO
-				closeSocket();
-				break;
-			}
-			case "START": {
-				const { gameProps } = data;
-				setGameProps(gameProps);
-				startClientGame();
-				break;
-			}
-			case "CLOSE": {
-				clientSocketClosed();
-				closeSocket();
-				break;
-			}
-			// @ts-ignore
-			case "STATE_UPDATE_MOVE": {
-				const { gameState, id, playerIndex, players } = data;
-				const [win, winner] = checkMPWin(gameState, {
-					id,
-					playerIndex,
-					players,
-				});
-				if (win && players[playerIndex].isHost) {
-					socket.send(
-						JSON.stringify([
-							{
-								action: "END_GAME",
-								id,
-								winner,
-							},
-						])
-					);
-				} else {
-					setGameState(gameState);
-					setMultiplayerState({
-						id,
-						playerIndex,
-						players,
-					});
-				}
-				break;
-			}
-			case "STATE_UPDATE": {
-				const { gameState, id, playerIndex, players } = data;
-				if (players.length < 2 && gameState.status === 1) {
-					socket.send(
-						JSON.stringify([
-							{
-								action: "END_GAME",
-								id,
-								winner: 0,
-							},
-						])
-					);
-				} else {
-					setGameState(gameState);
-					setMultiplayerState({
-						id,
-						playerIndex,
-						players,
-					});
-				}
-				break;
-			}
-		}
-	});
-}
-
-type PlayerItemProps = {
-	AIName: string;
-	index: number;
-	iconConfig: IconConfig;
-	removeItem: Function;
-	changeAI: Function;
-	canDelete: boolean;
-	AIMenuOptions: string[];
-};
-
-function PlayerItem(props: PlayerItemProps) {
-	const { AIName, index, iconConfig, removeItem, changeAI, canDelete, AIMenuOptions } = props;
-	return (
-		<div style={{ padding: "5px", border: "1px solid white", display: "flex", alignItems: "center" }}>
-			<SvgIcon sx={{ margin: 1 }}>
-				{React.createElement(iconConfig.playerIcons[index], {
-					color: iconConfig.playerColors[index],
-				})}
-			</SvgIcon>
-			<Select sx={{ margin: 1 }} variant="filled" id={`p${index + 1}`} value={AIName} onChange={(e) => changeAI(index, e.target.value)}>
-				<MenuItem value="player">No AI</MenuItem>
-				{AIMenuOptions.map((selectOption) => (
-					<MenuItem value={selectOption}>{selectOption}</MenuItem>
-				))}
-			</Select>
-			{canDelete && (
-				<Button sx={{ margin: 1 }} onClick={() => removeItem(index)}>
-					Remove
-				</Button>
-			)}
-		</div>
-	);
-}
-
-interface MultiplayerDialogProps {
-	iconConfig: IconConfig;
-	multiplayerState?: MultiplayerState;
-	socket: WebSocket;
-	status: number;
-}
-
-function MultiplayerDialog({ iconConfig, multiplayerState, socket, status }: MultiplayerDialogProps) {
-	const isHost = multiplayerState?.players[multiplayerState.playerIndex].isHost;
-	return (
-		<div>
-			{multiplayerState?.players.map(({ isReady, name }, index) => (
-				<Box
-					style={{
-						display: "flex",
-						alignItems: "center",
-						background: multiplayerState.playerIndex === index ? "#203645" : "rgb(54, 54, 54)",
-						borderRadius: "5px",
-						margin: "10px",
-						padding: "5px",
-						position: "relative",
-					}}
-				>
-					<SvgIcon sx={{ margin: 1 }}>
-						{React.createElement(iconConfig.playerIcons[index], {
-							color: iconConfig.playerColors[index],
-						})}
-					</SvgIcon>
-					<Typography sx={{ margin: 1 }} style={{ fontWeight: multiplayerState.playerIndex === index ? "bold" : "normal", fontStyle: 'italic' }}>
-						{name}
-					</Typography>
-					<Typography sx={{ margin: 1 }} style={{ fontWeight: multiplayerState.playerIndex === index ? "bold" : "normal" }}>
-						{isReady ? "READY" : "NOT READY"}
-					</Typography>
-					{isHost && (
-						<div style={{ display: "flex", flexDirection: "column", right: "5px", position: "absolute" }}>
-							<Button
-								disabled={index === 0 || status === 1}
-								style={{ fontSize: "20px", height: "20px" }}
-								onClick={() =>
-									socket.send(
-										JSON.stringify([
-											{
-												action: "MOVE_DOWN",
-												id: multiplayerState?.id,
-												pos: index,
-											},
-										])
-									)
-								}
-							>
-								<FontAwesomeIcon icon={faCaretUp} />
-							</Button>
-							<Button
-								disabled={index === multiplayerState.players.length - 1 || status === 1}
-								style={{ fontSize: "20px", height: "20px" }}
-								onClick={() =>
-									socket.send(
-										JSON.stringify([
-											{
-												action: "MOVE_UP",
-												id: multiplayerState?.id,
-												pos: index,
-											},
-										])
-									)
-								}
-							>
-								<FontAwesomeIcon icon={faCaretDown} />
-							</Button>
-						</div>
-					)}
-				</Box>
-			))}
-		</div>
-	);
-}
+import { useEffect, useState } from "react";
+import { GameProps, LocalGameProps } from "../GameProps";
+import { GameState } from "../GameState";
+import { IconConfig } from "../IconConfig";
+import { MultiplayerState } from "../MultiplayerState";
+import { setUpSocket } from "../utils";
+import { MultiplayerDialog } from "./MultiplayerDialog";
+import { PlayerItem } from "./PlayerItem";
+import { serverUrl } from "../Constants";
 
 function canStartGame(socket?: WebSocket, multiplayerState?: MultiplayerState, gameState?: GameState) {
 	if (socket === undefined) {
@@ -254,7 +55,7 @@ interface MenuProps {
 	checkMPWin: (gameState: GameState, multiplayerState: MultiplayerState) => [boolean, number?];
 }
 
-export function Menu({
+export function GameMenu({
 	gameState,
 	iconConfig,
 	gameProps,
@@ -384,17 +185,17 @@ export function Menu({
 						<>
 							<Box sx={{ margin: 1 }}>
 								<div style={{ border: "3px solid white" }}>
-									{AINames.map((AIName, index) =>
-										PlayerItem({
-											AIName,
-											index,
-											iconConfig,
-											removeItem,
-											changeAI,
-											canDelete,
-											AIMenuOptions,
-										})
-									)}
+									{AINames.map((AIName, index) => (
+										<PlayerItem
+											AIName={AIName}
+											index={index}
+											iconConfig={iconConfig}
+											removeItem={removeItem}
+											changeAI={changeAI}
+											canDelete={canDelete}
+											AIMenuOptions={AIMenuOptions}
+										/>
+									))}
 								</div>
 								{AINames.length < 4 && (
 									<Button
@@ -542,7 +343,16 @@ export function Menu({
 											])
 										);
 									});
-									setUpSocket(socket, setGameState, setMultiplayerState, setGameProps, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
+									setUpSocket(
+										socket,
+										setGameState,
+										setMultiplayerState,
+										setGameProps,
+										closeSocket,
+										startClientGame,
+										clientSocketClosed,
+										checkMPWin
+									);
 									setLocalGameProps({
 										...localGameProps,
 										socket,
@@ -562,7 +372,16 @@ export function Menu({
 											])
 										);
 									});
-									setUpSocket(socket, setGameState, setMultiplayerState, setGameProps, closeSocket, startClientGame, clientSocketClosed, checkMPWin);
+									setUpSocket(
+										socket,
+										setGameState,
+										setMultiplayerState,
+										setGameProps,
+										closeSocket,
+										startClientGame,
+										clientSocketClosed,
+										checkMPWin
+									);
 									setLocalGameProps({
 										...localGameProps,
 										socket,

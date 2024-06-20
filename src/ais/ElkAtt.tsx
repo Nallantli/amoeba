@@ -1,5 +1,6 @@
-import { AI } from "../AI";
-import { GameState, getValue } from "../GameState";
+import { AI } from "../game/AI";
+import { GameState } from "../GameState";
+import { getValue } from "../utils";
 import { countLine, getRandomElement } from "./utils";
 
 export class ElkAtt extends AI {

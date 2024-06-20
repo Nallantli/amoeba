@@ -1,12 +1,12 @@
-import { faArrowsToDot, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faMinus, faArrowsToDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
+import { buttonAudio } from "../Constants";
+import { GameState } from "../GameState";
+import { IconConfig } from "../IconConfig";
+import { checkWin, selectSquare, getPlayerScores, flatten } from "../utils";
 import { AI } from "./AI";
-import "./App.css";
-import { Chunk, chunkSize } from "./Chunk";
-import { GameState, checkWin, getPlayerScores, selectSquare } from "./GameState";
-import { IconConfig } from "./IconConfig";
-import { buttonAudio, flatten } from "./utils";
+import { chunkSize, Chunk } from "./Chunk";
 
 type BoardProps = {
 	gameState: GameState;
@@ -251,7 +251,9 @@ export class Board extends React.Component<BoardProps, BoardState> {
 					id="player-bar"
 					style={{
 						background: win
-							? iconConfig.playerColors[flatten(isLimited ? playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i : turn - 1, players.length)]
+							? iconConfig.playerColors[
+									flatten(isLimited ? playerScores.map((e, i) => ({ e, i })).sort((a, b) => b.e - a.e)[0].i : turn - 1, players.length)
+							  ]
 							: iconConfig.playerColors[turn],
 					}}
 				/>

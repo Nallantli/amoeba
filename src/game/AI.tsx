@@ -1,4 +1,4 @@
-import { GameState } from "./GameState";
+import { GameState } from "../GameState";
 
 export class AI {
 	winLength: number;

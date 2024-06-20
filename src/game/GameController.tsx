@@ -1,8 +1,8 @@
-import { MultiplayerState } from "./MultiplayerState";
+import { MultiplayerState } from "../MultiplayerState";
 import { Board } from "./Board";
-import { GameProps } from "./GameProps";
-import { GameState } from "./GameState";
-import { IconConfig } from "./IconConfig";
+import { GameProps } from "../GameProps";
+import { GameState } from "../GameState";
+import { IconConfig } from "../IconConfig";
 
 interface GameControllerProps {
 	socket?: WebSocket;

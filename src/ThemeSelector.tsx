@@ -4,7 +4,7 @@ import React from "react";
  * The theme components only imports it's theme CSS-file. These components are lazy
  * loaded, to enable "code splitting" (in order to avoid the themes being bundled together)
  */
-const DefaultTheme = React.lazy(() => import("./styles/App"));
+const DefaultTheme = React.lazy(() => import("./styles/Default"));
 const Win98Theme = React.lazy(() => import("./styles/Win98"));
 
 const ThemeSelector = (props: { theme: string; children: any }) => (

@@ -4,6 +4,20 @@
 	--tertiary-color: #080808;
 }
 
+@keyframes spaceFocusAnim {
+	0% {
+		outline-color: white;
+	}
+
+	50% {
+		outline-color: var(--primary-color);
+	}
+
+	100% {
+		outline-color: white;
+	}
+}
+
 body {
 	margin: 0;
 	padding: 0;
@@ -14,25 +28,36 @@ body {
 }
 
 * {
-	touch-action: none;
 	border-radius: 0;
-	-ms-touch-action: none;
+}
+
+#board {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: 0;
+	width: 0;
+	margin: 0;
+	padding: 0;
+	overflow: visible;
 }
 
 .space,
+.last-space,
 .win-square {
-	outline: 0.1rem solid var(--primary-color);
-	outline-offset: -0.1rem;
+	outline: 1px solid var(--primary-color);
+	outline-offset: -1px;
 	background-color: var(--secondary-color);
 	border: none;
 	padding: 0;
 	margin: 0;
-	transition: background-color 0.5s;
+	transition: background-color 0.1s;
 	z-index: 1;
 	border-radius: 0;
 }
 
-.space:hover {
+.space:hover,
+.last-space:hover {
 	background-color: var(--primary-color);
 }
 
@@ -43,6 +68,7 @@ body {
 }
 
 .space svg,
+.last-space svg,
 .win-square svg {
 	display: block;
 	padding: 10%;
@@ -66,17 +92,14 @@ body {
 	right: 0;
 	content: "";
 	z-index: -1;
-	box-shadow: var(--primary-color) 0.4rem 0.4rem, var(--primary-color) -0.4rem 0.4rem, var(--primary-color) 0.4rem -0.4rem, var(--primary-color) -0.4rem -0.4rem;
+	box-shadow: var(--primary-color) 5px 5px, var(--primary-color) -5px 5px, var(--primary-color) 5px -5px, var(--primary-color) -5px -5px;
 }
 
-.tablinks-active {
-	border: none;
-	background-color: #1f1f1f;
-	color: white;
+.last-space {
+	animation: spaceFocusAnim 3s infinite;
 }
 
-.tablinks-inactive {
-	border: none;
-	background-color: #c0c0c0;
-	color: black;
+.player-icon {
+	display: block;
+	padding: 5px;
 }

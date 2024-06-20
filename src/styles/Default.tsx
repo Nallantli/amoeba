@@ -1,5 +1,5 @@
 import React from "react";
-import "./App.css";
+import "./Default.css";
 
 const DefaultTheme = () => <React.Fragment></React.Fragment>;
 

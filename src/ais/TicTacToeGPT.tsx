@@ -1,6 +1,6 @@
-import { AI } from "../AI";
-import { GameState } from "../GameState";
 import OpenAI from "openai";
+import { GameState } from "../GameState";
+import { AI } from "../game/AI";
 
 const openai = new OpenAI({ apiKey: "use ur own", dangerouslyAllowBrowser: true });
 
